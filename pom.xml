@@ -20,6 +20,11 @@
             <artifactId>lombok</artifactId>
             <version>1.18.26</version>
         </dependency>
+        <dependency>
+            <groupId>fr.inria.gforge.spoon</groupId>
+            <artifactId>spoon-core</artifactId>
+            <version>10.4.0</version>
+        </dependency>
     </dependencies>
 
 </project>

@@ -4,9 +4,7 @@ package se.kth.log_Analyzer;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,16 +17,15 @@ public class MavenLogAnalyzer {
     }
 
 
-    public Set<MavenErrorLog> analyzeCompilationErrors() throws IOException {
+    public MavenErrorLog analyzeCompilationErrors() throws IOException {
 
         return extractLineNumbersWithPaths(logFile.getAbsolutePath());
     }
 
 
-    private Set<MavenErrorLog> extractLineNumbersWithPaths(String logFilePath) throws IOException {
-        Map<String, Map<Integer, String>> lineNumbersWithPaths = new HashMap<>();
-        Set<MavenErrorLog> mavenErrorLogs = new HashSet<>();
+    private MavenErrorLog extractLineNumbersWithPaths(String logFilePath) throws IOException {
 
+        MavenErrorLog mavenErrorLogs = new MavenErrorLog();
 
         try {
             FileInputStream fileInputStream = new FileInputStream(logFilePath);
@@ -48,11 +45,10 @@ public class MavenLogAnalyzer {
                     lines.put(lineNumber, line);
                     if (pathMatcher.find()) {
                         currentPath = pathMatcher.group();
-                        if (currentPath != null) {
-                            lineNumbersWithPaths.put(currentPath, lines);
-                            MavenErrorLog errorLog = new MavenErrorLog(Integer.parseInt(matcher.group(1)), currentPath, line);
-                            mavenErrorLogs.add(errorLog);
-                        }
+
+                    }
+                    if (currentPath != null) {
+                        mavenErrorLogs.addErrorInfo(currentPath, new MavenErrorLog.ErrorInfo(String.valueOf(lineNumber), currentPath, line));
                     }
                 }
             }

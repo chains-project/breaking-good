@@ -1,44 +1,65 @@
 package se.kth.log_Analyzer;
 
-import java.util.Objects;
+import java.util.*;
 
-public record MavenErrorLog(
-        int clientLinePosition,
-        String clientFilePath,
-        String errorMessage
-) {
+@lombok.Getter
+@lombok.Setter
+public class MavenErrorLog {
+
+    Map<String, Set<ErrorInfo>> errorInfo;
 
 
-    @Override
-    public String toString() {
-        return """
-                Error at line %d in file %s:
-                    %s
-                """.formatted(
-                clientLinePosition,
-                clientFilePath,
-                errorMessage
-        );
+    public MavenErrorLog() {
+        this.errorInfo = new HashMap<>();
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(clientLinePosition, clientFilePath, errorMessage);
+    public void addErrorInfo(String currentPath, ErrorInfo errorInfo) {
+        if (this.errorInfo.containsKey(currentPath)) {
+            for (ErrorInfo error : this.errorInfo.get(currentPath)) {
+                if (error.clientLinePosition.equals(errorInfo.clientLinePosition)
+                        && error.clientFilePath.equals(errorInfo.clientFilePath)
+                        && error.errorMessage.equals(errorInfo.errorMessage)) {
+                    return;
+                }
+            }
+            this.errorInfo.get(currentPath).add(errorInfo);
+        } else {
+            Set<ErrorInfo> errors = this.errorInfo.computeIfAbsent(currentPath, k -> new HashSet<>());
+            errors.add(errorInfo);
+        }
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        MavenErrorLog other = (MavenErrorLog) obj;
-        return clientLinePosition == other.clientLinePosition
-                && clientFilePath.equals(other.clientFilePath)
-                && errorMessage.equals(other.errorMessage);
+    @lombok.Getter
+    @lombok.Setter
+    public static class ErrorInfo {
+
+        String clientLinePosition;
+        String clientFilePath;
+        String errorMessage;
+
+        public ErrorInfo(String clientLinePosition, String clientFilePath, String errorMessage) {
+            this.clientLinePosition = clientLinePosition;
+            this.clientFilePath = clientFilePath;
+            this.errorMessage = errorMessage;
+        }
+
+        @Override
+        public String toString() {
+            return "ErrorInfo{" + "clientLinePosition='" + clientLinePosition + '\'' + ", clientFilePath='" + clientFilePath + '\'' + ", errorMessage='" + errorMessage + '\'' + '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            ErrorInfo errorInfo = (ErrorInfo) o;
+
+            if (!Objects.equals(clientLinePosition, errorInfo.clientLinePosition))
+                return false;
+            if (!Objects.equals(clientFilePath, errorInfo.clientFilePath))
+                return false;
+            return Objects.equals(errorMessage, errorInfo.errorMessage);
+        }
     }
-
-
 }

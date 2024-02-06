@@ -44,27 +44,31 @@ public class SpoonAnalyzer {
             if (!e.isImplicit() && e.getPosition().isValidPosition() && isInvalidLine(e.getPosition().getLine())) {
                 SpoonResults spoonResults = new SpoonResults();
                 MavenErrorLog.ErrorInfo mavenErrorLog = getMavenErrorLog(e.getPosition().getLine());
-//
-//
+////
                 if (e instanceof CtInvocation<?>) {
-                    spoonResults.setElement(String.valueOf(((CtInvocation<?>) e).getExecutable()));
                     String parsedElement = parseProject(((CtInvocation<?>) e).getExecutable(), depGrpId);
                     if (parsedElement != null) {
+                        spoonResults.setElement(String.valueOf(((CtInvocation<?>) e).getExecutable()));
                         spoonResults.setName(parsedElement);
                         spoonResults.setLine(mavenErrorLog.getClientLinePosition());
                         spoonResults.setPattern(replacePatterns(mavenErrorLog.getErrorMessage()));
+                        spoonResults.setErrorInfo(mavenErrorLog);
+                        results.add(spoonResults);
+
                     }
                 }
                 if (e instanceof CtConstructorCall<?>) {
-                    spoonResults.setElement(String.valueOf(((CtConstructorCall<?>) e).getExecutable()));
                     String parsedElement = parseProject(((CtConstructorCall<?>) e).getExecutable(), depGrpId);
                     if (parsedElement != null) {
+                        spoonResults.setElement(String.valueOf(((CtConstructorCall<?>) e).getExecutable()));
                         spoonResults.setName(parsedElement);
                         spoonResults.setLine(mavenErrorLog.getClientLinePosition());
                         spoonResults.setPattern(replacePatterns(mavenErrorLog.getErrorMessage()));
+                        spoonResults.setErrorInfo(mavenErrorLog);
+                        results.add(spoonResults);
+
                     }
                 }
-                results.add(spoonResults);
             }
         }
         return results;

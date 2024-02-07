@@ -39,8 +39,9 @@ public class SpoonAnalyzer {
         CtType<?> clazz = model.getAllTypes().iterator().next();
         List<SpoonResults> results = new ArrayList<>();
 
-
+        clazz.getElements(new TypeFilter<>(CtElement.class));
         for (CtElement e : clazz.getElements(new TypeFilter<>(CtElement.class))) {
+
             if (!e.isImplicit() && e.getPosition().isValidPosition() && isInvalidLine(e.getPosition().getLine())) {
                 SpoonResults spoonResults = new SpoonResults();
                 MavenErrorLog.ErrorInfo mavenErrorLog = getMavenErrorLog(e.getPosition().getLine());
@@ -50,7 +51,7 @@ public class SpoonAnalyzer {
                     if (parsedElement != null) {
                         spoonResults.setElement(String.valueOf(((CtInvocation<?>) e).getExecutable()));
                         spoonResults.setName(parsedElement);
-                        spoonResults.setLine(mavenErrorLog.getClientLinePosition());
+                        spoonResults.setClientLine(e.toString());
                         spoonResults.setPattern(replacePatterns(mavenErrorLog.getErrorMessage()));
                         spoonResults.setErrorInfo(mavenErrorLog);
                         results.add(spoonResults);
@@ -62,7 +63,7 @@ public class SpoonAnalyzer {
                     if (parsedElement != null) {
                         spoonResults.setElement(String.valueOf(((CtConstructorCall<?>) e).getExecutable()));
                         spoonResults.setName(parsedElement);
-                        spoonResults.setLine(mavenErrorLog.getClientLinePosition());
+                        spoonResults.setClientLine(e.toString());
                         spoonResults.setPattern(replacePatterns(mavenErrorLog.getErrorMessage()));
                         spoonResults.setErrorInfo(mavenErrorLog);
                         results.add(spoonResults);

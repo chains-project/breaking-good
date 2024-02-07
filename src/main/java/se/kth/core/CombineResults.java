@@ -36,7 +36,7 @@ public class CombineResults {
 
     }
 
-    public Set<BreakingChange> analyze() throws IOException {
+    public Changes analyze() throws IOException {
         MavenErrorLog log = mavenLog.analyzeCompilationErrors();
         Set<BreakingChange> change = new HashSet<>();
 
@@ -48,16 +48,20 @@ public class CombineResults {
 
         });
 
-        return change;
+        return new Changes("1.0.0", "1.0.1", change);
     }
 
     public void findBreakingChanges(List<SpoonResults> spoonResults, Set<BreakingChange> change) {
         spoonResults.forEach(spoonResult -> {
             apiChanges.forEach(apiChange -> {
                 if (apiChange.getName().equals(spoonResult.getName())) {
-                    change.add(new BreakingChange(apiChange, spoonResult.getErrorInfo()));
+
+                    change.add(new BreakingChange(apiChange, spoonResult));
                 }
             });
         });
     }
+
+
 }
+

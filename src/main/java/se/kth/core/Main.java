@@ -2,6 +2,8 @@ package se.kth.core;
 
 import se.kth.breaking_changes.ApiChange;
 import se.kth.breaking_changes.JApiCmpAnalyze;
+import se.kth.explaining.CompilationErrorTemplate;
+import se.kth.explaining.ExplanationTemplate;
 import se.kth.log_Analyzer.MavenLogAnalyzer;
 
 import java.io.File;
@@ -29,9 +31,15 @@ public class Main {
         combineResults.setMavenLog(new MavenLogAnalyzer(new File("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/0abf7148300f40a1da0538ab060552bca4a2f1d8.log")));
 
         try {
-            Set<BreakingChange> changes =   combineResults.analyze();
+            Changes changes = combineResults.analyze();
 
-            changes.forEach(System.out::println);
+
+
+            changes.changes().forEach(change -> {
+                ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, change);
+                explanationTemplate.generateTemplate();
+            }
+            );
 
 
         } catch (IOException e) {

@@ -36,16 +36,23 @@ public class MavenErrorLog {
         String clientLinePosition;
         String clientFilePath;
         String errorMessage;
+        String clientLineContent;
 
         public ErrorInfo(String clientLinePosition, String clientFilePath, String errorMessage) {
             this.clientLinePosition = clientLinePosition;
             this.clientFilePath = clientFilePath;
             this.errorMessage = errorMessage;
+            this.clientLineContent = "";
         }
 
         @Override
         public String toString() {
-            return "ErrorInfo{" + "clientLinePosition='" + clientLinePosition + '\'' + ", clientFilePath='" + clientFilePath + '\'' + ", errorMessage='" + errorMessage + '\'' + '}';
+            return "ErrorInfo{" +
+                    "clientLinePosition='" + clientLinePosition + '\'' +
+                    ", clientFilePath='" + clientFilePath + '\'' +
+                    ", errorMessage='" + errorMessage + '\'' +
+                    ", clientLineContent='" + clientLineContent + '\'' +
+                    '}';
         }
 
         @Override

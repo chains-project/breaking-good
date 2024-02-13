@@ -1,19 +1,19 @@
 package se.kth.core;
 
 import se.kth.breaking_changes.ApiChange;
-import se.kth.log_Analyzer.MavenErrorLog;
+import se.kth.spoon_compare.SpoonResults;
 
 @lombok.Setter
 @lombok.Getter
 public class BreakingChange {
 
-    public BreakingChange(ApiChange apiChanges, MavenErrorLog.ErrorInfo errorInfo) {
+    public BreakingChange(ApiChange apiChanges, SpoonResults errorInfo) {
         this.apiChanges = apiChanges;
         this.errorInfo = errorInfo;
     }
 
     ApiChange apiChanges;
-    MavenErrorLog.ErrorInfo errorInfo;
+    SpoonResults errorInfo;
 
     public BreakingChange() {
     }

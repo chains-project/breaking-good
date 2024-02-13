@@ -9,7 +9,6 @@ import japicmp.exception.JApiCmpException;
 import japicmp.model.AccessModifier;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
-import japicmp.model.JApiCompatibilityChange;
 import japicmp.output.OutputFilter;
 import japicmp.output.semver.SemverOut;
 import japicmp.output.xml.XmlOutput;
@@ -83,7 +82,7 @@ public class JApiCmpAnalyze {
 
             //read incompatible changes
             jApiClass.getCompatibilityChanges().forEach(jApiCompatibilityChange -> {
-                Collection<JApiCompatibilityChange> changes = jApiClass.getCompatibilityChanges();
+
                 //go for each change
                 jApiClasses.iterator().forEachRemaining(jApiClass1 -> {
                     //get methods
@@ -93,7 +92,9 @@ public class JApiCmpAnalyze {
                                     jApiMethod.getOldMethod().isPresent() ? jApiMethod.getOldMethod().get().getName() : "null",
                                     jApiMethod.getNewMethod().isPresent() ? jApiMethod.getNewMethod().get().getName() : "null",
                                     jApiMethod.getCompatibilityChanges().toString(),
-                                    jApiMethod.getName()
+                                    jApiMethod.getName(),
+                                    new ApiMetadata(newJar.toFile().getName(), newJar.getFileName().getFileName()),
+                                    new ApiMetadata(oldJar.toFile().getName(), oldJar.getFileName().getFileName())
                             ));
                         }
                     });

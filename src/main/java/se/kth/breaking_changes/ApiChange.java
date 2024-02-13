@@ -16,12 +16,25 @@ public class ApiChange {
 
     private String name;
 
+    private ApiMetadata newVersion;
+
+    private ApiMetadata oldVersion;
+
     public ApiChange(String oldElement, String newElement, String category, String name) {
         this.oldElement = oldElement;
         this.newElement = newElement;
         this.category = category;
         this.name = name;
 
+    }
+
+    public ApiChange(String oldElement, String newElement, String category, String name, ApiMetadata newVersion, ApiMetadata oldVersion) {
+        this.oldElement = oldElement;
+        this.newElement = newElement;
+        this.category = category;
+        this.name = name;
+        this.newVersion = newVersion;
+        this.oldVersion = oldVersion;
     }
 
     public ApiChange() {

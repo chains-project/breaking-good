@@ -1,6 +1,7 @@
 package se.kth;
 
 
+import picocli.CommandLine;
 import se.kth.breaking_changes.ApiChange;
 import se.kth.breaking_changes.JApiCmpAnalyze;
 import se.kth.core.Changes;
@@ -16,39 +17,78 @@ import java.util.Set;
 
 public class Main {
     public static void main(String[] args) {
-
-        JApiCmpAnalyze jApiCmpAnalyze = new JApiCmpAnalyze(
-//                Path.of("/Users/frank/Documents/Work/PHD/Tools/bump_experiments/jars/0abf7148300f40a1da0538ab060552bca4a2f1d8/jasperreports-6.18.1.jar"),
-//                Path.of("/Users/frank/Documents/Work/PHD/Tools/bump_experiments/jars/0abf7148300f40a1da0538ab060552bca4a2f1d8/jasperreports-6.18.1.jar"),
-                Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/examples/org.kohsuke.github-api.1.93.jar"),
-                Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/examples/org.kohsuke.github-api.1.313.jar")
-        );
-
-        Set<ApiChange> apiChanges = jApiCmpAnalyze.useJApiCmp();
-
-        CombineResults combineResults = new CombineResults(apiChanges);
-
-        combineResults.setDependencyGroupID("org.kohsuke");
-
-        combineResults.setProject("/Users/frank/Documents/Work/PHD/Tools");
-
-        combineResults.setMavenLog(new MavenLogAnalyzer(new File("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/5769bdad76925da568294cb8a40e7d4469699ac3.log")));
-
-        try {
-            Changes changes = combineResults.analyze();
-
-
-
-            changes.changes().forEach(change -> {
-                        ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, change);
-                        explanationTemplate.generateTemplate();
-                    }
-            );
-
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
+        int exitCode = new CommandLine(new Explaining()).execute(args);
+        System.exit(exitCode);
     }
+
+    @CommandLine.Command(name = "explaining", mixinStandardHelpOptions = true, version = "0.1")
+    private static class Explaining implements Runnable {
+
+        @CommandLine.Option(
+                names = {"-c", "--client"},
+                paramLabel = "Client project",
+                description = "A client project to analyze.",
+                required = true
+        )
+        Path client;
+
+        @CommandLine.Option(
+                names = {"-o", "--old-dependency"},
+                paramLabel = "Old dependency",
+                description = "The old dependency to analyze.",
+                required = true
+        )
+        Path oldDependency;
+
+        @CommandLine.Option(
+                names = {"-n", "--new-dependency"},
+                paramLabel = "New dependency",
+                description = "The new dependency to analyze.",
+                required = true
+        )
+        Path newDependency;
+
+        @CommandLine.Option(
+                names = {"-l", "--log"},
+                paramLabel = "Maven log",
+                description = "The maven log to analyze.",
+                required = false
+        )
+        File mavenLog;
+
+        @CommandLine.Option(
+                names = {"-g", "--group-id"},
+                paramLabel = "Dependency group ID",
+                description = "The group ID of the dependency to analyze.",
+                required = false
+        )
+        String dependencyGroupID;
+
+        @Override
+        public void run() {
+            JApiCmpAnalyze jApiCmpAnalyze = new JApiCmpAnalyze(
+                    oldDependency,
+                    newDependency);
+
+            Set<ApiChange> apiChanges = jApiCmpAnalyze.useJApiCmp();
+
+            CombineResults combineResults = new CombineResults(apiChanges);
+            combineResults.setDependencyGroupID(dependencyGroupID);
+            combineResults.setProject(client.toString());
+            combineResults.setMavenLog(new MavenLogAnalyzer(mavenLog));
+
+            try {
+                Changes changes = combineResults.analyze();
+                changes.changes().forEach(change -> {
+                            ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, change);
+                            explanationTemplate.generateTemplate();
+                        }
+                );
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+
 }

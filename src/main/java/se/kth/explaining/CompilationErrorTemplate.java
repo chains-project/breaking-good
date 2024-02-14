@@ -19,7 +19,7 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
 
     @Override
     public String clientError() {
-        return ("2. An error was detected in line %s which is making use of an outdated API.\n " +
+        return ("3. An error was detected in line %s which is making use of an outdated API.\n " +
                 "``` java\n %s   %s;\n ```").formatted(breakingChange.getErrorInfo().getErrorInfo().getClientLinePosition(),
                 breakingChange.getErrorInfo().getErrorInfo().getClientLinePosition(), breakingChange.getErrorInfo().getClientLine());
 
@@ -27,18 +27,13 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
 
     @Override
     public String logLine() {
-        String a = "3. Logs provide additional information\n" +
-                "\n" +
-                ">[ERROR] /biapi/src/main/java/xdev/tableexport/export/ReportBuilder.java:[369,81] incompatible types: int cannot be converted to java.lang.Float.\n";
-        return ("3. You can find more information in the logs\n " +
+         return ("2. The failure is identified from the logs generated in the build process\n " +
                 "\n" +
                 ">%s.").formatted(breakingChange.getErrorInfo().getErrorInfo().getErrorMessage());
     }
 
     @Override
     public String type() {
-
-
         return "1. Your client utilizes the instruction **%s** which has been modified in the new version of the dependency."
                 .formatted(breakingChange.getApiChanges().getOldElement());
     }

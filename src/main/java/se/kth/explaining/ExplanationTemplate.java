@@ -29,14 +29,14 @@ public abstract class ExplanationTemplate {
     public void generateTemplate() {
         FileWriter markdownFile = null;
         try {
-            markdownFile = new FileWriter("README" + new Date().getTime() + ".md");
+            markdownFile = new FileWriter("Explanation_" + new Date().getTime() + ".md");
             markdownFile.write(getHead());
             markdownFile.write("\n");
             markdownFile.write(type());
             markdownFile.write("\n");
-            markdownFile.write(clientError());
-            markdownFile.write("\n");
             markdownFile.write(logLine());
+            markdownFile.write("\n");
+            markdownFile.write(clientError());
             markdownFile.write("\n");
             markdownFile.close(); //
         } catch (IOException e) {

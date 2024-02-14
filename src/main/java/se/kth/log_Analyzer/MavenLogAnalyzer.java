@@ -58,9 +58,4 @@ public class MavenLogAnalyzer {
         }
         return mavenErrorLogs;
     }
-
-    public record ErrorLine(String name, String line, String pattern) {
-
-    }
-
 }

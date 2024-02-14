@@ -19,6 +19,15 @@ import java.util.Set;
 
 public class Main {
 
+
+    public static void main(String[] args) {
+        List<BreakingUpdateMetadata> list = getBreakingCommit(Path.of("examples/BENCHMARK"));
+
+        List<BreakingUpdateMetadata> compilationErrors = list.stream().filter(b -> b.failureCategory().equals("COMPILATION_FAILURE")).toList();
+
+        generateTemplate(compilationErrors);
+    }
+
     public static List<BreakingUpdateMetadata> getBreakingCommit(Path benchmarkDir) {
 
         File[] breakingUpdates = benchmarkDir.toFile().listFiles();
@@ -38,26 +47,17 @@ public class Main {
         return breakingUpdateList;
     }
 
-    public static void main(String[] args) {
-        List<BreakingUpdateMetadata> list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/chains-project/paper/bump/data/benchmark"));
-
-        List<BreakingUpdateMetadata> compilationErrors = list.stream().filter(b -> b.failureCategory().equals("COMPILATION_FAILURE")).toList();
-
-        generateTemplate(compilationErrors);
-    }
-
-    public boolean downloadJar() {
-
-
-        return true;
-    }
 
     public static void generateTemplate(List<BreakingUpdateMetadata> breakingUpdateList) {
 
         Path jars = Path.of("/Users/frank/Documents/Work/PHD/Tools/bump_experiments/jars");
+        DockerImages dockerImages = new DockerImages();
 
 
         for (BreakingUpdateMetadata breakingUpdate : breakingUpdateList) {
+
+            dockerImages.getProject(breakingUpdate);
+
 
             try {
                 JApiCmpAnalyze jApiCmpAnalyze = new JApiCmpAnalyze(
@@ -68,11 +68,11 @@ public class Main {
 
                 CombineResults combineResults = new CombineResults(apiChanges);
 //
-                combineResults.setDependencyGroupID("net.datafaker");
+                combineResults.setDependencyGroupID(breakingUpdate.updatedDependency().dependencyGroupID());
 
-                combineResults.setProject("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/examples");
+                combineResults.setProject("projects/%s".formatted(breakingUpdate.breakingCommit()));
 
-                combineResults.setMavenLog(new MavenLogAnalyzer(new File("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/examples/1ef97ea6c5b6e34151fe6167001b69e003449f95.log")));
+                combineResults.setMavenLog(new MavenLogAnalyzer(new File("projects/%s/%s/%s.log".formatted(breakingUpdate.breakingCommit(), breakingUpdate.project(), breakingUpdate.breakingCommit()))));
 
                 try {
                     Changes changes = combineResults.analyze();
@@ -93,35 +93,5 @@ public class Main {
                 System.out.println(e.getMessage());
             }
         }
-
-//        JApiCmpAnalyze jApiCmpAnalyze = new JApiCmpAnalyze(
-//                Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/examples/datafaker-1.3.0.jar"),
-//                Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/examples/datafaker-1.4.0.jar")
-//        );
-//
-//        Set<ApiChange> apiChanges = jApiCmpAnalyze.useJApiCmp();
-//
-//        CombineResults combineResults = new CombineResults(apiChanges);
-//
-//        combineResults.setDependencyGroupID("net.datafaker");
-//
-//        combineResults.setProject("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/examples");
-//
-//        combineResults.setMavenLog(new MavenLogAnalyzer(new File("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/examples/1ef97ea6c5b6e34151fe6167001b69e003449f95.log")));
-//
-//        try {
-//            Changes changes = combineResults.analyze();
-//
-//
-//            changes.changes().forEach(change -> {
-//                        ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, change);
-//                        explanationTemplate.generateTemplate();
-//                    }
-//            );
-//
-//
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
     }
 }

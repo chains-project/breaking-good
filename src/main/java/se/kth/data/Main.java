@@ -50,6 +50,8 @@ public class Main {
 
     public static void generateTemplate(List<BreakingUpdateMetadata> breakingUpdateList) {
 
+        String githubURL = "https://github.com/knaufk/flink-faker/blob/1ef97ea6c5b6e34151fe6167001b69e003449f95/src/main/java/com/github/knaufk/flink/faker/DateTime.java#L44";
+
         Path jars = Path.of("/Users/frank/Documents/Work/PHD/Tools/bump_experiments/jars");
         DockerImages dockerImages = new DockerImages();
 
@@ -72,7 +74,8 @@ public class Main {
 
                 combineResults.setProject("projects/%s".formatted(breakingUpdate.breakingCommit()));
 
-                combineResults.setMavenLog(new MavenLogAnalyzer(new File("projects/%s/%s/%s.log".formatted(breakingUpdate.breakingCommit(), breakingUpdate.project(), breakingUpdate.breakingCommit()))));
+                combineResults.setMavenLog(new MavenLogAnalyzer(
+                        new File("projects/%s/%s/%s.log".formatted(breakingUpdate.breakingCommit(), breakingUpdate.project(), breakingUpdate.breakingCommit()))));
 
                 try {
                     Changes changes = combineResults.analyze();

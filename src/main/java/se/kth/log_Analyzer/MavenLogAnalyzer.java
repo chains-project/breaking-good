@@ -12,10 +12,16 @@ public class MavenLogAnalyzer {
 
     private final File logFile;
 
+    private String projectURL;
+
     public MavenLogAnalyzer(File logFile) {
         this.logFile = logFile;
     }
 
+    public MavenLogAnalyzer(File logFile, String projectURL) {
+        this.logFile = logFile;
+        this.projectURL = projectURL;
+    }
 
     public MavenErrorLog analyzeCompilationErrors() throws IOException {
 

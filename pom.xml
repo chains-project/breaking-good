@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>se.kth</groupId>
-    <artifactId>e-BDU</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>breaking-good</artifactId>
+    <version>1.0</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

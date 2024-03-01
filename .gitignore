@@ -38,3 +38,10 @@ build/
 .DS_Store
 /projects/
 /examples/
+
+/src/main/java/se/kth/breaking_changes/Main.java
+/src/main/java/se/kth/core/Main.java
+/src/main/java/se/kth/data
+/src/main/java/se/kth/explaining/Main.java
+/src/main/java/se/kth/log_Analyzer/Main.java
+/src/main/java/se/kth/spoon_compare/Main.java

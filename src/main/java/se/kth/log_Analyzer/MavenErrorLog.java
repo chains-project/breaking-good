@@ -38,12 +38,16 @@ public class MavenErrorLog {
         String errorMessage;
         String clientLineContent;
         String clientGithubLink;
+        int errorLinePositionInFile;
+        String errorLogGithubLink;
 
-        public ErrorInfo(String clientLinePosition, String clientFilePath, String errorMessage) {
+        public ErrorInfo(String clientLinePosition, String clientFilePath, String errorMessage, int errorLinePositionInFile) {
             this.clientLinePosition = clientLinePosition;
             this.clientFilePath = clientFilePath;
             this.errorMessage = errorMessage;
             this.clientLineContent = "";
+            this.errorLinePositionInFile = errorLinePositionInFile;
+
         }
 
         public ErrorInfo(String clientLinePosition, String clientFilePath, String errorMessage, String clientLineContent) {
@@ -53,12 +57,13 @@ public class MavenErrorLog {
             this.clientLineContent = clientLineContent;
         }
 
-        public ErrorInfo(String clientLinePosition, String clientFilePath, String errorMessage, String clientLineContent, String clientGithubLink) {
+        public ErrorInfo(String clientLinePosition, String clientFilePath, String errorMessage, String clientLineContent, String clientGithubLink, int errorLinePositionInFile) {
             this.clientLinePosition = clientLinePosition;
             this.clientFilePath = clientFilePath;
             this.errorMessage = errorMessage;
             this.clientLineContent = clientLineContent;
             this.clientGithubLink = clientGithubLink;
+            this.errorLinePositionInFile = errorLinePositionInFile;
         }
 
         @Override

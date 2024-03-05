@@ -29,7 +29,7 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
     public String logLine() {
          return ("2. The failure is identified from the logs generated in the build process\n " +
                 "\n" +
-                ">%s.").formatted(breakingChange.getErrorInfo().getErrorInfo().getErrorMessage());
+                ">[%s](%s)").formatted(breakingChange.getErrorInfo().getErrorInfo().getErrorMessage(), breakingChange.getErrorInfo().getErrorInfo().getErrorLogGithubLink());
     }
 
     @Override

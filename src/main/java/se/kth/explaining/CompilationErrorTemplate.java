@@ -63,20 +63,8 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
 
                 String category = translateCategory(changes.getApiChanges().getCategory());
 
-                String description = "      * <details>\n" +
-                        "        <summary>Instruction <b>%s</b> which has been <b>%s</b> in the new version of the dependency</summary>\n".formatted(changes.getApiChanges().getOldElement(), category) +
-                        "\n" +
-                        "        ### Heading\n" +
-                        "        1. Foo\n" +
-                        "        2. Bar\n" +
-                        "            * Baz\n" +
-                        "            * Qux\n" +
-                        "      </details>\n" +
-                        "      ";
-
-
                 String singleChange = "   * <details>\n" +
-                        "        <summary>Instruction <b>%s</b> which has been <b>%s</b> in the new version of the dependency</summary>\n".formatted(changes.getApiChanges().getOldElement(), category) +
+                        "        <summary>Instruction <b>%s</b> which has been <b>%s</b> in the new version of the dependency</summary>\n".formatted(changes.getErrorInfo().getElement(), category) +
                         "            \n" +
                         "        * <details>\n" +
                         "          <summary>The failure is identified from the logs generated in the build process. </summary>\n" +

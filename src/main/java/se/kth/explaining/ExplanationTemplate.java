@@ -40,7 +40,7 @@ public abstract class ExplanationTemplate {
 
         FileWriter markdownFile = null;
         try {
-            markdownFile = new FileWriter("Explanation_%s.md".formatted(fileName));
+            markdownFile = new FileWriter(fileName);
             markdownFile.write(getHead());
             markdownFile.write("\n");
             markdownFile.write(brokenElement());

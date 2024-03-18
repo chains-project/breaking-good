@@ -6,12 +6,14 @@ import se.kth.core.Changes;
 public class CompilationErrorTemplate extends ExplanationTemplate {
 
 
-    public CompilationErrorTemplate(Changes changes, BreakingChange breakingChange) {
-        super(changes, breakingChange);
+    public CompilationErrorTemplate(Changes changes, String fileName) {
+        super(changes, fileName);
     }
 
     @Override
     public String getHead() {
+
+        BreakingChange breakingChange = changes.changes().iterator().next();
 
         return "CI detected that the dependency upgrade from version **%s** to **%s** has failed. Here are details to help you understand and fix the problem:"
                 .formatted(breakingChange.getApiChanges().getOldVersion().getName(), breakingChange.getApiChanges().getNewVersion().getName());
@@ -19,23 +21,84 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
 
     @Override
     public String clientError() {
-        return ("3. An error was detected in line %s which is making use of an outdated API.\n " +
-                "``` java\n %s   %s;\n ```").formatted(breakingChange.getErrorInfo().getErrorInfo().getClientLinePosition(),
-                breakingChange.getErrorInfo().getErrorInfo().getClientLinePosition(), breakingChange.getErrorInfo().getClientLine());
+        return "";
+//        return ("3. An error was detected in line %s which is making use of an outdated API.\n " +
+//                "``` java\n %s   %s;\n ```").formatted(breakingChange.getErrorInfo().getErrorInfo().getClientLinePosition(),
+//                breakingChange.getErrorInfo().getErrorInfo().getClientLinePosition(), breakingChange.getErrorInfo().getClientLine());
 
+    }
+
+    public String clientErrorLine(BreakingChange breakingChange) {
+        return "            *   An error was detected in line %s which is making use of an outdated API.\n".formatted(breakingChange.getErrorInfo().getErrorInfo().getClientLinePosition()) +
+                "             ``` java\n" +
+                "             %s   %s;\n".formatted(breakingChange.getErrorInfo().getErrorInfo().getClientLinePosition(), breakingChange.getErrorInfo().getClientLine()) +
+                "            ```\n";
     }
 
     @Override
     public String logLine() {
-         return ("2. The failure is identified from the logs generated in the build process\n " +
-                "\n" +
-                ">[%s](%s)").formatted(breakingChange.getErrorInfo().getErrorInfo().getErrorMessage(), breakingChange.getErrorInfo().getErrorInfo().getErrorLogGithubLink());
+        return "";
     }
 
+
+    public String logLineew(BreakingChange breakingChange) {
+        return "            *   >[%s](%s)\n".formatted(breakingChange.getErrorInfo().getErrorInfo().getErrorMessage(), breakingChange.getErrorInfo().getErrorInfo().getErrorLogGithubLink());
+    }
+
+
     @Override
-    public String type() {
-        return "1. Your client utilizes the instruction **%s** which has been modified in the new version of the dependency."
-                .formatted(breakingChange.getApiChanges().getOldElement());
+    public String brokenElement() {
+
+//        String message = "1. Your client utilizes the instruction **%s** which has been modified in the new version of the dependency."
+//                .formatted(breakingChange.getApiChanges().getOldElement());
+
+        String message = "";
+        // if there are more than one changes
+        if (!changes.changes().isEmpty()) {
+            String firstLine = "1. Your client utilizes **%d** instructions which has been modified in the new version of the dependency."
+                    .formatted(changes.changes().size());
+
+            String text = "";
+            for (BreakingChange changes : changes.changes()) {
+
+                String category = translateCategory(changes.getApiChanges().getCategory());
+
+                String description = "      * <details>\n" +
+                        "        <summary>Instruction <b>%s</b> which has been <b>%s</b> in the new version of the dependency</summary>\n".formatted(changes.getApiChanges().getOldElement(), category) +
+                        "\n" +
+                        "        ### Heading\n" +
+                        "        1. Foo\n" +
+                        "        2. Bar\n" +
+                        "            * Baz\n" +
+                        "            * Qux\n" +
+                        "      </details>\n" +
+                        "      ";
+
+
+                String singleChange = "   * <details>\n" +
+                        "        <summary>Instruction <b>%s</b> which has been <b>%s</b> in the new version of the dependency</summary>\n".formatted(changes.getApiChanges().getOldElement(), category) +
+                        "            \n" +
+                        "        * <details>\n" +
+                        "          <summary>The failure is identified from the logs generated in the build process. </summary>\n" +
+                        "          \n" +
+                        logLineew(changes) +
+                        clientErrorLine(changes) +
+                        "\n" +
+                        "          </details>\n" +
+                        "            \n" +
+                        "     </details>\n";
+
+                text = text.concat(singleChange);
+
+            }
+
+
+            message = firstLine + "\n" + text;
+
+
+        }
+
+        return message;
     }
 
 

@@ -25,7 +25,7 @@ public class ApiMetadata {
 
     private static final Map<String, String> repositoryUrls = Map.of(
             "mavenCentral", "https://repo1.maven.org/maven2/",
-            "jenkins","https://repo.jenkins-ci.org/artifactory/releases/"
+            "jenkins", "https://repo.jenkins-ci.org/artifactory/releases/"
     );
 
 
@@ -48,9 +48,6 @@ public class ApiMetadata {
      * @return true if the download was successful, false otherwise
      */
     public static boolean download(String groupId, String artifactId, String version) {
-
-
-
         /*
          * Maven repository link for the previous version of the dependency
          */

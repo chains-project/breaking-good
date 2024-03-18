@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
+@lombok.Setter
+@lombok.Getter
 public class JApiCmpAnalyze {
     private static final Logger log = LoggerFactory.getLogger(JApiCmpAnalyze.class);
 

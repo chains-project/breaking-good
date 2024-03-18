@@ -21,7 +21,7 @@ public class Main {
 
 
     public static void main(String[] args) {
-        List<BreakingUpdateMetadata> list = getBreakingCommit(Path.of("examples/BENCHMARK"));
+        List<BreakingUpdateMetadata> list = getBreakingCommit(Path.of("examples/Benchmark"));
 
         List<BreakingUpdateMetadata> compilationErrors = list.stream().filter(b -> b.failureCategory().equals("COMPILATION_FAILURE")).toList();
 
@@ -66,6 +66,9 @@ public class Main {
                         jars.resolve("%s/%s-%s.jar".formatted(breakingUpdate.breakingCommit(), breakingUpdate.updatedDependency().dependencyArtifactID(), breakingUpdate.updatedDependency().previousVersion())),
                         jars.resolve("%s/%s-%s.jar".formatted(breakingUpdate.breakingCommit(), breakingUpdate.updatedDependency().dependencyArtifactID(), breakingUpdate.updatedDependency().newVersion()))
                 );
+
+                System.out.println(jApiCmpAnalyze);
+
                 Set<ApiChange> apiChanges = jApiCmpAnalyze.useJApiCmp();
 
                 CombineResults combineResults = new CombineResults(apiChanges);
@@ -81,13 +84,9 @@ public class Main {
                     Changes changes = combineResults.analyze();
 
 
-                    changes.changes().forEach(change -> {
-                                ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, change);
-                                explanationTemplate.generateTemplate();
-                            }
-                    );
-
-
+                    System.out.println("Changes: " + changes.changes().size());
+                    ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, breakingUpdate.breakingCommit());
+                    explanationTemplate.generateTemplate();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

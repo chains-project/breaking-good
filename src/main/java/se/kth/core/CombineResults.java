@@ -44,10 +44,9 @@ public class CombineResults {
         log.getErrorInfo().forEach((k, v) -> {
             SpoonAnalyzer spoonAnalyzer = new SpoonAnalyzer(dependencyGroupID, v);
             List<SpoonResults> results = spoonAnalyzer.applySpoon(project + k);
+            System.out.println(results.size());
             findBreakingChanges(results, change);
-
         });
-
         return new Changes("1.0.0", "1.0.1", change);
     }
 
@@ -55,13 +54,17 @@ public class CombineResults {
         spoonResults.forEach(spoonResult -> {
             apiChanges.forEach(apiChange -> {
                 if (apiChange.getName().equals(spoonResult.getName())) {
-
-                    change.add(new BreakingChange(apiChange, spoonResult));
+                    for (BreakingChange breakingChange : change) {
+                        if (breakingChange.getApiChanges().getName().equals(apiChange.getName())) {
+                            breakingChange.getErrorInfo().add(spoonResult);
+                            return;
+                        }
+                    }
+                    BreakingChange breakingChange = new BreakingChange(apiChange);
+                    breakingChange.getErrorInfo().add(spoonResult);
+                    change.add(breakingChange);
                 }
             });
         });
     }
-
-
 }
-

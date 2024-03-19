@@ -2,6 +2,7 @@ package se.kth.explaining;
 
 import se.kth.core.BreakingChange;
 import se.kth.core.Changes;
+import se.kth.spoon_compare.SpoonResults;
 
 public class CompilationErrorTemplate extends ExplanationTemplate {
 
@@ -28,10 +29,10 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
 
     }
 
-    public String clientErrorLine(BreakingChange breakingChange) {
-        return "            *   An error was detected in line %s which is making use of an outdated API.\n".formatted(breakingChange.getErrorInfo().getErrorInfo().getClientLinePosition()) +
+    public String clientErrorLine(SpoonResults spoonResults) {
+        return "            *   An error was detected in line %s which is making use of an outdated API.\n".formatted(spoonResults.getErrorInfo().getClientLinePosition()) +
                 "             ``` java\n" +
-                "             %s   %s;\n".formatted(breakingChange.getErrorInfo().getErrorInfo().getClientLinePosition(), breakingChange.getErrorInfo().getClientLine()) +
+                "             %s   %s;\n".formatted(spoonResults.getErrorInfo().getClientLinePosition(), spoonResults.getClientLine()) +
                 "            ```\n";
     }
 
@@ -41,8 +42,17 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
     }
 
 
-    public String logLineew(BreakingChange breakingChange) {
-        return "            *   >[%s](%s)\n".formatted(breakingChange.getErrorInfo().getErrorInfo().getErrorMessage(), breakingChange.getErrorInfo().getErrorInfo().getErrorLogGithubLink());
+    public String logLineew(SpoonResults spoonResults) {
+        return "            *   >[%s](%s)\n".formatted(spoonResults.getErrorInfo().getErrorMessage(), spoonResults.getErrorInfo().getErrorLogGithubLink());
+    }
+
+    public String errorSection(BreakingChange breakingChange) {
+        StringBuilder message = new StringBuilder();
+        for (SpoonResults spoonResults : breakingChange.getErrorInfo()) {
+            message.append(logLineew(spoonResults)).append(clientErrorLine(spoonResults));
+        }
+
+        return message.toString();
     }
 
 
@@ -64,13 +74,12 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
                 String category = translateCategory(changes.getApiChanges().getCategory());
 
                 String singleChange = "   * <details>\n" +
-                        "        <summary>Instruction <b>%s</b> which has been <b>%s</b> in the new version of the dependency</summary>\n".formatted(changes.getErrorInfo().getElement(), category) +
+                        "        <summary>Instruction <b>%s</b> which has been <b>%s</b> in the new version of the dependency</summary>\n".formatted(changes.getErrorInfo().get(0).getElement(), category) +
                         "            \n" +
                         "        * <details>\n" +
                         "          <summary>The failure is identified from the logs generated in the build process. </summary>\n" +
                         "          \n" +
-                        logLineew(changes) +
-                        clientErrorLine(changes) +
+                        errorSection(changes) +
                         "\n" +
                         "          </details>\n" +
                         "            \n" +
@@ -79,13 +88,8 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
                 text = text.concat(singleChange);
 
             }
-
-
             message = firstLine + "\n" + text;
-
-
         }
-
         return message;
     }
 

@@ -23,7 +23,7 @@ public class Main {
     public static void main(String[] args) {
 //        List<BreakingUpdateMetadata> list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/chains-project/paper/bump/data/benchmark"));
 List<BreakingUpdateMetadata> list = getBreakingCommit(Path.of("examples/Benchmark"));
-
+//
         List<BreakingUpdateMetadata> compilationErrors = list.stream().filter(b -> b.failureCategory().equals("COMPILATION_FAILURE")).toList();
 
         generateTemplate(compilationErrors);

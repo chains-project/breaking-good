@@ -76,7 +76,7 @@
         <dependency>
             <groupId>com.github.siom79.japicmp</groupId>
             <artifactId>japicmp</artifactId>
-            <version>0.18.3</version>
+            <version>0.20.0</version>
         </dependency>
     </dependencies>
 

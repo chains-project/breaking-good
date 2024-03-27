@@ -5,7 +5,6 @@ import se.kth.spoon_compare.SpoonResults;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @lombok.Setter
 @lombok.Getter

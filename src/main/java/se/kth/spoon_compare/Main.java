@@ -12,7 +12,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        MavenLogAnalyzer mavenLog = new MavenLogAnalyzer(new File("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/0abf7148300f40a1da0538ab060552bca4a2f1d8.log"));
+        MavenLogAnalyzer mavenLog = new MavenLogAnalyzer(new File("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/0abf7148300f40a1da0538ab060552bca4a2f1d8/biapi/0abf7148300f40a1da0538ab060552bca4a2f1d8.log"));
 
 
         try {

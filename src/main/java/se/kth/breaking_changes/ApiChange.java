@@ -1,6 +1,10 @@
 package se.kth.breaking_changes;
 
+import japicmp.model.JApiBehavior;
+import japicmp.model.JApiChangeStatus;
+
 import java.util.Objects;
+import java.util.Set;
 
 @lombok.Getter
 @lombok.Setter
@@ -16,9 +20,17 @@ public class ApiChange {
 
     private String name;
 
+    private String newLongName;
+
     private ApiMetadata newVersion;
 
     private ApiMetadata oldVersion;
+
+    private JApiChangeStatus changeType;
+
+    private JApiBehavior behavior;
+
+    Set<ApiChange> newVariants;
 
     public ApiChange(String oldElement, String newElement, String category, String name) {
         this.oldElement = oldElement;
@@ -28,13 +40,16 @@ public class ApiChange {
 
     }
 
-    public ApiChange(String oldElement, String newElement, String category, String name, ApiMetadata newVersion, ApiMetadata oldVersion) {
+    public ApiChange(String oldElement, String newElement, String category, String name, String newLongName, JApiChangeStatus changeType, ApiMetadata newVersion, ApiMetadata oldVersion, JApiBehavior behavior) {
         this.oldElement = oldElement;
         this.newElement = newElement;
         this.category = category;
         this.name = name;
+        this.newLongName = newLongName;
         this.newVersion = newVersion;
         this.oldVersion = oldVersion;
+        this.changeType = changeType;
+        this.behavior = behavior;
     }
 
     public ApiChange() {

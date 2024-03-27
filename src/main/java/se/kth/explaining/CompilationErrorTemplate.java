@@ -1,8 +1,13 @@
 package se.kth.explaining;
 
+import japicmp.model.JApiMethod;
+import javassist.CtClass;
+import javassist.NotFoundException;
 import se.kth.core.BreakingChange;
 import se.kth.core.Changes;
 import se.kth.spoon_compare.SpoonResults;
+
+import java.util.Arrays;
 
 public class CompilationErrorTemplate extends ExplanationTemplate {
 
@@ -83,7 +88,9 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
                         "\n" +
                         "          </details>\n" +
                         "            \n" +
-                        "     </details>\n";
+                        newCandidates(changes)+
+                        "     </details>\n"
+                        ;
 
                 text = text.concat(singleChange);
 
@@ -91,6 +98,56 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
             message = firstLine + "\n" + text;
         }
         return message;
+    }
+
+
+    /**
+     * This method translates the category of the change to a human-readable format
+     *
+     * <p>To resolve this issue, there are alternative options available in the new version of the dependency that can replace the incompatible instruction currently used in the client. You can consider substituting the existing instruction with one of the following options provided by the new version of the dependency
+     * ``` java
+     * net.datafaker.DateAndTime.between(java.sql.Timestamp,java.sql.Timestamp);
+     * <p/> ```
+     *
+     * @param breakingChange
+     * @return
+     */
+    public String newCandidates(BreakingChange breakingChange) {
+        if (breakingChange.getApiChanges().getNewVariants().isEmpty()) {
+            return "";
+        }
+
+        int amountVariants = breakingChange.getApiChanges().getNewVariants().size();
+
+
+        StringBuilder message = new StringBuilder();
+
+        if (amountVariants > 1) {
+            message.append("        To address this incompatibility, there are ")
+                    .append(amountVariants)
+                    .append(" alternative options available in the new version of the dependency that can replace the incompatible instruction currently used in the client. You can consider substituting the existing instruction with one of the following options provided by the new version of the dependency:\n");
+
+            breakingChange.getApiChanges().getNewVariants().forEach(apiChange -> {
+                message.append("        ``` java\n")
+                        .append("        ").append(((JApiMethod) apiChange.getBehavior()).getNewMethod().get().getLongName()).append(";\n")
+                        .append("        ```\n")
+
+                ;
+            });
+        } else {
+            message.append(
+                    "        To resolve this issue, there are alternative options available in the new version of the dependency that can replace the incompatible instruction currently used in the client. You can consider substituting the existing instruction with one of the following options provided by the new version of the dependency\n");
+            breakingChange.getApiChanges().getNewVariants().forEach(apiChange -> {
+                try {
+                    message.append("        ``` java\n")
+                            .append("        ").append(((JApiMethod) apiChange.getBehavior()).getNewMethod().get().getName()).append(Arrays.toString(Arrays.stream(((JApiMethod) apiChange.getBehavior()).getNewMethod().get().getParameterTypes()).map(ctClass -> ctClass.getClass().getName()).toArray())).append(";\n")
+                            .append("        ```\n");
+                } catch (NotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+        return message.toString();
     }
 
 

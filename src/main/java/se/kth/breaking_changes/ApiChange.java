@@ -31,6 +31,7 @@ public class ApiChange {
     private JApiBehavior behavior;
 
     Set<ApiChange> newVariants;
+    String instruction;
 
     public ApiChange(String oldElement, String newElement, String category, String name) {
         this.oldElement = oldElement;
@@ -40,7 +41,7 @@ public class ApiChange {
 
     }
 
-    public ApiChange(String oldElement, String newElement, String category, String name, String newLongName, JApiChangeStatus changeType, ApiMetadata newVersion, ApiMetadata oldVersion, JApiBehavior behavior) {
+    public ApiChange(String oldElement, String newElement, String category, String name, String newLongName, JApiChangeStatus changeType, ApiMetadata newVersion, ApiMetadata oldVersion, JApiBehavior behavior, String instruction) {
         this.oldElement = oldElement;
         this.newElement = newElement;
         this.category = category;
@@ -50,6 +51,7 @@ public class ApiChange {
         this.oldVersion = oldVersion;
         this.changeType = changeType;
         this.behavior = behavior;
+        this.instruction = instruction;
     }
 
     public ApiChange() {

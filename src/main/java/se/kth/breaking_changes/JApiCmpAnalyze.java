@@ -20,6 +20,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import se.kth.core.Instruction;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -98,7 +99,9 @@ public class JApiCmpAnalyze {
                                 jApiMethod.getChangeStatus(),
                                 new ApiMetadata(newJar.toFile().getName(), newJar.getFileName().getFileName()),
                                 new ApiMetadata(oldJar.toFile().getName(), oldJar.getFileName().getFileName()),
-                                jApiMethod
+                                jApiMethod,
+                                Instruction.Method.toString()
+
                         ));
                     });
                 });

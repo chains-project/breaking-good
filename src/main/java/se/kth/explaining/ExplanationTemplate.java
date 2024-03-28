@@ -29,9 +29,13 @@ public abstract class ExplanationTemplate {
 
     public String translateCategory(String category) {
         return switch (category) {
-            case "[METHOD_REMOVED]" -> "removed";
-            case "[METHOD_ADDED]" -> "added";
-            default -> "";
+            case "[METHOD_REMOVED]":
+            case "REMOVED":
+                yield "removed";
+            case "[METHOD_ADDED]":
+                yield "added";
+            default:
+                yield "";
         };
     }
 

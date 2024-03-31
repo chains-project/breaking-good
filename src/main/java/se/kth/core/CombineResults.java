@@ -39,7 +39,7 @@ public class CombineResults {
         log.getErrorInfo().forEach((k, v) -> {
             SpoonAnalyzer spoonAnalyzer = new SpoonAnalyzer(dependencyGroupID, v);
             List<SpoonResults> results = spoonAnalyzer.applySpoon(project + k);
-            System.out.printf("Amount of instructions %d%n", results.size());
+//            System.out.printf("Amount of instructions %d%n", results.size());
             findBreakingChanges(results, change);
         });
         return new Changes("1.0.0", "1.0.1", change);
@@ -72,11 +72,11 @@ public class CombineResults {
         Set<ApiChange> newVariants = new HashSet<>();
         apiChanges.forEach(apiChange1 -> {
             if (apiChange1.getName().contains("between")) {
-                System.out.println("between");
+//                System.out.println("between");
             }
             if (apiChange1.getName().equals(apiChange.getName()) && !apiChange1.getChangeType().equals(JApiChangeStatus.REMOVED)) {
-                System.out.println("New Element  " + apiChange1.getName());
-                System.out.println("Old element  " + apiChange.getName());
+//                System.out.println("New Element  " + apiChange1.getName());
+//                System.out.println("Old element  " + apiChange.getName());
                 newVariants.add(apiChange1);
             }
         });

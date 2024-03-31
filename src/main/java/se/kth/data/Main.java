@@ -21,9 +21,9 @@ public class Main {
 
 
     public static void main(String[] args) {
-//        List<BreakingUpdateMetadata> list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/chains-project/paper/bump/data/benchmark"));
-List<BreakingUpdateMetadata> list = getBreakingCommit(Path.of("examples/Benchmark"));
-//
+        List<BreakingUpdateMetadata> list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/chains-project/paper/bump/data/benchmark"));
+        //List<BreakingUpdateMetadata> list = getBreakingCommit(Path.of("examples/Benchmark"));
+
         List<BreakingUpdateMetadata> compilationErrors = list.stream().filter(b -> b.failureCategory().equals("COMPILATION_FAILURE")).toList();
 
         generateTemplate(compilationErrors);
@@ -59,6 +59,7 @@ List<BreakingUpdateMetadata> list = getBreakingCommit(Path.of("examples/Benchmar
 
         for (BreakingUpdateMetadata breakingUpdate : breakingUpdateList) {
 
+            System.out.println("Processing breaking update " + breakingUpdate.breakingCommit());
             dockerImages.getProject(breakingUpdate);
 
 
@@ -68,7 +69,7 @@ List<BreakingUpdateMetadata> list = getBreakingCommit(Path.of("examples/Benchmar
                         jars.resolve("%s/%s-%s.jar".formatted(breakingUpdate.breakingCommit(), breakingUpdate.updatedDependency().dependencyArtifactID(), breakingUpdate.updatedDependency().newVersion()))
                 );
 
-                System.out.println(jApiCmpAnalyze);
+//                System.out.println(jApiCmpAnalyze);
 
                 Set<ApiChange> apiChanges = jApiCmpAnalyze.useJApiCmp();
 
@@ -84,15 +85,19 @@ List<BreakingUpdateMetadata> list = getBreakingCommit(Path.of("examples/Benchmar
                 try {
                     Changes changes = combineResults.analyze();
 
-
+                    System.out.println("Project: " + breakingUpdate.project());
+                    System.out.println("Breaking Commit: " + breakingUpdate.breakingCommit());
                     System.out.println("Changes: " + changes.changes().size());
-                    ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, "Explanations/"+breakingUpdate.breakingCommit()+".md");
+                    System.out.println("**********************************************************");
+                    System.out.println();
+                    ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, "Explanations/" + breakingUpdate.breakingCommit() + ".md");
                     explanationTemplate.generateTemplate();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
 
             } catch (Exception e) {
+                System.out.println("Error processing breaking update " + breakingUpdate.breakingCommit());
                 System.out.println(e.getMessage());
             }
         }

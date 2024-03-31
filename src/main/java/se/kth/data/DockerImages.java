@@ -43,10 +43,8 @@ public class DockerImages {
 
         createDockerClient();
 
-
         if (breakingUpdates != null) {
             //read each breaking update json file
-
             String breakingCommit = breakingUpdates.breakingCommit();
             String project = breakingUpdates.project();
 

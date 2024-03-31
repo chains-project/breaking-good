@@ -23,15 +23,6 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
                 .formatted(breakingChange.getApiChanges().getOldVersion().getName(), breakingChange.getApiChanges().getNewVersion().getName());
     }
 
-    @Override
-    public String clientError() {
-        return "";
-//        return ("3. An error was detected in line %s which is making use of an outdated API.\n " +
-//                "``` java\n %s   %s;\n ```").formatted(breakingChange.getErrorInfo().getErrorInfo().getClientLinePosition(),
-//                breakingChange.getErrorInfo().getErrorInfo().getClientLinePosition(), breakingChange.getErrorInfo().getClientLine());
-
-    }
-
     public String clientErrorLine(SpoonResults spoonResults) {
         return "            *   An error was detected in line %s which is making use of an outdated API.\n".formatted(spoonResults.getErrorInfo().getClientLinePosition()) +
                 "             ``` java\n" +
@@ -45,7 +36,7 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
     }
 
 
-    public String logLineew(SpoonResults spoonResults) {
+    public String logLineErrorMessage(SpoonResults spoonResults) {
         return "            *   >[%s](%s)\n".formatted(spoonResults.getErrorInfo().getErrorMessage(), spoonResults.getErrorInfo().getErrorLogGithubLink());
 
     }
@@ -53,13 +44,17 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
     public String errorSection(BreakingChange breakingChange, int instructions) {
         StringBuilder message = new StringBuilder();
         for (SpoonResults spoonResults : breakingChange.getErrorInfo()) {
-            message.append(logLineew(spoonResults)).append(clientErrorLine(spoonResults));
+            message.append(logLineErrorMessage(spoonResults)).append(clientErrorLine(spoonResults));
         }
 
         return message.toString();
     }
 
 
+    /**
+     * This method generates the broken element section of the markdown file
+     * @return
+     */
     @Override
     public String brokenElement() {
 
@@ -116,29 +111,25 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
      * net.datafaker.DateAndTime.between(java.sql.Timestamp,java.sql.Timestamp);
      * <p/> ```
      *
-     * @param breakingChange
-     * @return
+     * @param breakingChange BreakingChange
+     * @return Number of new candidates and their method signature
      */
     public String newCandidates(BreakingChange breakingChange) {
         if (breakingChange.getApiChanges().getNewVariants().isEmpty()) {
             return "";
         }
-
         int amountVariants = breakingChange.getApiChanges().getNewVariants().size();
-
-
         StringBuilder message = new StringBuilder();
-
         if (amountVariants > 1) {
             message.append("        To address this incompatibility, there are ")
                     .append(amountVariants)
                     .append(" alternative options available in the new version of the dependency that can replace the incompatible %s currently used in the client. You can consider substituting the existing %s with one of the following options provided by the new version of the dependency:\n".formatted(breakingChange.getApiChanges().getInstruction().toLowerCase(), breakingChange.getApiChanges().getInstruction().toLowerCase()));
 
             breakingChange.getApiChanges().getNewVariants().forEach(apiChange -> {
+                JApiMethod method = ((JApiMethod) apiChange.getBehavior());
                 message.append("        ``` java\n")
-                        .append("        ").append(((JApiMethod) apiChange.getBehavior()).getNewMethod().get().getLongName()).append(";\n")
+                        .append("        ").append(methodName(method)).append(";\n")
                         .append("        ```\n")
-
                 ;
             });
         } else {
@@ -153,7 +144,6 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
         }
         return message.toString();
     }
-
 
     /**
      * This method returns the method name in the format of returnType methodName(params)

@@ -21,8 +21,6 @@ public abstract class ExplanationTemplate {
 
     public abstract String getHead();
 
-    public abstract String clientError();
-
     public abstract String logLine();
 
     public abstract String brokenElement();

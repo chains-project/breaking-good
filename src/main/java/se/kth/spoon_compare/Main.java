@@ -21,11 +21,11 @@ public class Main {
 
             log.getErrorInfo().forEach((k, v) -> {
                 System.out.println(k);
-                v.forEach(System.out::println);
+//                v.forEach(System.out::println);
                 SpoonAnalyzer spoonAnalyzer = new SpoonAnalyzer("net.sf.jasperreports", v);
                 List<SpoonResults> results = spoonAnalyzer.applySpoon(proyect + k);
 
-                results.forEach(System.out::println);
+//                results.forEach(System.out::println);
 
             });
 

@@ -14,7 +14,9 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.kth.breaking_changes.Download;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -24,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 
 public class DockerImages {
 
@@ -39,14 +40,12 @@ public class DockerImages {
     private static final List<String> containers = new ArrayList<>();
 
 
-    public void getProject(BreakingUpdateMetadata breakingUpdates) {
+    public void getProject(BreakingUpdateMetadata breakingUpdates) throws IOException, InterruptedException {
 
         createDockerClient();
 
-
         if (breakingUpdates != null) {
             //read each breaking update json file
-
             String breakingCommit = breakingUpdates.breakingCommit();
             String project = breakingUpdates.project();
 
@@ -58,31 +57,55 @@ public class DockerImages {
             Path breaking = dir.resolve(breakingCommit);
 
 
-            if (Files.exists(breaking)) {
-                return;
-            }
+            String previousVersion = breakingUpdates.updatedDependency().dependencyArtifactID() + "-" + breakingUpdates.updatedDependency().previousVersion() + ".jar";
+            String newVersion = breakingUpdates.updatedDependency().dependencyArtifactID() + "-" + breakingUpdates.updatedDependency().newVersion() + ".jar";
 
-            Path projectDir_breaking;
-            try {
-                projectDir_breaking = Files.createDirectories(breaking);
-            } catch (IOException e) {
-                log.error("Could not create the project directory {}", project, e);
-                return;
-            }
+            boolean existsProject = Files.exists(breaking.resolve(project));
+            boolean existPreviousVersion = Files.exists(breaking.resolve(previousVersion));
+            boolean existNewVersion = Files.exists(breaking.resolve(newVersion));
 
 
-            Path projectDir = copyProject(Objects.requireNonNull(startContainer(breakingImage, project)).getKey(), project, projectDir_breaking);
-            if (projectDir == null) {
+            if (!existsProject) {
+                Path projectDir_breaking;
+                try {
+                    projectDir_breaking = Files.createDirectories(breaking);
+                } catch (IOException e) {
+                    log.error("Could not create the project directory {}", project, e);
+                    return;
+                }
+                Path projectDir = copyProject(Objects.requireNonNull(startContainer(breakingImage, project)).getKey(), project, projectDir_breaking);
                 deleteContainers(breakingImage);
-                return;
+                if (projectDir == null) {
+                    log.error("Could not copy the project {}", project);
+                    return;
+                }
             }
 
-            deleteContainers(breakingImage);
+            try {
+                if (!existPreviousVersion) {
+                    Files.createDirectories(breaking);
+                    File prev = Download.getJarFile(breakingUpdates.updatedDependency().dependencyGroupID(),
+                            breakingUpdates.updatedDependency().dependencyArtifactID(),
+                            breakingUpdates.updatedDependency().previousVersion(), breaking);
+                    System.out.println((prev != null ? "Downloaded " : "Fail to download  ") + breakingUpdates.updatedDependency().dependencyArtifactID() + "-" + breakingUpdates.updatedDependency().previousVersion());
+                }
+                if (!existNewVersion) {
+                    File newV = Download.getJarFile(breakingUpdates.updatedDependency().dependencyGroupID(),
+                            breakingUpdates.updatedDependency().dependencyArtifactID(),
+                            breakingUpdates.updatedDependency().newVersion(), breaking);
+                    System.out.println((newV != null ? "Downloaded " : "Fail to download  ") + breakingUpdates.updatedDependency().dependencyArtifactID() + "-" + breakingUpdates.updatedDependency().newVersion());
+                }
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
 
-            log.info("=====================================================================================================");
-            log.info("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
-            log.info("=====================================================================================================");
-            log.info("");
+
+//            deleteContainers(breakingImage);
+
+//            log.info("=====================================================================================================");
+//            log.info("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
+//            log.info("=====================================================================================================");
+//            log.info("");
 
 
         }
@@ -202,6 +225,14 @@ public class DockerImages {
                 .build();
         dockerClient = DockerClientImpl.getInstance(clientConfig, httpClient);
     }
+
+
+    /**
+     * Copy old/new pair of dependency jar/pom files from the corresponding containers.
+     *
+     * @return the type of the updated dependency.
+     */
+
 
     public DockerImages() {
         createDockerClient();

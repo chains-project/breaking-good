@@ -1,45 +1,59 @@
 package se.kth.explaining;
 
-import se.kth.core.BreakingChange;
 import se.kth.core.Changes;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Date;
+
+import static java.lang.Thread.sleep;
 
 public abstract class ExplanationTemplate {
 
     protected Changes changes;
-    BreakingChange breakingChange;
 
-    public ExplanationTemplate(Changes changes, BreakingChange breakingChange) {
+    protected String fileName;
+
+    public ExplanationTemplate(Changes changes, String fileName) {
         this.changes = changes;
-        this.breakingChange = breakingChange;
+        this.fileName = fileName;
 
     }
 
     public abstract String getHead();
 
-    public abstract String clientError();
-
     public abstract String logLine();
 
-    public abstract String type();
+    public abstract String brokenElement();
+
+    public String translateCategory(String category) {
+        return switch (category) {
+            case "[METHOD_REMOVED]":
+            case "REMOVED":
+                yield "removed";
+            case "[METHOD_ADDED]":
+                yield "added";
+            default:
+                yield "";
+        };
+    }
 
     public void generateTemplate() {
+
+        if(changes.changes().isEmpty()){
+            return;
+        }
+
         FileWriter markdownFile = null;
         try {
-            markdownFile = new FileWriter("Explanation_" + new Date().getTime() + ".md");
+            markdownFile = new FileWriter(fileName);
             markdownFile.write(getHead());
             markdownFile.write("\n");
-            markdownFile.write(type());
+            markdownFile.write(brokenElement());
             markdownFile.write("\n");
-            markdownFile.write(logLine());
-            markdownFile.write("\n");
-            markdownFile.write(clientError());
             markdownFile.write("\n");
             markdownFile.close(); //
-        } catch (IOException e) {
+            sleep(3000);
+        } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }

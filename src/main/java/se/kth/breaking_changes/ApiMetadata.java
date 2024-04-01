@@ -25,7 +25,7 @@ public class ApiMetadata {
 
     private static final Map<String, String> repositoryUrls = Map.of(
             "mavenCentral", "https://repo1.maven.org/maven2/",
-            "jenkins","https://repo.jenkins-ci.org/artifactory/releases/"
+            "jenkins", "https://repo.jenkins-ci.org/artifactory/releases/"
     );
 
 
@@ -47,10 +47,7 @@ public class ApiMetadata {
      * @param version    the version of the dependency
      * @return true if the download was successful, false otherwise
      */
-    public static boolean download(String groupId, String artifactId, String version) {
-
-
-
+    public static boolean download(String groupId, String artifactId, String version, Path directory) {
         /*
          * Maven repository link for the previous version of the dependency
          */
@@ -64,7 +61,7 @@ public class ApiMetadata {
             String artifactUrl = getArtifactUrl(groupId, artifactId, version, repository);
             try (Response response = httpConnector.newCall(new Request.Builder().url(artifactUrl).build()).execute()) {
                 if (response.code() == 200) {
-                    downloadAndConvert(response, "jars" + File.separator + jarName);
+                    downloadAndConvert(response, directory.toString() + File.separator + jarName);
                     return true;
                 }
             } catch (IOException e) {
@@ -90,3 +87,4 @@ public class ApiMetadata {
     }
 
 }
+

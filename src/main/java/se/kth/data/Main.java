@@ -11,6 +11,7 @@ import se.kth.log_Analyzer.MavenLogAnalyzer;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +22,9 @@ public class Main {
 
 
     public static void main(String[] args) {
-        List<BreakingUpdateMetadata> list = getBreakingCommit(Path.of("examples/BENCHMARK"));
-
+        List<BreakingUpdateMetadata> list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark"));
+//        List<BreakingUpdateMetadata> list = getBreakingCommit(Path.of("examples/Benchmark"));
+//
         List<BreakingUpdateMetadata> compilationErrors = list.stream().filter(b -> b.failureCategory().equals("COMPILATION_FAILURE")).toList();
 
         generateTemplate(compilationErrors);
@@ -53,48 +55,77 @@ public class Main {
         String githubURL = "https://github.com/knaufk/flink-faker/blob/1ef97ea6c5b6e34151fe6167001b69e003449f95/src/main/java/com/github/knaufk/flink/faker/DateTime.java#L44";
 
         Path jars = Path.of("/Users/frank/Documents/Work/PHD/Tools/bump_experiments/jars");
+
         DockerImages dockerImages = new DockerImages();
 
+        List<ExplanationStatistics> explanationStatistics = new ArrayList<>();
 
         for (BreakingUpdateMetadata breakingUpdate : breakingUpdateList) {
 
-            dockerImages.getProject(breakingUpdate);
+            Path jarsFile = Path.of("projects/");
 
+            System.out.println("Processing breaking update " + breakingUpdate.breakingCommit());
+            try {
+                dockerImages.getProject(breakingUpdate);
+            } catch (IOException | InterruptedException e) {
+                System.out.println("Error downloading breaking update " + breakingUpdate.breakingCommit());
+            }
+
+//            processingBreakingUpdate(breakingUpdate, jarsFile, explanationStatistics);
+        }
+
+    }
+
+    private static void processingBreakingUpdate(BreakingUpdateMetadata breakingUpdate, Path jarsFile, List<ExplanationStatistics> explanationStatistics) {
+        try {
+            JApiCmpAnalyze jApiCmpAnalyze = new JApiCmpAnalyze(
+                    jarsFile.resolve("%s/%s-%s.jar".formatted(breakingUpdate.breakingCommit(), breakingUpdate.updatedDependency().dependencyArtifactID(), breakingUpdate.updatedDependency().previousVersion())),
+                    jarsFile.resolve("%s/%s-%s.jar".formatted(breakingUpdate.breakingCommit(), breakingUpdate.updatedDependency().dependencyArtifactID(), breakingUpdate.updatedDependency().newVersion()))
+            );
+
+
+            Set<ApiChange> apiChanges = jApiCmpAnalyze.useJApiCmp();
+
+            CombineResults combineResults = new CombineResults(apiChanges);
+
+            combineResults.setDependencyGroupID(breakingUpdate.updatedDependency().dependencyGroupID());
+
+            combineResults.setProject("projects/%s".formatted(breakingUpdate.breakingCommit()));
+
+            combineResults.setMavenLog(new MavenLogAnalyzer(
+                    new File("projects/%s/%s/%s.log".formatted(breakingUpdate.breakingCommit(), breakingUpdate.project(), breakingUpdate.breakingCommit()))));
 
             try {
-                JApiCmpAnalyze jApiCmpAnalyze = new JApiCmpAnalyze(
-                        jars.resolve("%s/%s-%s.jar".formatted(breakingUpdate.breakingCommit(), breakingUpdate.updatedDependency().dependencyArtifactID(), breakingUpdate.updatedDependency().previousVersion())),
-                        jars.resolve("%s/%s-%s.jar".formatted(breakingUpdate.breakingCommit(), breakingUpdate.updatedDependency().dependencyArtifactID(), breakingUpdate.updatedDependency().newVersion()))
-                );
-                Set<ApiChange> apiChanges = jApiCmpAnalyze.useJApiCmp();
+                Changes changes = combineResults.analyze();
 
-                CombineResults combineResults = new CombineResults(apiChanges);
-//
-                combineResults.setDependencyGroupID(breakingUpdate.updatedDependency().dependencyGroupID());
-
-                combineResults.setProject("projects/%s".formatted(breakingUpdate.breakingCommit()));
-
-                combineResults.setMavenLog(new MavenLogAnalyzer(
-                        new File("projects/%s/%s/%s.log".formatted(breakingUpdate.breakingCommit(), breakingUpdate.project(), breakingUpdate.breakingCommit()))));
-
-                try {
-                    Changes changes = combineResults.analyze();
-
-
-                    changes.changes().forEach(change -> {
-                                ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, change);
-                                explanationTemplate.generateTemplate();
-                            }
-                    );
-
-
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
+                System.out.println("Project: " + breakingUpdate.project());
+                System.out.println("Breaking Commit: " + breakingUpdate.breakingCommit());
+                System.out.println("Changes: " + changes.changes().size());
+                explanationStatistics.add(new ExplanationStatistics(breakingUpdate.project(), breakingUpdate.breakingCommit(), changes.changes().size()));
+                ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, "Explanations/" + breakingUpdate.breakingCommit() + ".md");
+                explanationTemplate.generateTemplate();
+                System.out.println("**********************************************************");
+                System.out.println();
+            } catch (IOException e) {
+                System.out.println("Error analyzing breaking update " + breakingUpdate.breakingCommit());
+                System.out.println(e);
+                throw new RuntimeException(e);
             }
+            try {
+                Path file = Path.of("explanationStatistics.json");
+                Files.deleteIfExists(file);
+                Files.createFile(file);
+                JsonUtils.writeToFile(file, explanationStatistics);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error processing breaking update " + breakingUpdate.breakingCommit());
+            System.out.println(e);
         }
+    }
+
+    public record ExplanationStatistics(String project, String commit, int changes) {
     }
 }

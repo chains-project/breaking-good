@@ -17,7 +17,8 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
     @Override
     public String getHead() {
 
-        BreakingChange breakingChange = changes.changes().iterator().next();
+        BreakingChange breakingChange = !changes.changes().isEmpty() ?changes.changes().iterator().next() : null;
+
 
         return "CI detected that the dependency upgrade from version **%s** to **%s** has failed. Here are details to help you understand and fix the problem:"
                 .formatted(breakingChange.getApiChanges().getOldVersion().getName(), breakingChange.getApiChanges().getNewVersion().getName());

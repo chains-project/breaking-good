@@ -39,6 +39,9 @@ public abstract class ExplanationTemplate {
 
     public void generateTemplate() {
 
+        if(changes.changes().isEmpty()){
+            return;
+        }
 
         FileWriter markdownFile = null;
         try {

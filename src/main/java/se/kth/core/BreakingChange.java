@@ -3,17 +3,20 @@ package se.kth.core;
 import se.kth.breaking_changes.ApiChange;
 import se.kth.spoon_compare.SpoonResults;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @lombok.Setter
 @lombok.Getter
 public class BreakingChange {
 
-    public BreakingChange(ApiChange apiChanges, SpoonResults errorInfo) {
-        this.apiChanges = apiChanges;
-        this.errorInfo = errorInfo;
-    }
-
     ApiChange apiChanges;
-    SpoonResults errorInfo;
+    List<SpoonResults> errorInfo;
+
+    public BreakingChange(ApiChange apiChanges) {
+        this.apiChanges = apiChanges;
+        this.errorInfo = new ArrayList<>();
+    }
 
     public BreakingChange() {
     }

@@ -40,7 +40,7 @@ public class Main {
 
 
             changes.changes().forEach(change -> {
-                        ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, change);
+                        ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, "change");
                         explanationTemplate.generateTemplate();
                     }
             );

@@ -12,7 +12,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        MavenLogAnalyzer mavenLog = new MavenLogAnalyzer(new File("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/0abf7148300f40a1da0538ab060552bca4a2f1d8.log"));
+        MavenLogAnalyzer mavenLog = new MavenLogAnalyzer(new File("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/0abf7148300f40a1da0538ab060552bca4a2f1d8/biapi/0abf7148300f40a1da0538ab060552bca4a2f1d8.log"));
 
 
         try {
@@ -21,11 +21,11 @@ public class Main {
 
             log.getErrorInfo().forEach((k, v) -> {
                 System.out.println(k);
-                v.forEach(System.out::println);
+//                v.forEach(System.out::println);
                 SpoonAnalyzer spoonAnalyzer = new SpoonAnalyzer("net.sf.jasperreports", v);
                 List<SpoonResults> results = spoonAnalyzer.applySpoon(proyect + k);
 
-                results.forEach(System.out::println);
+//                results.forEach(System.out::println);
 
             });
 

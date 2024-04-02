@@ -1,7 +1,12 @@
 package se.kth.breaking_changes;
 
+import se.kth.data.BreakingUpdateMetadata;
+
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Set;
+
+import static se.kth.data.Main.getBreakingCommit;
 
 public class Main {
 
@@ -19,5 +24,35 @@ public class Main {
         }
 
 
+//        List<BreakingUpdateMetadata> list =
+//                getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/chains-project/paper/bump/data/benchmark"));
+//
+//
+//        for (BreakingUpdateMetadata breakingUpdate : list) {
+//            boolean result = ApiMetadata.download(breakingUpdate.updatedDependency().dependencyGroupID(),
+//                    breakingUpdate.updatedDependency().dependencyArtifactID(),
+//                    breakingUpdate.updatedDependency().newVersion());
+//
+//            if (result) {
+//                System.out.println("Downloaded " + breakingUpdate.updatedDependency().dependencyArtifactID() + "-" + breakingUpdate.updatedDependency().newVersion());
+//            } else {
+//                System.out.println("Failed to download " + breakingUpdate.updatedDependency().dependencyArtifactID() + "-" + breakingUpdate.updatedDependency().newVersion());
+//            }
+//
+//             result = ApiMetadata.download(breakingUpdate.updatedDependency().dependencyGroupID(),
+//                    breakingUpdate.updatedDependency().dependencyArtifactID(),
+//                    breakingUpdate.updatedDependency().previousVersion());
+//
+//            if (result) {
+//                System.out.println("Downloaded " + breakingUpdate.updatedDependency().dependencyArtifactID() + "-" + breakingUpdate.updatedDependency().newVersion());
+//            } else {
+//                System.out.println("Failed to download " + breakingUpdate.updatedDependency().dependencyArtifactID() + "-" + breakingUpdate.updatedDependency().newVersion());
+//            }
+
+//        }
+
+
     }
+
+
 }

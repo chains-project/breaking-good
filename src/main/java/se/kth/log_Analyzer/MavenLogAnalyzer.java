@@ -42,7 +42,9 @@ public class MavenLogAnalyzer {
             Pattern errorPattern = Pattern.compile("\\[ERROR\\] .*:\\[(\\d+),\\d+\\]");
             Pattern pathPattern = Pattern.compile("/[^:/]+(/[^\\[\\]:]+)");
 
+            int lineNumberInFile = 0;
             while ((line = reader.readLine()) != null) {
+                lineNumberInFile++;
                 Map<Integer, String> lines = new HashMap<>();
                 Matcher matcher = errorPattern.matcher(line);
                 if (matcher.find()) {
@@ -51,10 +53,12 @@ public class MavenLogAnalyzer {
                     lines.put(lineNumber, line);
                     if (pathMatcher.find()) {
                         currentPath = pathMatcher.group();
-
                     }
                     if (currentPath != null) {
-                        mavenErrorLogs.addErrorInfo(currentPath, new MavenErrorLog.ErrorInfo(String.valueOf(lineNumber), currentPath, line));
+
+                        MavenErrorLog.ErrorInfo errorInfo = new MavenErrorLog.ErrorInfo(String.valueOf(lineNumber), currentPath, line, lineNumberInFile);
+                        errorInfo.setErrorLogGithubLink(generateLogsLink(projectURL, 4, lineNumberInFile));
+                        mavenErrorLogs.addErrorInfo(currentPath, errorInfo);
                     }
                 }
             }
@@ -63,5 +67,9 @@ public class MavenLogAnalyzer {
             e.printStackTrace();
         }
         return mavenErrorLogs;
+    }
+
+    private String generateLogsLink(String projectURL, int step, int lineNumber) {
+        return "https://github.com/chains-project/breaking-good/actions/runs/8110103454/job/22166641300#step:%d:%d".formatted(step, lineNumber);
     }
 }

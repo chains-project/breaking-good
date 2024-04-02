@@ -7,7 +7,6 @@ import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
 import japicmp.exception.JApiCmpException;
 import japicmp.model.AccessModifier;
-import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.output.OutputFilter;
 import japicmp.output.semver.SemverOut;
@@ -21,6 +20,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import se.kth.core.Instruction;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
+@lombok.Setter
+@lombok.Getter
 public class JApiCmpAnalyze {
     private static final Logger log = LoggerFactory.getLogger(JApiCmpAnalyze.class);
 
@@ -87,16 +89,20 @@ public class JApiCmpAnalyze {
                 jApiClasses.iterator().forEachRemaining(jApiClass1 -> {
                     //get methods
                     jApiClass1.getMethods().forEach(jApiMethod -> {
-                        if (jApiMethod.getChangeStatus().equals(JApiChangeStatus.REMOVED)) {
-                            libraryChanges.add(new ApiChange(
-                                    jApiMethod.getOldMethod().isPresent() ? jApiMethod.getOldMethod().get().getName() : "null",
-                                    jApiMethod.getNewMethod().isPresent() ? jApiMethod.getNewMethod().get().getName() : "null",
-                                    jApiMethod.getCompatibilityChanges().toString(),
-                                    jApiMethod.getName(),
-                                    new ApiMetadata(newJar.toFile().getName(), newJar.getFileName().getFileName()),
-                                    new ApiMetadata(oldJar.toFile().getName(), oldJar.getFileName().getFileName())
-                            ));
-                        }
+//                        if (jApiMethod.getChangeStatus().equals(JApiChangeStatus.REMOVED)) {
+                        libraryChanges.add(new ApiChange(
+                                jApiMethod.getOldMethod().isPresent() ? jApiMethod.getOldMethod().get().getName() : "null",
+                                jApiMethod.getNewMethod().isPresent() ? jApiMethod.getNewMethod().get().getName() : "null",
+                                jApiMethod.getCompatibilityChanges().toString(),
+                                jApiMethod.getName(),
+                                jApiMethod.getOldMethod().isPresent() ? jApiMethod.getOldMethod().get().getLongName() : jApiMethod.getNewMethod().isPresent() ? jApiMethod.getNewMethod().get().getName() : "null",
+                                jApiMethod.getChangeStatus(),
+                                new ApiMetadata(newJar.toFile().getName(), newJar.getFileName().getFileName()),
+                                new ApiMetadata(oldJar.toFile().getName(), oldJar.getFileName().getFileName()),
+                                jApiMethod,
+                                Instruction.Method.toString()
+
+                        ));
                     });
                 });
             });

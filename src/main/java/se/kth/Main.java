@@ -80,7 +80,7 @@ public class Main {
             try {
                 Changes changes = combineResults.analyze();
                 changes.changes().forEach(change -> {
-                            ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, change);
+                            ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, "Explanation");
                             explanationTemplate.generateTemplate();
                         }
                 );

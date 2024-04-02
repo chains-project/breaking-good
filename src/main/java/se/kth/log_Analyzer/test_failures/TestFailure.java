@@ -83,24 +83,32 @@ public class TestFailure {
 
     public static List<File> getTestFiles(Path clientPath) {
         Path testFilesPath = clientPath.resolve(surefireFolder);
+        if (!testFilesPath.toFile().exists()) {
+            return Collections.emptyList();
+        }
         return Arrays.stream(Objects.requireNonNull(testFilesPath.toFile().listFiles())).filter(file -> file.getName().endsWith("xml")).toList();
     }
 
-    public static void parserSurefireTests(File logFile, Path client) throws IOException {
+    public static void parserSurefireTests(Path client, String fileName) throws IOException {
         List<File> testFilesList = getTestFiles(client);
+        List<TestFailureMetadata> allTestFailures = new ArrayList<>();
         for (File testFile : testFilesList) {
 
             try {
-                parseTest(testFile);
+                List<TestFailureMetadata> testFailure = parseTest(testFile);
+                allTestFailures.addAll(testFailure);
             } catch (ParserConfigurationException | SAXException e) {
-                throw new RuntimeException(e);
+                System.out.println("Error parsing test file: " + testFile.getName());
             }
         }
+
+        generateMarkdownFile(allTestFailures, fileName);
+
         System.out.println("Size of test files: " + testFilesList.size());
     }
 
 
-    public static void parseTest(File testFile) throws IOException, ParserConfigurationException, SAXException {
+    public static List<TestFailureMetadata> parseTest(File testFile) throws IOException, ParserConfigurationException, SAXException {
 
 
         /*
@@ -114,12 +122,13 @@ public class TestFailure {
         /*
          * 2. Extract the test name
          */
-        String testName = doc.getElementsByTagName("testcase").item(0).getAttributes().getNamedItem("name").getNodeValue();
+//        String testName = doc.getElementsByTagName("testcase").item(0).getAttributes().getNamedItem("name").getNodeValue();
 
         /*
          * 3. Extract the error message
          */
         NodeList testCaseList = doc.getElementsByTagName("testcase");
+        List<TestFailureMetadata> testFailureMetadataList = new ArrayList<>();
         for (int i = 0; i < testCaseList.getLength(); i++) {
             Node node = testCaseList.item(i);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
@@ -143,60 +152,85 @@ public class TestFailure {
                         System.out.println("Error Type: " + type);
                         System.out.println("Error Text: " + errorText);
                         parseError(errorText);
+                        testFailureMetadataList.add(new TestFailureMetadata(name, type, message));
                     }
                 }
             }
         }
 
+        return testFailureMetadataList;
+
 
     }
-    
-    public static void parseError(String input){
 
-            // Pattern to match the Java line number
-            Pattern lineNumberPattern = Pattern.compile(".*\\.java:(\\d+).*");
+    public static void parseError(String input) {
 
-            // Pattern to match the exception and associated message
-            Pattern exceptionPattern = Pattern.compile("Caused by: (.*)");
+        // Pattern to match the Java line number
+        Pattern lineNumberPattern = Pattern.compile(".*\\.java:(\\d+).*");
 
-            Matcher lineNumberMatcher = lineNumberPattern.matcher(input);
-            Matcher exceptionMatcher = exceptionPattern.matcher(input);
+        // Pattern to match the exception and associated message
+        Pattern exceptionPattern = Pattern.compile("Caused by: (.*)");
 
-            // Find the line number
-            if (lineNumberMatcher.find()) {
-                String lineNumber = lineNumberMatcher.group(1);
-                System.out.println("Line Number of Java File: " + lineNumber);
-            } else {
-                System.out.println("Java Line Number not found.");
-            }
+        Matcher lineNumberMatcher = lineNumberPattern.matcher(input);
+        Matcher exceptionMatcher = exceptionPattern.matcher(input);
 
-            // Find the exception and associated message
-            if (exceptionMatcher.find()) {
-                String exceptionMessage = exceptionMatcher.group(1);
-                System.out.println("Exception and Associated Message: " + exceptionMessage);
-            } else {
-                System.out.println("Exception not found.");
-            }
+        // Find the line number
+        if (lineNumberMatcher.find()) {
+            String lineNumber = lineNumberMatcher.group(1);
+            System.out.println("Line Number of Java File: " + lineNumber);
+        } else {
+            System.out.println("Java Line Number not found.");
         }
+
+        // Find the exception and associated message
+        if (exceptionMatcher.find()) {
+            String exceptionMessage = exceptionMatcher.group(1);
+            System.out.println("Exception and Associated Message: " + exceptionMessage);
+        } else {
+            System.out.println("Exception not found.");
+        }
+    }
+
+    public static void generateMarkdownFile(List<TestFailureMetadata> list, String filename) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(filename))) {
+            // header
+            writer.println("| Name | Type | Message |");
+            writer.println("|------|------|---------|");
+
+            // row
+
+            list.forEach(entry -> {
+                writer.printf("| %-20s | %-30s | %-70s |%n", entry.name(), entry.type(), entry.message());
+            });
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //    public static void main(String[] args) {
+    List<Map<String, String>> data = List.of(
+            Map.of(
+                    "name", "initializationError",
+                    "type", "java.lang.NoClassDefFoundError",
+                    "message", "Could not initialize class org.springframework.test.context.junit4.SpringJUnit4ClassRunner"
+            )
+    );
+
+//        generateMarkdownFile(data, "output.md");
+//    }
 
 
     public static void main(String[] args) {
-        // TODO code application logic here
-        File logFile = new File("examples/log/1eb6d9d5b2a07720a0839457cee81e066dd932f2.log");
-//        final var testFiles = getTestFiles(Path.of("/Users/frank/Downloads/Test_Failures/webapp"));
-        try {
-            parserSurefireTests(logFile, Path.of("/Users/frank/Downloads/Test_Failures/webapp"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
 
 //        try {
-//            extractErrorInfo(logFile.getAbsolutePath());
+//            parserSurefireTests(Path.of("/Users/frank/Downloads/Test_Failures/webapp"));
 //        } catch (IOException e) {
 //            throw new RuntimeException(e);
 //        }
+    }
 
+    public record TestFailureMetadata(String name, String type, String message) {
     }
 }
 

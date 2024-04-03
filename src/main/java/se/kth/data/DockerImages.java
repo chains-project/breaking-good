@@ -79,6 +79,8 @@ public class DockerImages {
                     log.error("Could not copy the project {}", project);
                     return;
                 }
+            }else {
+                log.info("Project {} already exists.", project);
             }
 
             try {

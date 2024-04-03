@@ -21,7 +21,7 @@ def process_json_files(folder_path):
 
 def write_to_csv(data_list):
     # Open a CSV file in write mode
-    with open('output.csv', mode='w', newline='') as file:
+    with open('Maracas_Compilation_Failures.csv', mode='w', newline='') as file:
         # Create a CSV writer object
         writer = csv.writer(file)
         # Write the header row

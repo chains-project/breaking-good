@@ -21,7 +21,7 @@ def process_json_files(folder_path):
 
 def write_to_csv(data_list):
     # Open a CSV file in write mode
-    with open('Maracas_Compilation_Failures.csv', mode='w', newline='') as file:
+    with open('Maracas_Test_Failures.csv', mode='w', newline='') as file:
         # Create a CSV writer object
         writer = csv.writer(file)
         # Write the header row
@@ -31,5 +31,5 @@ def write_to_csv(data_list):
             writer.writerow(item)
 
 # Change the folder path according to your configuration
-folder_path = "/Users/frank/Documents/Work/PHD/Tools/bump_experiments/src/main/java/maracas/breaking_changes_compilation_errors"
+folder_path = "/Users/frank/Documents/Work/PHD/Tools/bump_experiments/src/main/java/maracas/breaking_changes"
 process_json_files(folder_path)

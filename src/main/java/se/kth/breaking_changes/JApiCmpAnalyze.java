@@ -1,12 +1,10 @@
 package se.kth.breaking_changes;
 
-import japicmp.cli.JApiCli;
 import japicmp.cmp.JApiCmpArchive;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
 import japicmp.exception.JApiCmpException;
-import japicmp.model.AccessModifier;
 import japicmp.model.JApiClass;
 import japicmp.output.OutputFilter;
 import japicmp.output.semver.SemverOut;
@@ -20,7 +18,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import se.kth.core.Instruction;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -45,29 +42,9 @@ public class JApiCmpAnalyze {
         this.newJar = newJar;
     }
 
-    private static Options getDefaultOptions() {
-        Options defaultOptions = Options.newDefault();
-        defaultOptions.setAccessModifier(AccessModifier.PROTECTED);
-        defaultOptions.setOutputOnlyModifications(true);
-        defaultOptions.setXmlOutputFile(Optional.of("output.xml"));
-        defaultOptions.setClassPathMode(JApiCli.ClassPathMode.TWO_SEPARATE_CLASSPATHS);
-        defaultOptions.setIgnoreMissingClasses(true);
-        defaultOptions.setReportOnlyFilename(true);
-        String[] excl = {"(*.)?tests(.*)?", "(*.)?test(.*)?",
-                "@org.junit.After", "@org.junit.AfterClass",
-                "@org.junit.Before", "@org.junit.BeforeClass",
-                "@org.junit.Ignore", "@org.junit.Test",
-                "@org.junit.runner.RunWith"};
-
-        for (String e : excl) {
-            defaultOptions.addExcludeFromArgument(Optional.of(e), false);
-        }
-
-        return defaultOptions;
-    }
 
     public Set<ApiChange> useJApiCmp() {
-        Options defaultOptions = getDefaultOptions();
+        Options defaultOptions = BreakingGoodOptions.getDefaultOptions();
         JarArchiveComparatorOptions comparatorOptions = JarArchiveComparatorOptions.of(defaultOptions);
 
         JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(comparatorOptions);
@@ -75,45 +52,58 @@ public class JApiCmpAnalyze {
         JApiCmpArchive old = new JApiCmpArchive(oldJar.toFile(), oldJar.getFileName().toString());
 
         List<JApiClass> jApiClasses = jarArchiveComparator.compare(old, newF);
+
         OutputFilter filter = new OutputFilter(defaultOptions);
         filter.filter(jApiClasses);
+
         Set<ApiChange> libraryChanges = new HashSet<>();
 
+        JApiCmpElements jApiCmpElements = new JApiCmpElements();
+        JApiCompareScan.visit(jApiClasses, jApiCmpElements);
+
+        System.out.println("API CHANGES  "+ jApiCmpElements.getChanges().size());
+
+
+
         //list of classes
-        jApiClasses.forEach(jApiClass -> {
-
-            //read incompatible changes
-            jApiClass.getCompatibilityChanges().forEach(jApiCompatibilityChange -> {
-
-                //go for each change
-                jApiClasses.iterator().forEachRemaining(jApiClass1 -> {
-                    //get methods
-                    jApiClass1.getMethods().forEach(jApiMethod -> {
-//                        if (jApiMethod.getChangeStatus().equals(JApiChangeStatus.REMOVED)) {
-                        libraryChanges.add(new ApiChange(
-                                jApiMethod.getOldMethod().isPresent() ? jApiMethod.getOldMethod().get().getName() : "null",
-                                jApiMethod.getNewMethod().isPresent() ? jApiMethod.getNewMethod().get().getName() : "null",
-                                jApiMethod.getCompatibilityChanges().toString(),
-                                jApiMethod.getName(),
-                                jApiMethod.getOldMethod().isPresent() ? jApiMethod.getOldMethod().get().getLongName() : jApiMethod.getNewMethod().isPresent() ? jApiMethod.getNewMethod().get().getName() : "null",
-                                jApiMethod.getChangeStatus(),
-                                new ApiMetadata(newJar.toFile().getName(), newJar.getFileName().getFileName()),
-                                new ApiMetadata(oldJar.toFile().getName(), oldJar.getFileName().getFileName()),
-                                jApiMethod,
-                                Instruction.Method.toString()
-
-                        ));
-                    });
-                });
-            });
-        });
-        return libraryChanges;
+//        jApiClasses.forEach(jApiClass -> {
+//
+//
+//            //read incompatible changes
+//            jApiClass.getCompatibilityChanges().forEach(jApiCompatibilityChange -> {
+//
+//                //go for each change
+//                jApiClasses.iterator().forEachRemaining(jApiClass1 -> {
+//                    //get methods
+//                    jApiClass1.getMethods().forEach(jApiMethod -> {
+////                        if (jApiMethod.getChangeStatus().equals(JApiChangeStatus.REMOVED)) {
+//                        libraryChanges.add(new ApiChange(
+//                                jApiMethod.getOldMethod().isPresent() ? jApiMethod.getOldMethod().get().getName() : "null",
+//                                jApiMethod.getNewMethod().isPresent() ? jApiMethod.getNewMethod().get().getName() : "null",
+//                                jApiMethod.getCompatibilityChanges().toString(),
+//                                jApiMethod.getName(),
+//                                jApiMethod.getOldMethod().isPresent() ? jApiMethod.getOldMethod().get().getLongName() : jApiMethod.getNewMethod().isPresent() ? jApiMethod.getNewMethod().get().getName() : "null",
+//                                jApiMethod.getChangeStatus(),
+//                                new ApiMetadata(newJar.toFile().getName(), newJar.getFileName().getFileName()),
+//                                new ApiMetadata(oldJar.toFile().getName(), oldJar.getFileName().getFileName()),
+//                                jApiMethod,
+//                                Instruction.Method.toString()
+//
+//                        ));
+//                    });
+//
+//
+//
+//                });
+//            });
+//        });
+        return jApiCmpElements.getChanges();
     }
 
     public void getChanges() {
 
         log.info("Comparing {} with {}", this.newJar.getFileName(), this.oldJar.getFileName());
-        Options defaultOptions = getDefaultOptions();
+        Options defaultOptions = BreakingGoodOptions.getDefaultOptions();
         JarArchiveComparatorOptions comparatorOptions = JarArchiveComparatorOptions.of(defaultOptions);
 
         final var jApiClasses = getjApiClasses(comparatorOptions, defaultOptions);

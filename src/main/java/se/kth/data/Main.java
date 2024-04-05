@@ -22,10 +22,10 @@ public class Main {
 
 
     public static void main(String[] args) {
-        List<BreakingUpdateMetadata> list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark"));
-//        List<BreakingUpdateMetadata> list = getBreakingCommit(Path.of("examples/Benchmark"));
+//        List<BreakingUpdateMetadata> list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark"));
+        List<BreakingUpdateMetadata> list = getBreakingCommit(Path.of("examples/Benchmark"));
 //
-        List<BreakingUpdateMetadata> compilationErrors = list.stream().filter(b -> b.failureCategory().equals("TEST_FAILURE")).toList();
+        List<BreakingUpdateMetadata> compilationErrors = list.stream().filter(b -> b.failureCategory().equals("COMPILATION_FAILURE")).toList();
 
         generateTemplate(compilationErrors);
     }
@@ -71,7 +71,7 @@ public class Main {
                 System.out.println("Error downloading breaking update " + breakingUpdate.breakingCommit());
             }
 
-//            processingBreakingUpdate(breakingUpdate, jarsFile, explanationStatistics);
+            processingBreakingUpdate(breakingUpdate, jarsFile, explanationStatistics);
         }
 
     }

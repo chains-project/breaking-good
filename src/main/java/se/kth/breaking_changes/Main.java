@@ -13,11 +13,14 @@ public class Main {
     public static void main(String[] args) {
 
         JApiCmpAnalyze jApiCmpAnalyze = new JApiCmpAnalyze(
-                Path.of("/Users/frank/Documents/Work/PHD/Tools/bump_experiments/jars/0abf7148300f40a1da0538ab060552bca4a2f1d8/jasperreports-6.18.1.jar"),
-                Path.of("/Users/frank/Documents/Work/PHD/Tools/bump_experiments/jars/0abf7148300f40a1da0538ab060552bca4a2f1d8/jasperreports-6.19.1.jar")
+                Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/5cf5a482bd430d81257b4ecd85b3d4f7da911621/jakarta.mvc-api-1.1.0.jar"),
+                Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/5cf5a482bd430d81257b4ecd85b3d4f7da911621/jakarta.mvc-api-2.0.1.jar")
         );
 
+
         Set<ApiChange> apiChanges = jApiCmpAnalyze.useJApiCmp();
+
+        System.out.println("Number of changes: " + apiChanges.size());
 
         for (ApiChange apiChange : apiChanges) {
             System.out.println(apiChange);

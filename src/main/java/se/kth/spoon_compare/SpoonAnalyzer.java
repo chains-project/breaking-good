@@ -7,8 +7,10 @@ import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
+import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtType;
 import spoon.reflect.visitor.filter.TypeFilter;
+import spoon.support.reflect.declaration.CtFieldImpl;
 
 import java.util.*;
 
@@ -30,7 +32,13 @@ public class SpoonAnalyzer {
         spoon.addInputResource(projectFilePath);
         spoon.buildModel();
 
+        BreakingGoodScanner scanner = new BreakingGoodScanner();
+        scanner.scan(spoon.getModel().getRootPackage().getFactory().CompilationUnit().getMap());
+        scanner.scan(spoon.getModel().getRootPackage());
+
+
         return getElementFromSourcePosition(spoon.getModel(), dependencyGroupID);
+//        return null;
     }
 
 
@@ -45,30 +53,64 @@ public class SpoonAnalyzer {
             if (!e.isImplicit() && e.getPosition().isValidPosition() && isInvalidLine(e.getPosition().getLine())) {
                 SpoonResults spoonResults = new SpoonResults();
                 MavenErrorLog.ErrorInfo mavenErrorLog = getMavenErrorLog(e.getPosition().getLine());
+                System.out.println("ELEMENT :"+e.getPosition());
 ////
                 if (e instanceof CtInvocation<?>) {
-                    String parsedElement = parseProject(((CtInvocation<?>) e).getExecutable(), depGrpId);
-                    if (parsedElement != null) {
-                        spoonResults.setElement(String.valueOf(((CtInvocation<?>) e).getExecutable()));
-                        spoonResults.setName(parsedElement);
-                        spoonResults.setClientLine(e.toString());
-                        spoonResults.setPattern(replacePatterns(mavenErrorLog.getErrorMessage()));
-                        spoonResults.setErrorInfo(mavenErrorLog);
-                        results.add(spoonResults);
 
-                    }
+                    System.out.println(((CtInvocation<?>) e).getExecutable());
+
+//                    String parsedElement = parseProject(((CtInvocation<?>) e).getExecutable(), depGrpId);
+//                    if (parsedElement != null) {
+                    spoonResults.setElement(String.valueOf(((CtInvocation<?>) e).getExecutable()));
+                    spoonResults.setName(((CtInvocation<?>) e).getExecutable().getSimpleName());
+                    spoonResults.setClientLine(e.toString());
+                    spoonResults.setPattern(replacePatterns(mavenErrorLog.getErrorMessage()));
+                    spoonResults.setErrorInfo(mavenErrorLog);
+                    spoonResults.setCtElement(e);
+                    results.add(spoonResults);
+
+//                    }
                 }
                 if (e instanceof CtConstructorCall<?>) {
-                    String parsedElement = parseProject(((CtConstructorCall<?>) e).getExecutable(), depGrpId);
-                    if (parsedElement != null) {
-                        spoonResults.setElement(String.valueOf(((CtConstructorCall<?>) e).getExecutable()));
-                        spoonResults.setName(parsedElement);
-                        spoonResults.setClientLine(e.toString());
-                        spoonResults.setPattern(replacePatterns(mavenErrorLog.getErrorMessage()));
-                        spoonResults.setErrorInfo(mavenErrorLog);
-                        results.add(spoonResults);
+//                    String parsedElement = parseProject(((CtConstructorCall<?>) e).getExecutable(), depGrpId);
+//                    if (parsedElement != null) {
+                    spoonResults.setElement(String.valueOf(((CtConstructorCall<?>) e).getExecutable()));
+                    spoonResults.setName(String.valueOf(((CtConstructorCall<?>) e).getExecutable()));
+                    spoonResults.setClientLine(e.toString());
+                    spoonResults.setPattern(replacePatterns(mavenErrorLog.getErrorMessage()));
+                    spoonResults.setErrorInfo(mavenErrorLog);
+                    spoonResults.setCtElement(e);
+                    results.add(spoonResults);
+                    System.out.println(((CtConstructorCall<?>) e).getExecutable());
 
-                    }
+
+//                    }
+                }
+                if (e instanceof CtClass<?>) {
+                    spoonResults.setElement(String.valueOf(e));
+                    spoonResults.setName(String.valueOf(e));
+                    spoonResults.setClientLine(e.toString());
+                    spoonResults.setPattern(replacePatterns(mavenErrorLog.getErrorMessage()));
+                    spoonResults.setErrorInfo(mavenErrorLog);
+                    spoonResults.setCtElement(e);
+                    results.add(spoonResults);
+                    System.out.println(((CtClass<?>) e).getReference());
+                }
+
+                if (e instanceof CtFieldImpl<?>) {
+                    spoonResults.setElement(String.valueOf(e));
+                    spoonResults.setName(String.valueOf(e));
+                    spoonResults.setClientLine(e.toString());
+                    spoonResults.setPattern(replacePatterns(mavenErrorLog.getErrorMessage()));
+                    spoonResults.setErrorInfo(mavenErrorLog);
+                    spoonResults.setCtElement(e);
+                    results.add(spoonResults);
+                    System.out.println(((CtFieldImpl<?>) e).getType());
+                    System.out.println(Arrays.toString(((CtFieldImpl<?>) e).getReferencedTypes().toArray()));
+                }
+                if (e instanceof CtMethod<?>) {
+                    System.out.println(((CtMethod<?>) e).getSignature());
+
                 }
             }
         }

@@ -1,20 +1,19 @@
 package se.kth.breaking_changes;
 
-import se.kth.data.BreakingUpdateMetadata;
-
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Set;
-
-import static se.kth.data.Main.getBreakingCommit;
 
 public class Main {
 
     public static void main(String[] args) {
 
+        ApiMetadata apiMetadata = new ApiMetadata(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/0abf7148300f40a1da0538ab060552bca4a2f1d8/jasperreports-6.18.1.jar"));
+        ApiMetadata apiMetadata1 = new ApiMetadata(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/0abf7148300f40a1da0538ab060552bca4a2f1d8/jasperreports-6.19.1.jar"));
+
+
         JApiCmpAnalyze jApiCmpAnalyze = new JApiCmpAnalyze(
-                Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/5cf5a482bd430d81257b4ecd85b3d4f7da911621/jakarta.mvc-api-1.1.0.jar"),
-                Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/5cf5a482bd430d81257b4ecd85b3d4f7da911621/jakarta.mvc-api-2.0.1.jar")
+                apiMetadata,
+                apiMetadata1
         );
 
 

@@ -3,11 +3,13 @@ package se.kth;
 
 import picocli.CommandLine;
 import se.kth.breaking_changes.ApiChange;
+import se.kth.breaking_changes.ApiMetadata;
 import se.kth.breaking_changes.JApiCmpAnalyze;
 import se.kth.core.Changes;
 import se.kth.core.CombineResults;
 import se.kth.explaining.CompilationErrorTemplate;
 import se.kth.explaining.ExplanationTemplate;
+import se.kth.log_Analyzer.MavenErrorLog;
 import se.kth.log_Analyzer.MavenLogAnalyzer;
 
 import java.io.File;
@@ -66,18 +68,32 @@ public class Main {
 
         @Override
         public void run() {
+
+            ApiMetadata oldApiMetadata = new ApiMetadata(oldDependency.toFile().getName(), oldDependency);
+            ApiMetadata newApiMetadata = new ApiMetadata(newDependency.toFile().getName(), newDependency);
+
             JApiCmpAnalyze jApiCmpAnalyze = new JApiCmpAnalyze(
-                    oldDependency,
-                    newDependency);
+                    oldApiMetadata,
+                    newApiMetadata);
 
             Set<ApiChange> apiChanges = jApiCmpAnalyze.useJApiCmp();
 
-            CombineResults combineResults = new CombineResults(apiChanges);
-            combineResults.setDependencyGroupID(dependencyGroupID);
-            combineResults.setProject(client.toString());
-            combineResults.setMavenLog(new MavenLogAnalyzer(mavenLog));
+
+            ApiMetadata newApiVersion = new ApiMetadata(newDependency.toFile().getName(), newDependency);
+            ApiMetadata oldApiVersion = new ApiMetadata(oldDependency.toFile().getName(), oldDependency);
+
+            MavenLogAnalyzer log = new MavenLogAnalyzer(mavenLog);
 
             try {
+                MavenErrorLog errorLog = log.analyzeCompilationErrors();
+
+
+                CombineResults combineResults = new CombineResults(apiChanges, oldApiVersion, newApiVersion,errorLog,null);
+                combineResults.setDependencyGroupID(dependencyGroupID);
+                combineResults.setProject(client.toString());
+
+
+
                 Changes changes = combineResults.analyze();
                 changes.changes().forEach(change -> {
                             ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, "Explanation");

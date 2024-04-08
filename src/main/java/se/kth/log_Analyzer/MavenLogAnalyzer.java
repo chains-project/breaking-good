@@ -10,8 +10,9 @@ import java.util.regex.Pattern;
 
 public class MavenLogAnalyzer {
 
+    // Path to the log file
     private final File logFile;
-
+    // URL of the project
     private String projectURL;
 
     public MavenLogAnalyzer(File logFile) {
@@ -56,7 +57,7 @@ public class MavenLogAnalyzer {
                     }
                     if (currentPath != null) {
 
-                        MavenErrorLog.ErrorInfo errorInfo = new MavenErrorLog.ErrorInfo(String.valueOf(lineNumber), currentPath, line, lineNumberInFile);
+                        ErrorInfo errorInfo = new ErrorInfo(String.valueOf(lineNumber), currentPath, line, lineNumberInFile);
                         errorInfo.setErrorLogGithubLink(generateLogsLink(projectURL, 4, lineNumberInFile));
                         mavenErrorLogs.addErrorInfo(currentPath, errorInfo);
                     }

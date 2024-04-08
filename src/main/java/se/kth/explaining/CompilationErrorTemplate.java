@@ -1,11 +1,10 @@
 package se.kth.explaining;
 
-import japicmp.model.JApiMethod;
 import se.kth.core.BreakingChange;
 import se.kth.core.Changes;
 import se.kth.spoon_compare.SpoonResults;
-
-import static java.util.stream.Collectors.joining;
+import spoon.reflect.declaration.CtElement;
+import spoon.reflect.declaration.CtNamedElement;
 
 public class CompilationErrorTemplate extends ExplanationTemplate {
 
@@ -17,11 +16,8 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
     @Override
     public String getHead() {
 
-        BreakingChange breakingChange = !changes.changes().isEmpty() ?changes.changes().iterator().next() : null;
-
-
         return "CI detected that the dependency upgrade from version **%s** to **%s** has failed. Here are details to help you understand and fix the problem:"
-                .formatted(breakingChange.getApiChanges().getOldVersion().getName(), breakingChange.getApiChanges().getNewVersion().getName());
+                .formatted(changes.oldApiVersion().getName(), changes.newApiVersion().getName());
     }
 
     public String clientErrorLine(SpoonResults spoonResults) {
@@ -47,14 +43,14 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
         for (SpoonResults spoonResults : breakingChange.getErrorInfo()) {
             message.append(logLineErrorMessage(spoonResults)).append(clientErrorLine(spoonResults));
         }
-
         return message.toString();
     }
 
 
     /**
      * This method generates the broken element section of the markdown file
-     * @return
+     *
+     * @return String broken element section
      */
     @Override
     public String brokenElement() {
@@ -103,6 +99,10 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
         }
     }
 
+    private String getName(CtElement bc) {
+        return bc instanceof CtNamedElement ne ? ne.getSimpleName() : bc.getShortRepresentation();
+    }
+
 
     /**
      * This method translates the category of the change to a human-readable format
@@ -121,48 +121,28 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
         }
         int amountVariants = breakingChange.getApiChanges().getNewVariants().size();
         StringBuilder message = new StringBuilder();
+
         if (amountVariants > 1) {
             message.append("        To address this incompatibility, there are ")
                     .append(amountVariants)
                     .append(" alternative options available in the new version of the dependency that can replace the incompatible %s currently used in the client. You can consider substituting the existing %s with one of the following options provided by the new version of the dependency:\n".formatted(breakingChange.getApiChanges().getInstruction().toLowerCase(), breakingChange.getApiChanges().getInstruction().toLowerCase()));
 
-            breakingChange.getApiChanges().getNewVariants().forEach(apiChange -> {
-                JApiMethod method = ((JApiMethod) apiChange.getBehavior());
+            breakingChange.getApiChanges().getNewVariants().forEach(v -> {
                 message.append("        ``` java\n")
-                        .append("        ").append(methodName(method)).append(";\n")
+                        .append("        ").append(v.getReference().variantName()).append(";\n")
                         .append("        ```\n")
                 ;
             });
         } else {
             message.append(
                     "        To resolve this issue, there are alternative options available in the new version of the dependency that can replace the incompatible %s currently used in the client. You can consider substituting the existing %s with one of the following options provided by the new version of the dependency\n".formatted(breakingChange.getApiChanges().getInstruction().toLowerCase(), breakingChange.getApiChanges().getInstruction().toLowerCase()));
-            breakingChange.getApiChanges().getNewVariants().forEach(apiChange -> {
-                JApiMethod method = ((JApiMethod) apiChange.getBehavior());
+            breakingChange.getApiChanges().getNewVariants().forEach(v -> {
                 message.append("        ``` java\n")
-                        .append("        ").append(methodName(method)).append(";\n")
+                        .append("        ").append(v.getReference().variantName()).append(";\n")
                         .append("        ```\n");
             });
         }
         return message.toString();
-    }
-
-    /**
-     * This method returns the method name in the format of returnType methodName(params)
-     *
-     * @param method JApiMethod
-     * @return String
-     */
-    private String methodName(JApiMethod method) {
-
-        String[] fullReturnTypeName = method.getReturnType().getNewReturnType().split("\\.");
-        String returnTypeClass = fullReturnTypeName[fullReturnTypeName.length - 1].equals("n.a.") ? "void" : fullReturnTypeName[fullReturnTypeName.length - 1];
-
-        String params = method.getParameters().stream().map(jApiParameter -> {
-            String[] fullParameterTypeName = jApiParameter.getType().split("\\.");
-            return fullParameterTypeName[fullParameterTypeName.length - 1];
-        }).collect(joining(","));
-
-        return "%s %s(%s)".formatted(returnTypeClass, method.getName(), params);
     }
 
 

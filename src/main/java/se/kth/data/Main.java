@@ -11,9 +11,11 @@ import se.kth.explaining.ExplanationTemplate;
 import se.kth.log_Analyzer.MavenErrorLog;
 import se.kth.log_Analyzer.MavenLogAnalyzer;
 import se.kth.spoon_compare.Client;
+import spoon.reflect.CtModel;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,20 +23,55 @@ import java.util.Map;
 import java.util.Set;
 
 public class Main {
-
+    static List<BreakingUpdateMetadata> list = new ArrayList<>();
 
     public static void main(String[] args) {
-        List<BreakingUpdateMetadata> list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark"));
-//        List<BreakingUpdateMetadata> list = getBreakingCommit(Path.of("examples/Benchmark"));
+        String fileName = "cb541fd65c7b9bbc3424ea927f1dab223261d156";
+
+//        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark"));
+//      list = getBreakingCommit(Path.of("examples/Benchmark"));
+        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark/%s.json".formatted(fileName)));
 //
         List<BreakingUpdateMetadata> compilationErrors = list.stream().filter(b -> b.failureCategory().equals("COMPILATION_FAILURE")).toList();
 
+
+//        compilationErrors = read(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/explanationStatistics-data-old.json"), compilationErrors);
         generateTemplate(compilationErrors);
     }
 
-    public static List<BreakingUpdateMetadata> getBreakingCommit(Path benchmarkDir) {
 
-        File[] breakingUpdates = benchmarkDir.toFile().listFiles();
+    private static List<BreakingUpdateMetadata> read(Path path, List<BreakingUpdateMetadata> breakingUpdateList) {
+        List<ExplanationStatistics> bu = List.of(JsonUtils.readFromFile(path, ExplanationStatistics[].class));
+        List<BreakingUpdateMetadata> newlist = new ArrayList<>();
+
+        bu.forEach(b -> {
+            boolean found = false;
+            int j = 0;
+
+            for (int i = 0; i < bu.size(); i++) {
+                if (breakingUpdateList.get(i).breakingCommit().equals(b.commit())) {
+                    found = true;
+                    j = i;
+                    break;
+                }
+            }
+            if (!found)
+                newlist.add(breakingUpdateList.get(j));
+        });
+
+        return newlist;
+    }
+
+
+    public static List<BreakingUpdateMetadata> getBreakingCommit(Path benchmarkDir) {
+        File[] breakingUpdates = null;
+
+        if (Files.isDirectory(benchmarkDir)) {
+            breakingUpdates = benchmarkDir.toFile().listFiles();
+        } else {
+            breakingUpdates = new File[]{benchmarkDir.toFile()};
+        }
+
         MapType buJsonType = JsonUtils.getTypeFactory().constructMapType(Map.class, String.class, Object.class);
         List<BreakingUpdateMetadata> breakingUpdateList = new ArrayList<>();
 
@@ -66,7 +103,7 @@ public class Main {
                 continue;
             }
 
-            Path jarsFile = Path.of("projects/");
+            Path jarsFile = Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/");
 
             System.out.println("Processing breaking update " + breakingUpdate.breakingCommit());
             try {
@@ -80,7 +117,7 @@ public class Main {
 
             } catch (Exception e) {
                 System.out.println("Error processing breaking update " + breakingUpdate.breakingCommit());
-                System.out.println(e.toString());
+                System.out.println(e);
                 continue;
             }
         }
@@ -107,16 +144,18 @@ public class Main {
             Set<ApiChange> apiChanges = jApiCmpAnalyze.useJApiCmp();
             System.out.println("Number of changes: " + apiChanges.size());
 
-            Client client = new Client(Path.of("projects/%s".formatted(breakingUpdate.breakingCommit())));
+            Client client = new Client(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/%s/%s".formatted(breakingUpdate.breakingCommit(), breakingUpdate.project())));
+            client.setClasspath(List.of(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/43b3a858b77ec27fc8946aba292001c3de465012/logback-classic-1.2.11.jar")));
 
-
-            CombineResults combineResults = new CombineResults(apiChanges, oldApiVersion, newApiVersion, mavenLogAnalyzer, client);
+            CtModel model = client.createModel();
+            CombineResults combineResults = new CombineResults(apiChanges, oldApiVersion, newApiVersion, mavenLogAnalyzer, model);
             combineResults.setProject("projects/%s".formatted(breakingUpdate.breakingCommit()));
 
             try {
                 Changes changes = combineResults.analyze();
                 System.out.println("Project: " + breakingUpdate.project());
                 System.out.println("Breaking Commit: " + breakingUpdate.breakingCommit());
+                System.out.println("Maven Errors: " + mavenLogAnalyzer.getErrorInfo().size());
                 System.out.println("Changes: " + changes.changes().size());
                 explanationStatistics.add(new ExplanationStatistics(breakingUpdate.project(), breakingUpdate.breakingCommit(), changes.changes().size()));
                 ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, "Explanations/" + breakingUpdate.breakingCommit() + ".md");
@@ -128,19 +167,19 @@ public class Main {
                 System.out.println(e);
                 throw new RuntimeException(e);
             }
-////            try {
-////                Path file = Path.of("explanationStatistics.json");
-////                Files.deleteIfExists(file);
-////                Files.createFile(file);
-////                JsonUtils.writeToFile(file, explanationStatistics);
-////            } catch (IOException e) {
-////                throw new RuntimeException(e);
-////            }
+            try {
+                Path file = (list.size() > 1) ? Path.of("explanationStatistics-data.json") : Path.of("tmpStatistics.json");
+                Files.deleteIfExists(file);
+                Files.createFile(file);
+                JsonUtils.writeToFile(file, explanationStatistics);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
         } catch (Exception e) {
             System.out.println("Error processing breaking update " + breakingUpdate.breakingCommit());
             System.out.println(e.toString());
-//            throw new RuntimeException(e);
+            throw new RuntimeException(e);
         }
     }
 

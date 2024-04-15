@@ -33,28 +33,29 @@ public class CombineResults {
 
     ApiMetadata newVersion;
 
-    Client client;
+    CtModel model;
 
-    public CombineResults(Set<ApiChange> apiChanges, ApiMetadata oldVersion, ApiMetadata newVersion, MavenErrorLog mavenLog, Client client) {
+    public CombineResults(Set<ApiChange> apiChanges, ApiMetadata oldVersion, ApiMetadata newVersion, MavenErrorLog mavenLog, CtModel model) {
         Objects.requireNonNull(apiChanges);
         Objects.requireNonNull(oldVersion);
         Objects.requireNonNull(newVersion);
         Objects.requireNonNull(mavenLog);
+        Objects.requireNonNull(model);
 
 
         this.apiChanges = apiChanges;
         this.oldVersion = oldVersion;
         this.newVersion = newVersion;
         this.mavenLog = mavenLog;
-        this.client = client;
+        this.model = model;
     }
 
     public Changes analyze() throws IOException {
 
         Set<BreakingChange> change = new HashSet<>();
         try {
-            client.setClasspath(List.of(oldVersion.getFile()));
-            CtModel model = client.createModel();
+            // client.setClasspath(List.of(oldVersion.getFile()));
+
             mavenLog.getErrorInfo().forEach((k, v) -> {
                 SpoonAnalyzer spoonAnalyzer = new SpoonAnalyzer(v, apiChanges, model);
                 List<SpoonResults> results = spoonAnalyzer.applySpoon(project + k);
@@ -63,6 +64,7 @@ public class CombineResults {
             });
         } catch (Exception e) {
             System.out.println("Error creating model");
+            throw new RuntimeException(e);
         }
 
 
@@ -72,7 +74,9 @@ public class CombineResults {
     public void findBreakingChanges(List<SpoonResults> spoonResults, Set<BreakingChange> change) {
         spoonResults.forEach(spoonResult -> {
             apiChanges.forEach(apiChange -> {
-                if (apiChange.getChangeType().equals(JApiChangeStatus.REMOVED) && apiChange.getName().equals(spoonResult.getName())) {
+                if ((apiChange.getChangeType().equals(JApiChangeStatus.REMOVED) ||
+                        apiChange.getChangeType().equals(JApiChangeStatus.MODIFIED)
+                ) && apiChange.getName().equals(spoonResult.getName())) {
                     for (BreakingChange breakingChange : change) {
                         if (breakingChange.getApiChanges().getName().equals(apiChange.getName())) {
                             breakingChange.addErrorInfo(spoonResult);

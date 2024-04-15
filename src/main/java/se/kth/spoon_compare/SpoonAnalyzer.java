@@ -46,8 +46,8 @@ public class SpoonAnalyzer {
                         && element.getPosition().isValidPosition()
                         && errorLines.contains(element.getPosition().getLine())
                         && element.getPosition().toString().contains(fileInClient)
-
         ).list();
+
 
         BreakingGoodScanner scanner = new BreakingGoodScanner(apiChanges, mavenErrorLog);
         scanner.scan(elements);

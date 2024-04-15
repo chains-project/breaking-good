@@ -1,5 +1,6 @@
 package se.kth.spoon_compare;
 
+import japicmp.model.JApiCompatibilityChangeType;
 import lombok.Getter;
 import se.kth.breaking_changes.ApiChange;
 import se.kth.log_Analyzer.ErrorInfo;
@@ -55,10 +56,14 @@ public class BreakingGoodScanner extends CtScanner {
     @Override
     public <T> void visitCtMethod(CtMethod<T> m) {
         if (m.getPosition().isValidPosition() && clientLine.contains(m.getPosition().getLine())) {
-            System.out.println("Method Simple Name: " + m.getSimpleName());
-            System.out.println("Method Signature: " + m.getSignature());
-            System.out.println("Method Position: " + (m.getPosition().isValidPosition() ? m.getPosition().getLine() : "Invalid"));
-            System.out.println("Method Parent: " + m.getParent().toString());
+            SpoonResults spoonResults = new SpoonResults();
+            spoonResults.setElement(m.toString());
+            spoonResults.setName(m.getSimpleName());
+            spoonResults.setClientLine(m.toString());
+            spoonResults.setPattern("");
+            spoonResults.setErrorInfo(getMavenErrorLog(m.getPosition().getLine()));
+            spoonResults.setCtElement(m);
+            results.add(spoonResults);
         }
         super.visitCtMethod(m);
     }
@@ -197,7 +202,26 @@ public class BreakingGoodScanner extends CtScanner {
 
     @Override
     public <T> void visitCtExecutableReference(CtExecutableReference<T> reference) {
-        // visitors.forEach(v -> v.visitCtExecutableReference(reference));
+        apiChanges.stream().filter(apiChange -> apiChange.getName().equals(reference.getSimpleName())).forEach(apiChange -> {
+            if (apiChange.getCompatibilityChange().getType().equals(JApiCompatibilityChangeType.METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION)) {
+            }
+//            System.out.println("Api compatibility: " + apiChange.getCompatibilityChange().getType().toString());
+//            System.out.println("Executable Reference: " + reference.getSimpleName());
+//            MethodBreakingChange a = (MethodBreakingChange) apiChange.getReference();
+//            a.getJApiMethod().getExceptions().forEach(exception -> {
+//                System.out.println("Exception: " + exception.getName());
+//                System.out.println("Incompatibility "+exception.getChangeStatus().toString());
+//            });
+
+            SpoonResults spoonResults = new SpoonResults();
+            spoonResults.setName(reference.getSimpleName());
+            spoonResults.setCtElement(reference);
+            spoonResults.setClientLine(reference.toString());
+            spoonResults.setElement(reference.getSignature());
+            spoonResults.setErrorInfo(getMavenErrorLog(reference.getPosition().getLine()));
+            results.add(spoonResults);
+        });
+
         super.visitCtExecutableReference(reference);
     }
 
@@ -287,6 +311,15 @@ public class BreakingGoodScanner extends CtScanner {
     @Override
     public <T> void visitCtLocalVariable(CtLocalVariable<T> localVariable) {
         // visitors.forEach(v -> v.visitCtLocalVariable(localVariable));
+        if (localVariable.getPosition().isValidPosition() && clientLine.contains(localVariable.getPosition().getLine())) {
+            SpoonResults spoonResults = new SpoonResults();
+            spoonResults.setName(localVariable.getSimpleName());
+            spoonResults.setCtElement(localVariable);
+            spoonResults.setClientLine(localVariable.toString());
+            spoonResults.setElement(localVariable.getType().toString());
+            spoonResults.setErrorInfo(getMavenErrorLog(localVariable.getPosition().getLine()));
+            results.add(spoonResults);
+        }
         super.visitCtLocalVariable(localVariable);
     }
 
@@ -456,12 +489,14 @@ public class BreakingGoodScanner extends CtScanner {
     @Override
     public <T> void visitCtVariableRead(CtVariableRead<T> variableRead) {
         // visitors.forEach(v -> v.visitCtVariableRead(variableRead));
+
         super.visitCtVariableRead(variableRead);
     }
 
     @Override
     public <T> void visitCtVariableWrite(CtVariableWrite<T> variableWrite) {
         // visitors.forEach(v -> v.visitCtVariableWrite(variableWrite));
+
         super.visitCtVariableWrite(variableWrite);
     }
 

@@ -34,14 +34,26 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
 
 
     public String logLineErrorMessage(SpoonResults spoonResults) {
-        return "            *   >[%s](%s)\n".formatted(spoonResults.getErrorInfo().getErrorMessage(), spoonResults.getErrorInfo().getErrorLogGithubLink());
+        try {
+            return "            *   >[%s](%s)\n".formatted(spoonResults.getErrorInfo().getErrorMessage(), spoonResults.getErrorInfo().getErrorLogGithubLink());
+        } catch (
+                Exception e) {
+
+            return "";
+        }
 
     }
 
     public String errorSection(BreakingChange breakingChange, int instructions) {
         StringBuilder message = new StringBuilder();
         for (SpoonResults spoonResults : breakingChange.getErrorInfo()) {
-            message.append(logLineErrorMessage(spoonResults)).append(clientErrorLine(spoonResults));
+            try {
+                message.append(logLineErrorMessage(spoonResults)).append(clientErrorLine(spoonResults));
+            } catch (Exception e) {
+
+                return "";
+            }
+
         }
         return message.toString();
     }
@@ -137,9 +149,14 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
             message.append(
                     "        To resolve this issue, there are alternative options available in the new version of the dependency that can replace the incompatible %s currently used in the client. You can consider substituting the existing %s with one of the following options provided by the new version of the dependency\n".formatted(breakingChange.getApiChanges().getInstruction().toLowerCase(), breakingChange.getApiChanges().getInstruction().toLowerCase()));
             breakingChange.getApiChanges().getNewVariants().forEach(v -> {
-                message.append("        ``` java\n")
-                        .append("        ").append(v.getReference().variantName()).append(";\n")
-                        .append("        ```\n");
+                if (v.getReference() != null)
+                    try {
+                        message.append("        ``` java\n")
+                                .append("        ").append(v.getReference().variantName()).append(";\n")
+                                .append("        ```\n");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
             });
         }
         return message.toString();

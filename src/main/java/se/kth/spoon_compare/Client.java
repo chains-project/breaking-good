@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * We create a class to represent a client based in the Maracas Process.
  * This class is used to represent a client.
  * It is used to test the comparison of the Spoon library.
  * It is used to create Spoon model and add Jar files to the model.
@@ -31,7 +32,7 @@ public class Client {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public Client(Path sourcePath) {
+    public  Client(Path sourcePath) {
         this.sourcePath = sourcePath;
     }
 
@@ -41,7 +42,7 @@ public class Client {
 
         // Attempting to get the proper source folders to analyze
         if (Files.exists(sourcePath.resolve("pom.xml"))) {
-            launcher = new MavenLauncher(sourcePath.toString(), MavenLauncher.SOURCE_TYPE.APP_SOURCE, new String[0]);
+            launcher = new MavenLauncher(sourcePath.toString(), MavenLauncher.SOURCE_TYPE.ALL_SOURCE, new String[0]);
         } else {
             launcher = new Launcher();
             launcher.getEnvironment().setComplianceLevel(11);
@@ -60,6 +61,7 @@ public class Client {
         launcher.getEnvironment().setSourceClasspath(cp);
 
         CtModel spoonModel = launcher.buildModel();
+        System.out.println("Building Spoon model for " + this + " [classpath=" + classpath + "] took " + sw.elapsed().toMillis() + "ms");
         log.info("Building Spoon model for {} [classpath={}] took {}ms", this, classpath, sw.elapsed().toMillis());
         return spoonModel;
     }

@@ -5,6 +5,11 @@ import japicmp.model.JApiMethod;
 
 import static java.util.stream.Collectors.joining;
 
+/**
+ * Represents a method-level breaking change
+ * Result from the comparison of two versions of an API
+ */
+@lombok.Getter
 public class MethodBreakingChange extends AbstractApiChange {
 
     private final JApiBehavior jApiMethod;

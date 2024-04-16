@@ -6,6 +6,7 @@ import se.kth.breaking_changes.ApiMetadata;
 import se.kth.breaking_changes.JApiCmpAnalyze;
 import se.kth.core.Changes;
 import se.kth.core.CombineResults;
+import se.kth.core.Util;
 import se.kth.explaining.CompilationErrorTemplate;
 import se.kth.explaining.ExplanationTemplate;
 import se.kth.log_Analyzer.MavenErrorLog;
@@ -26,7 +27,7 @@ public class Main {
     static List<BreakingUpdateMetadata> list = new ArrayList<>();
 
     public static void main(String[] args) {
-        String fileName = "cb541fd65c7b9bbc3424ea927f1dab223261d156";
+        String fileName = "0abf7148300f40a1da0538ab060552bca4a2f1d8";
 
 //        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark"));
 //      list = getBreakingCommit(Path.of("examples/Benchmark"));
@@ -117,7 +118,7 @@ public class Main {
 
             } catch (Exception e) {
                 System.out.println("Error processing breaking update " + breakingUpdate.breakingCommit());
-                System.out.println(e);
+                System.out.println(e.toString());
                 continue;
             }
         }
@@ -157,8 +158,14 @@ public class Main {
                 System.out.println("Breaking Commit: " + breakingUpdate.breakingCommit());
                 System.out.println("Maven Errors: " + mavenLogAnalyzer.getErrorInfo().size());
                 System.out.println("Changes: " + changes.changes().size());
+
+                final var explanationsTmp = Path.of("Explanations_tmp");
+                if (Files.notExists(explanationsTmp)) {
+                    Files.createDirectory(explanationsTmp);
+                }
+
                 explanationStatistics.add(new ExplanationStatistics(breakingUpdate.project(), breakingUpdate.breakingCommit(), changes.changes().size()));
-                ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, "Explanations/" + breakingUpdate.breakingCommit() + ".md");
+                ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, explanationsTmp.toString()+File.separator + breakingUpdate.breakingCommit() + ".md");
                 explanationTemplate.generateTemplate();
                 System.out.println("**********************************************************");
 //                System.out.println();

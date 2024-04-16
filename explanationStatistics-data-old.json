@@ -1,0 +1,505 @@
+[ {
+  "project" : "OCR4all",
+  "commit" : "bd3ce213e2771c6ef7817c80818807a757d4e94a",
+  "changes" : 1
+}, {
+  "project" : "pdb",
+  "commit" : "43b3a858b77ec27fc8946aba292001c3de465012",
+  "changes" : 0
+}, {
+  "project" : "jadler",
+  "commit" : "d3af06df4613be146bb9f8034e1a8a3098050c82",
+  "changes" : 5
+}, {
+  "project" : "jadler",
+  "commit" : "ae16b526695fe275ab5e6a1992916875d26da860",
+  "changes" : 5
+}, {
+  "project" : "jooq-meta-postgres-flyway",
+  "commit" : "8e1f0f08eef839903067c7c11432117c4897d0cd",
+  "changes" : 0
+}, {
+  "project" : "jakartaee-mvc-sample",
+  "commit" : "5cf5a482bd430d81257b4ecd85b3d4f7da911621",
+  "changes" : 14
+}, {
+  "project" : "dropwizard-pac4j",
+  "commit" : "115827c6675f532a4d33751d1a0c0ba394bbd304",
+  "changes" : 4
+}, {
+  "project" : "lithium",
+  "commit" : "10d7545c5771b03dd9f6122bd5973a759eb2cd03",
+  "changes" : 2
+}, {
+  "project" : "LPVS",
+  "commit" : "aa14451c6f218af9c08e846345d83259eb7d46a8",
+  "changes" : 0
+}, {
+  "project" : "myfaces-tobago",
+  "commit" : "6ac25d3a60ea29a41a37ad47b7feb2908ee84fff",
+  "changes" : 2
+}, {
+  "project" : "HAP-Java",
+  "commit" : "6ad104c4fb9263ad1bb29e6b33618b8225efd92d",
+  "changes" : 1
+}, {
+  "project" : "IDS-Messaging-Services",
+  "commit" : "90cca141fc95d0510f92e23032c9d03813b074d8",
+  "changes" : 0
+}, {
+  "project" : "camunda-platform-7-mockito",
+  "commit" : "11be71ab8713fe987785e9e25e4f3e410e709ab9",
+  "changes" : 0
+}, {
+  "project" : "IDS-Messaging-Services",
+  "commit" : "e14a9e4a300747a582012aec4d40a6a69f5fd4f4",
+  "changes" : 5
+}, {
+  "project" : "camunda-platform-7-mockito",
+  "commit" : "df8452d0d7878f371c8775814e7a60cf6cecbfbb",
+  "changes" : 0
+}, {
+  "project" : "IDS-Messaging-Services",
+  "commit" : "fe57fca108ccd8ea9b98666075fbc3237874c314",
+  "changes" : 5
+}, {
+  "project" : "WorldwideChat",
+  "commit" : "832e0f184efdad0fcf15d14cb7af5e30239ff454",
+  "changes" : 1
+}, {
+  "project" : "flacoco",
+  "commit" : "b8f92ff37d1aed054d8320283fd6d6a492703a55",
+  "changes" : 0
+}, {
+  "project" : "log-record",
+  "commit" : "3d2b38ee1c838d885db80326b3cd60e314704e39",
+  "changes" : 0
+}, {
+  "project" : "code-coverage-api-plugin",
+  "commit" : "8ab7a7214f9ac1d130b416fae7280cfda533a54f",
+  "changes" : 0
+}, {
+  "project" : "IDS-Messaging-Services",
+  "commit" : "abe29340c60b0bfe93b13b638838163cf355eb03",
+  "changes" : 0
+}, {
+  "project" : "guice",
+  "commit" : "6c53cd904bd66fc79af8687571e607c259226b81",
+  "changes" : 0
+}, {
+  "project" : "code-coverage-api-plugin",
+  "commit" : "26fd1cd7639b7deb7078df5e4cb05c6d463ad07a",
+  "changes" : 0
+}, {
+  "project" : "poc-multi-module-arch-hexagonal-springboot",
+  "commit" : "6c9a2ecf3bac1e0c7675e03b2828a71450d8ed45",
+  "changes" : 0
+}, {
+  "project" : "nem",
+  "commit" : "c5fd5187ce64d2b53602717f09cc18dd21d55e8d",
+  "changes" : 0
+}, {
+  "project" : "IDS-Messaging-Services",
+  "commit" : "2b3054325e9e55e1af6056b604048fc328dbb2dd",
+  "changes" : 0
+}, {
+  "project" : "camunda-platform-7-mockito",
+  "commit" : "c5905f7220e1129a0448715ee5d0e61ee5ac31e1",
+  "changes" : 0
+}, {
+  "project" : "license-maven-plugin",
+  "commit" : "28be199c825d419957bc753a9519e8e9ecc6a08e",
+  "changes" : 2
+}, {
+  "project" : "camunda-platform-7-mockito",
+  "commit" : "17778ff224c38fe03999cac8caa1814b68fd0ef2",
+  "changes" : 0
+}, {
+  "project" : "micronaut-openapi-codegen",
+  "commit" : "59849004763ffd66d14047d51908192ba0551a73",
+  "changes" : 0
+}, {
+  "project" : "camunda-platform-7-mockito",
+  "commit" : "0ed34fa61c9e31bd4ebb7e4bf12ce792aec96091",
+  "changes" : 0
+}, {
+  "project" : "jcabi-simpledb",
+  "commit" : "7d97e1c7331f6722eb1d8192bf0a2686f5a33798",
+  "changes" : 0
+}, {
+  "project" : "sorald",
+  "commit" : "3d29f9a6823fa68763d3148bc0353ac557f2a815",
+  "changes" : 2
+}, {
+  "project" : "nem",
+  "commit" : "c44aa1857cdeb811d87303df5671be9431105d3c",
+  "changes" : 0
+}, {
+  "project" : "nem",
+  "commit" : "af6e5d1cc94f031f29b4838e7a8b56704c8c5de4",
+  "changes" : 6
+}, {
+  "project" : "docker-adapter",
+  "commit" : "db02c6bcb989a5b0f08861c3344b532769530467",
+  "changes" : 0
+}, {
+  "project" : "http",
+  "commit" : "4aab2869639226035c999c282f31efba15648ea3",
+  "changes" : 3
+}, {
+  "project" : "nem",
+  "commit" : "14fc5fa696f499cac48401b3a86882b3bf7d9b82",
+  "changes" : 6
+}, {
+  "project" : "code-coverage-api-plugin",
+  "commit" : "7e8c62e2bb21097e563747184636cf8e8934ce98",
+  "changes" : 0
+}, {
+  "project" : "code-coverage-api-plugin",
+  "commit" : "3a4a2b11483689ca3e99e92785a7b27c56d072b8",
+  "changes" : 0
+}, {
+  "project" : "incrementals-tools",
+  "commit" : "c09896887acf0fe59320e01145a7034cd8d4e326",
+  "changes" : 1
+}, {
+  "project" : "polyglot-maven",
+  "commit" : "1e17e176460ab4283e463e62fece844d341da7f0",
+  "changes" : 1
+}, {
+  "project" : "billy",
+  "commit" : "f6659d758a437f8b676481fe70671a68a6ee1cde",
+  "changes" : 1
+}, {
+  "project" : "LPVS",
+  "commit" : "433fbc0ee1192ca4aa69f337fd3b530ec94906e9",
+  "changes" : 0
+}, {
+  "project" : "jadler",
+  "commit" : "8fbb6deb112102ef7507a8e68c5215e5f481d03b",
+  "changes" : 5
+}, {
+  "project" : "docker-adapter",
+  "commit" : "497b81f4446c257f693648cad7a64f62b23920a2",
+  "changes" : 0
+}, {
+  "project" : "IDS-Messaging-Services",
+  "commit" : "4b9fdf1135b704e050cf785d6ea353d24f4c64bb",
+  "changes" : 5
+}, {
+  "project" : "IDS-Messaging-Services",
+  "commit" : "fe31c5e11259881e9dce66d325d1b8b8ed8afc81",
+  "changes" : 0
+}, {
+  "project" : "IDS-Messaging-Services",
+  "commit" : "08e33c7bbc45ceac64564dadb9abbae0ed481ca5",
+  "changes" : 0
+}, {
+  "project" : "nem",
+  "commit" : "c3818c076f0c088d1d11b7812b880be579c19ec2",
+  "changes" : 1
+}, {
+  "project" : "arex-agent-java",
+  "commit" : "dc9a40fde9a9fee5aaec3f60695385ba539406d4",
+  "changes" : 0
+}, {
+  "project" : "polyglot-maven",
+  "commit" : "a9df7b2235224fcabefa1d62e8956911aa5bb825",
+  "changes" : 1
+}, {
+  "project" : "ChangeSkin",
+  "commit" : "402082609522c66a3b790aedafd0570148a7d53f",
+  "changes" : 62
+}, {
+  "project" : "IDS-Messaging-Services",
+  "commit" : "bcafa6f39116555a4c53882ed2cf2835594d9114",
+  "changes" : 0
+}, {
+  "project" : "nem",
+  "commit" : "b6a48a6e557fad1ceda680618e0a34c7b8c5c087",
+  "changes" : 6
+}, {
+  "project" : "pdb",
+  "commit" : "d401e189fb6435110e3dc4ca1a94838f167e7ddf",
+  "changes" : 0
+}, {
+  "project" : "LPVS",
+  "commit" : "0cdcc1f1319311f383676a89808c9b8eb190145c",
+  "changes" : 0
+}, {
+  "project" : "lti-launch",
+  "commit" : "4259baebb426fefbe9dbee26725d6803170dcb85",
+  "changes" : 5
+}, {
+  "project" : "plexus-archiver",
+  "commit" : "3ff575ae202cdf76ddfa8a4228a1711a6fa1e921",
+  "changes" : 1
+}, {
+  "project" : "camunda-platform-7-mockito",
+  "commit" : "a698299490d70ce07b7af6e29ebf4627d412f4dd",
+  "changes" : 0
+}, {
+  "project" : "IDS-Messaging-Services",
+  "commit" : "fb71d68c62a6b9263ebc5113d97c91535d3106b2",
+  "changes" : 0
+}, {
+  "project" : "openhospital-core",
+  "commit" : "9da8825fbdb24922b94be9eb82eefc73640d8f6b",
+  "changes" : 0
+}, {
+  "project" : "nem",
+  "commit" : "1d43bce1de6a81ac017c233d72f348d3c850299e",
+  "changes" : 6
+}, {
+  "project" : "IDS-Messaging-Services",
+  "commit" : "02eedffd33cc1fe94b59372a1c1bfd91b2fc2ced",
+  "changes" : 0
+}, {
+  "project" : "depclean",
+  "commit" : "2f01c46b96a8edf437edf20e6dbd848edcb27085",
+  "changes" : 0
+}, {
+  "project" : "docker-adapter",
+  "commit" : "fab0f8d4f7322fa6da914c8c9f30baf740d46b99",
+  "changes" : 0
+}, {
+  "project" : "nem",
+  "commit" : "c32185c43be158d32c7d13c5b816991954eb45fa",
+  "changes" : 6
+}, {
+  "project" : "allure-maven",
+  "commit" : "88c1f903cede03ff371059cdaf009dab12007043",
+  "changes" : 0
+}, {
+  "project" : "cdi-test",
+  "commit" : "4bba3fb6147e72946f64724fe55eee5d15ff6206",
+  "changes" : 0
+}, {
+  "project" : "jadler",
+  "commit" : "5287fc631fa78e7f11d39983824cdd4215b9a03b",
+  "changes" : 5
+}, {
+  "project" : "IDS-Messaging-Services",
+  "commit" : "979780b29cf329579fa703552f9090b23c10e81d",
+  "changes" : 0
+}, {
+  "project" : "IDS-Messaging-Services",
+  "commit" : "ae17c8e47b93596cffeb2ec9241465cf39c7f8eb",
+  "changes" : 5
+}, {
+  "project" : "IDS-Messaging-Services",
+  "commit" : "d675fa18d22f8ad374f8d6cb7e0dfd9b1f18cc58",
+  "changes" : 0
+}, {
+  "project" : "docker-adapter",
+  "commit" : "974c914726a07961dcf87718e3035f1de72567ea",
+  "changes" : 0
+}, {
+  "project" : "jadler",
+  "commit" : "f26cd85b97b24c07a2e446f43ac8793619fa0724",
+  "changes" : 5
+}, {
+  "project" : "code-coverage-api-plugin",
+  "commit" : "6d68d927b01ceb567f1067a91afbc97b4c5a66ce",
+  "changes" : 0
+}, {
+  "project" : "jooq-meta-postgres-flyway",
+  "commit" : "626631e833256a62137c1e5c35c5c5821ca700d5",
+  "changes" : 0
+}, {
+  "project" : "qa-catalogue",
+  "commit" : "43c824a24b09efd8b4b00449ce31cd121a6b23eb",
+  "changes" : 2
+}, {
+  "project" : "jadler",
+  "commit" : "95b2c15de16fd9fd612ce73672e29b613ce7a909",
+  "changes" : 5
+}, {
+  "project" : "pay-adminusers",
+  "commit" : "a80dac86d1caa3958c45c036d93a7d9231d88fbf",
+  "changes" : 0
+}, {
+  "project" : "jakartaee-mvc-sample",
+  "commit" : "500d9c021d34b307b1a70d3f29fb7f9b5ab9d1a6",
+  "changes" : 14
+}, {
+  "project" : "sorald",
+  "commit" : "65200df71d5f6ab1c5502f74a5dc7bcbda459563",
+  "changes" : 2
+}, {
+  "project" : "docker-adapter",
+  "commit" : "c131a3dbb5670183944861f23f225fd772370ff4",
+  "changes" : 0
+}, {
+  "project" : "scoverage-maven-plugin",
+  "commit" : "c7c9590a206d4fb77dd05b9df391d888e6181667",
+  "changes" : 0
+}, {
+  "project" : "LPVS",
+  "commit" : "c1fc16b4fe9dfdfa16ce7248fccad0e7d994094d",
+  "changes" : 0
+}, {
+  "project" : "singer",
+  "commit" : "3572a1ecc0154c61e05505aed56055b9c5e539a6",
+  "changes" : 2
+}, {
+  "project" : "IDS-Messaging-Services",
+  "commit" : "79759978f25c94d97f340c80ef0e77c3ee6f8cfc",
+  "changes" : 0
+}, {
+  "project" : "log-record",
+  "commit" : "6e9e6cdda5c5637ce66ba16b8ccfcd5ffce8141d",
+  "changes" : 0
+}, {
+  "project" : "quickfixj",
+  "commit" : "00a7cc31784ac4a9cc27d506a73ae589d6df36d6",
+  "changes" : 2
+}, {
+  "project" : "docker-adapter",
+  "commit" : "5fca04bd287baf1534baff8cc23cc3dc26dc680d",
+  "changes" : 0
+}, {
+  "project" : "pay-adminusers",
+  "commit" : "cbcafe129e143ef09401470e9d11de9758f298d0",
+  "changes" : 0
+}, {
+  "project" : "code-coverage-api-plugin",
+  "commit" : "e40f76d1150d41821ccfd72e9dd3fabbc8763c1e",
+  "changes" : 0
+}, {
+  "project" : "LPVS",
+  "commit" : "1629113f03956a230738c47397c33f8ba2d11341",
+  "changes" : 0
+}, {
+  "project" : "LPVS",
+  "commit" : "e47fd8edc5227b6852ebd2466dd89049c9907b80",
+  "changes" : 0
+}, {
+  "project" : "IDS-Messaging-Services",
+  "commit" : "f5a34301592bb62474489de79069d7873ffe070e",
+  "changes" : 0
+}, {
+  "project" : "LPVS",
+  "commit" : "5b90c67ef2d2ebb296534ea2ce8d8955cf6854c7",
+  "changes" : 0
+}, {
+  "project" : "minfraud-api-java",
+  "commit" : "42a220bd546d293886df0d5e3892cc3ff82f1091",
+  "changes" : 0
+}, {
+  "project" : "nem",
+  "commit" : "ea33b5101edffc0242967cbf21c1016378b18483",
+  "changes" : 6
+}, {
+  "project" : "java-pubsub-group-kafka-connector",
+  "commit" : "d54b56b91c11f21b97d4903143b04b7c1f10c255",
+  "changes" : 7
+}, {
+  "project" : "docker-adapter",
+  "commit" : "9836e07e553e29f16ee35b5d7e4d0370e1789ecd",
+  "changes" : 0
+}, {
+  "project" : "camunda-platform-7-mockito",
+  "commit" : "8881523e12a0890f72ac9fef69821cefba0c7a09",
+  "changes" : 0
+}, {
+  "project" : "code-coverage-api-plugin",
+  "commit" : "06c5386831e97e94d9b9fd155d3ea4aa8711c4e7",
+  "changes" : 0
+}, {
+  "project" : "docker-adapter",
+  "commit" : "da616b08bed87397264691470f47638652f0015a",
+  "changes" : 0
+}, {
+  "project" : "camunda-platform-7-mockito",
+  "commit" : "7d1985cccacafa64e9eaa7fd5fe5c7154e994456",
+  "changes" : 0
+}, {
+  "project" : "docker-adapter",
+  "commit" : "ae0a0bd1311451e4a5a185a8d96405cfe3e049c5",
+  "changes" : 0
+}, {
+  "project" : "singer",
+  "commit" : "867e69e208ff59d1f8baae7ed41d3e163a51bc65",
+  "changes" : 3
+}, {
+  "project" : "guice",
+  "commit" : "acc50dabec6796c091b84c1ada2ae4cbcab8b562",
+  "changes" : 0
+}, {
+  "project" : "jooq-meta-postgres-flyway",
+  "commit" : "eb82573b99b6d9688e557d3490fa5d3e9512c99b",
+  "changes" : 0
+}, {
+  "project" : "IDS-Messaging-Services",
+  "commit" : "d7cc1744503dcd393468db7cbc47cec0cea2a2f0",
+  "changes" : 0
+}, {
+  "project" : "myfaces-tobago",
+  "commit" : "f5bc873a4b68e87761a65064ebea9ad8c3fb085f",
+  "changes" : 0
+}, {
+  "project" : "jcabi-ssh",
+  "commit" : "54abbbde6a1233e1523a9b5f811ea100efb5dead",
+  "changes" : 0
+}, {
+  "project" : "singer",
+  "commit" : "067f5d2c81ff87c90755f4ed48f62eb5faa8ecf9",
+  "changes" : 0
+}, {
+  "project" : "log-record",
+  "commit" : "2c04b9834112eba86fbb8ad1f925128d49449c41",
+  "changes" : 0
+}, {
+  "project" : "pay-adminusers",
+  "commit" : "07fad972bb884e9fa6143b4f870d08305811607d",
+  "changes" : 0
+}, {
+  "project" : "polyglot-maven",
+  "commit" : "249c3b394540fde4fcb72f66172af5e02b9c637e",
+  "changes" : 1
+}, {
+  "project" : "camunda-platform-7-mockito",
+  "commit" : "11c09e31119c28ea91a9777b2ce8893bca483493",
+  "changes" : 0
+}, {
+  "project" : "nem",
+  "commit" : "4b4c08d502d98d240855013ab76008f5e0243435",
+  "changes" : 6
+}, {
+  "project" : "wicket-crudifier",
+  "commit" : "9218cc9c8e0018d01e2d7cfe0e77aae7b65b378f",
+  "changes" : 14
+}, {
+  "project" : "micronaut-openapi-codegen",
+  "commit" : "88676d24472254d05976a62e72e1c3799525a616",
+  "changes" : 0
+}, {
+  "project" : "IDS-Messaging-Services",
+  "commit" : "58d2448fa2d6ec02f428b85eaeef0855508e72b9",
+  "changes" : 0
+}, {
+  "project" : "facebook-java-business-sdk",
+  "commit" : "83a25390887d8afa7d43b70070d710da3c90a7a6",
+  "changes" : 0
+}, {
+  "project" : "micronaut-openapi-codegen",
+  "commit" : "bad55510363bde900a60f13ecc744e0c244397d4",
+  "changes" : 0
+}, {
+  "project" : "IDS-Messaging-Services",
+  "commit" : "e14e4c4fa02468ad27d303785c26539a6b3b8eab",
+  "changes" : 0
+}, {
+  "project" : "pay-adminusers",
+  "commit" : "a26797cdeeecaa3b900ea1e0d5ec0cec66bf03ff",
+  "changes" : 0
+}, {
+  "project" : "code-coverage-api-plugin",
+  "commit" : "f9763c18c7e1fa54fb67dcf3935aa5106807aba9",
+  "changes" : 0
+}, {
+  "project" : "cdi-test",
+  "commit" : "3f30dfff617fd652412260ecf648a25769a27101",
+  "changes" : 5
+} ]

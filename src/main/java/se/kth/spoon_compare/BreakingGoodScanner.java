@@ -3,6 +3,7 @@ package se.kth.spoon_compare;
 import japicmp.model.JApiCompatibilityChangeType;
 import lombok.Getter;
 import se.kth.breaking_changes.ApiChange;
+import se.kth.core.Util;
 import se.kth.log_Analyzer.ErrorInfo;
 import spoon.reflect.code.*;
 import spoon.reflect.declaration.*;
@@ -202,7 +203,15 @@ public class BreakingGoodScanner extends CtScanner {
 
     @Override
     public <T> void visitCtExecutableReference(CtExecutableReference<T> reference) {
-        apiChanges.stream().filter(apiChange -> apiChange.getName().equals(reference.getSimpleName())).forEach(apiChange -> {
+
+        String name = Util.fullyQualifiedName(reference);
+
+
+        apiChanges.stream().filter(apiChange -> {
+            if (apiChange.getReference() != null)
+                System.out.println(apiChange.getReference().getFullQualifiedName() + " " + name);
+            return apiChange.getReference() != null && apiChange.getReference().getFullQualifiedName().equals(name);
+        }).forEach(apiChange -> {
             if (apiChange.getCompatibilityChange().getType().equals(JApiCompatibilityChangeType.METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION)) {
             }
 //            System.out.println("Api compatibility: " + apiChange.getCompatibilityChange().getType().toString());
@@ -281,18 +290,17 @@ public class BreakingGoodScanner extends CtScanner {
 
     @Override
     public <T> void visitCtInvocation(CtInvocation<T> invocation) {
+        String name = Util.fullyQualifiedName(invocation.getExecutable());
+        apiChanges.stream().filter(apiChange -> apiChange.getReference() != null && apiChange.getReference().getFullQualifiedName().equals(name)).forEach(apiChange -> {
+            SpoonResults spoonResults = new SpoonResults();
+            spoonResults.setName(invocation.getExecutable().getSimpleName());
+            spoonResults.setCtElement(invocation);
+            spoonResults.setClientLine(invocation.toString());
+            spoonResults.setElement(invocation.getExecutable().getSignature());
+            spoonResults.setErrorInfo(getMavenErrorLog(invocation.getPosition().getLine()));
+            results.add(spoonResults);
+        });
 
-        if (invocation.getPosition().isValidPosition() && clientLine.contains(invocation.getPosition().getLine())) {
-            apiChanges.stream().filter(apiChange -> apiChange.getName().equals(invocation.getExecutable().getSimpleName())).forEach(apiChange -> {
-                SpoonResults spoonResults = new SpoonResults();
-                spoonResults.setName(invocation.getExecutable().getSimpleName());
-                spoonResults.setCtElement(invocation);
-                spoonResults.setClientLine(invocation.toString());
-                spoonResults.setElement(invocation.getExecutable().getSignature());
-                spoonResults.setErrorInfo(getMavenErrorLog(invocation.getPosition().getLine()));
-                results.add(spoonResults);
-            });
-        }
         super.visitCtInvocation(invocation);
     }
 

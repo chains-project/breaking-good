@@ -38,6 +38,15 @@ public class MethodBreakingChange extends AbstractApiChange {
         return "%s %s(%s)".formatted(returnTypeClass, method.getName(), params);
     }
 
+    public String getFullQualifiedName() {
+
+        String className = jApiMethod.getjApiClass().getFullyQualifiedName();
+        String name = jApiMethod.getName();
+
+        return "%s.%s".formatted(className, name);
+
+    }
+
     @Override
     public String toString() {
         return "MethodBreakingChange{" +

@@ -28,9 +28,9 @@ public class Main {
     public static void main(String[] args) {
         String fileName = "cb541fd65c7b9bbc3424ea927f1dab223261d156";
 
-//        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark"));
+        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark"));
 //      list = getBreakingCommit(Path.of("examples/Benchmark"));
-        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark/%s.json".formatted(fileName)));
+//        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark/%s.json".formatted(fileName)));
 //
         List<BreakingUpdateMetadata> compilationErrors = list.stream().filter(b -> b.failureCategory().equals("COMPILATION_FAILURE")).toList();
 
@@ -155,7 +155,6 @@ public class Main {
                 Changes changes = combineResults.analyze();
                 System.out.println("Project: " + breakingUpdate.project());
                 System.out.println("Breaking Commit: " + breakingUpdate.breakingCommit());
-                System.out.println("Maven Errors: " + mavenLogAnalyzer.getErrorInfo().size());
                 System.out.println("Changes: " + changes.changes().size());
                 explanationStatistics.add(new ExplanationStatistics(breakingUpdate.project(), breakingUpdate.breakingCommit(), changes.changes().size()));
                 ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, "Explanations/" + breakingUpdate.breakingCommit() + ".md");
@@ -168,7 +167,7 @@ public class Main {
                 throw new RuntimeException(e);
             }
             try {
-                Path file = (list.size() > 1) ? Path.of("explanationStatistics-data.json") : Path.of("tmpStatistics.json");
+                Path file = (list.size() > 1) ? Path.of("explanationStatistics-last.json") : Path.of("tmpStatistics.json");
                 Files.deleteIfExists(file);
                 Files.createFile(file);
                 JsonUtils.writeToFile(file, explanationStatistics);

@@ -29,9 +29,9 @@ public class Main {
     public static void main(String[] args) {
         String fileName = "0abf7148300f40a1da0538ab060552bca4a2f1d8";
 
-//        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark"));
+        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark"));
 //      list = getBreakingCommit(Path.of("examples/Benchmark"));
-        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark/%s.json".formatted(fileName)));
+//        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark/%s.json".formatted(fileName)));
 //
         List<BreakingUpdateMetadata> compilationErrors = list.stream().filter(b -> b.failureCategory().equals("COMPILATION_FAILURE")).toList();
 
@@ -146,7 +146,7 @@ public class Main {
             System.out.println("Number of changes: " + apiChanges.size());
 
             Client client = new Client(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/%s/%s".formatted(breakingUpdate.breakingCommit(), breakingUpdate.project())));
-            client.setClasspath(List.of(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/43b3a858b77ec27fc8946aba292001c3de465012/logback-classic-1.2.11.jar")));
+            client.setClasspath(List.of(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/%s/%s-%s.jar".formatted(breakingUpdate.breakingCommit(), breakingUpdate.updatedDependency().dependencyArtifactID(), breakingUpdate.updatedDependency().previousVersion()))));
 
             CtModel model = client.createModel();
             CombineResults combineResults = new CombineResults(apiChanges, oldApiVersion, newApiVersion, mavenLogAnalyzer, model);
@@ -156,16 +156,16 @@ public class Main {
                 Changes changes = combineResults.analyze();
                 System.out.println("Project: " + breakingUpdate.project());
                 System.out.println("Breaking Commit: " + breakingUpdate.breakingCommit());
-                System.out.println("Maven Errors: " + mavenLogAnalyzer.getErrorInfo().size());
                 System.out.println("Changes: " + changes.changes().size());
 
-                final var explanationsTmp = Path.of("Explanations_tmp");
-                if (Files.notExists(explanationsTmp)) {
-                    Files.createDirectory(explanationsTmp);
+                String explanationFolder = list.size() > 1 ? "Explanations/" : "Explanations_tmp/";
+                final var dir = Path.of(explanationFolder);
+                if (Files.notExists(dir)) {
+                    Files.createDirectory(dir);
                 }
 
                 explanationStatistics.add(new ExplanationStatistics(breakingUpdate.project(), breakingUpdate.breakingCommit(), changes.changes().size()));
-                ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, explanationsTmp.toString()+File.separator + breakingUpdate.breakingCommit() + ".md");
+                ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, explanationFolder + "/" + breakingUpdate.breakingCommit() + ".md");
                 explanationTemplate.generateTemplate();
                 System.out.println("**********************************************************");
 //                System.out.println();
@@ -175,7 +175,7 @@ public class Main {
                 throw new RuntimeException(e);
             }
             try {
-                Path file = (list.size() > 1) ? Path.of("explanationStatistics-data.json") : Path.of("tmpStatistics.json");
+                Path file = (list.size() > 1) ? Path.of("explanationStatistics-last.json") : Path.of("tmpStatistics.json");
                 Files.deleteIfExists(file);
                 Files.createFile(file);
                 JsonUtils.writeToFile(file, explanationStatistics);

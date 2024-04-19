@@ -145,7 +145,7 @@ public class Main {
             System.out.println("Number of changes: " + apiChanges.size());
 
             Client client = new Client(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/%s/%s".formatted(breakingUpdate.breakingCommit(), breakingUpdate.project())));
-            client.setClasspath(List.of(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/43b3a858b77ec27fc8946aba292001c3de465012/logback-classic-1.2.11.jar")));
+            client.setClasspath(List.of(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/%s/%s-%s.jar".formatted(breakingUpdate.breakingCommit(), breakingUpdate.updatedDependency().dependencyArtifactID(), breakingUpdate.updatedDependency().previousVersion()))));
 
             CtModel model = client.createModel();
             CombineResults combineResults = new CombineResults(apiChanges, oldApiVersion, newApiVersion, mavenLogAnalyzer, model);
@@ -156,8 +156,15 @@ public class Main {
                 System.out.println("Project: " + breakingUpdate.project());
                 System.out.println("Breaking Commit: " + breakingUpdate.breakingCommit());
                 System.out.println("Changes: " + changes.changes().size());
+
+                String explanationFolder = list.size() > 1 ? "Explanations/" : "Explanations_tmp/";
+                final var dir = Path.of(explanationFolder);
+                if (Files.notExists(dir)) {
+                    Files.createDirectory(dir);
+                }
+
                 explanationStatistics.add(new ExplanationStatistics(breakingUpdate.project(), breakingUpdate.breakingCommit(), changes.changes().size()));
-                ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, "Explanations/" + breakingUpdate.breakingCommit() + ".md");
+                ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, explanationFolder + "/" + breakingUpdate.breakingCommit() + ".md");
                 explanationTemplate.generateTemplate();
                 System.out.println("**********************************************************");
 //                System.out.println();

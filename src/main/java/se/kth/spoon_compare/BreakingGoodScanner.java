@@ -290,15 +290,18 @@ public class BreakingGoodScanner extends CtScanner {
 
     @Override
     public <T> void visitCtInvocation(CtInvocation<T> invocation) {
-        String name = Util.fullyQualifiedName(invocation.getExecutable());
-        apiChanges.stream().filter(apiChange -> apiChange.getReference() != null && apiChange.getReference().getFullQualifiedName().equals(name)).forEach(apiChange -> {
-            SpoonResults spoonResults = new SpoonResults();
-            spoonResults.setName(invocation.getExecutable().getSimpleName());
-            spoonResults.setCtElement(invocation);
-            spoonResults.setClientLine(invocation.toString());
-            spoonResults.setElement(invocation.getExecutable().getSignature());
-            spoonResults.setErrorInfo(getMavenErrorLog(invocation.getPosition().getLine()));
-            results.add(spoonResults);
+
+        apiChanges.forEach(apiChange -> {
+            boolean match = new SpoonCtInvocation(invocation, apiChange).compare();
+            if (match) {
+                SpoonResults spoonResults = new SpoonResults();
+                spoonResults.setName(invocation.getExecutable().getSimpleName());
+                spoonResults.setCtElement(invocation);
+                spoonResults.setClientLine(invocation.toString());
+                spoonResults.setElement(invocation.getExecutable().getSignature());
+                spoonResults.setErrorInfo(getMavenErrorLog(invocation.getPosition().getLine()));
+                results.add(spoonResults);
+            }
         });
 
         super.visitCtInvocation(invocation);
@@ -381,7 +384,8 @@ public class BreakingGoodScanner extends CtScanner {
     }
 
     @Override
-    public <T, E extends CtExpression<?>> void visitCtExecutableReferenceExpression(CtExecutableReferenceExpression<T, E> expression) {
+    public <T, E extends CtExpression<?>> void visitCtExecutableReferenceExpression
+            (CtExecutableReferenceExpression<T, E> expression) {
         // visitors.forEach(v -> v.visitCtExecutableReferenceExpression(expression));
         super.visitCtExecutableReferenceExpression(expression);
     }

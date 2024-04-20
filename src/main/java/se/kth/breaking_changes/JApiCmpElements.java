@@ -86,6 +86,7 @@ public class JApiCmpElements implements JApiCompareScan {
     @Override
     public void visit(JApiImplementedInterface intf) {
         // Using visit(JApiClass jApiClass, JApiImplementedInterface jApiImplementedInterface)
+//        System.out.println("JApiImplementedInterface " + intf.getFullyQualifiedName() + " : " + (!intf.getCompatibilityChanges().isEmpty() ? intf.getCompatibilityChanges().get(0).getType() : "null"));
 
     }
 

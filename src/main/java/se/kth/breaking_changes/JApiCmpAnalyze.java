@@ -5,7 +5,6 @@ import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
 import japicmp.model.JApiClass;
-import japicmp.output.OutputFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,19 +39,12 @@ public class JApiCmpAnalyze {
 
         List<JApiClass> jApiClasses = jarArchiveComparator.compare(old, newF);
 
-        for (JApiClass jApiClass : jApiClasses) {
-
-        }
-
         BreakingGoodFilter filter = new BreakingGoodFilter(options);
         filter.filter(jApiClasses);
 
         JApiCmpElements jApiCmpElements = new JApiCmpElements();
         JApiCompareScan.visit(jApiClasses, jApiCmpElements);
 
-        jApiCmpElements.getAllChanges().forEach(apiChange -> {
-            log.info("{}", apiChange);
-        });
         return jApiCmpElements.getChanges();
     }
 }

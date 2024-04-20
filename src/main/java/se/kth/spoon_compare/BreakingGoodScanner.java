@@ -1,9 +1,7 @@
 package se.kth.spoon_compare;
 
-import japicmp.model.JApiCompatibilityChangeType;
 import lombok.Getter;
 import se.kth.breaking_changes.ApiChange;
-import se.kth.core.Util;
 import se.kth.log_Analyzer.ErrorInfo;
 import spoon.reflect.code.*;
 import spoon.reflect.declaration.*;
@@ -204,16 +202,7 @@ public class BreakingGoodScanner extends CtScanner {
     @Override
     public <T> void visitCtExecutableReference(CtExecutableReference<T> reference) {
 
-        String name = Util.fullyQualifiedName(reference);
-
-
         apiChanges.stream().filter(apiChange -> {
-            if (apiChange.getReference() != null)
-                System.out.println(apiChange.getReference().getFullQualifiedName() + " " + name);
-            return apiChange.getReference() != null && apiChange.getReference().getFullQualifiedName().equals(name);
-        }).forEach(apiChange -> {
-            if (apiChange.getCompatibilityChange().getType().equals(JApiCompatibilityChangeType.METHOD_NO_LONGER_THROWS_CHECKED_EXCEPTION)) {
-            }
 //            System.out.println("Api compatibility: " + apiChange.getCompatibilityChange().getType().toString());
 //            System.out.println("Executable Reference: " + reference.getSimpleName());
 //            MethodBreakingChange a = (MethodBreakingChange) apiChange.getReference();
@@ -229,6 +218,7 @@ public class BreakingGoodScanner extends CtScanner {
             spoonResults.setElement(reference.getSignature());
             spoonResults.setErrorInfo(getMavenErrorLog(reference.getPosition().getLine()));
             results.add(spoonResults);
+            return false;
         });
 
         super.visitCtExecutableReference(reference);
@@ -290,7 +280,6 @@ public class BreakingGoodScanner extends CtScanner {
 
     @Override
     public <T> void visitCtInvocation(CtInvocation<T> invocation) {
-
         apiChanges.forEach(apiChange -> {
             boolean match = new SpoonCtInvocation(invocation, apiChange).compare();
             if (match) {
@@ -303,7 +292,6 @@ public class BreakingGoodScanner extends CtScanner {
                 results.add(spoonResults);
             }
         });
-
         super.visitCtInvocation(invocation);
     }
 
@@ -367,7 +355,19 @@ public class BreakingGoodScanner extends CtScanner {
 
     @Override
     public <T> void visitCtConstructorCall(CtConstructorCall<T> ctConstructorCall) {
-        // visitors.forEach(v -> v.visitCtConstructorCall(ctConstructorCall));
+
+        for (ApiChange apiChange : apiChanges) {
+            boolean match = new SpoonCtConstructorCall(ctConstructorCall, apiChange).compare();
+            if (match) {
+                SpoonResults spoonResults = new SpoonResults();
+                spoonResults.setName(ctConstructorCall.getExecutable().getSimpleName());
+                spoonResults.setCtElement(ctConstructorCall);
+                spoonResults.setClientLine(ctConstructorCall.toString());
+                spoonResults.setElement(ctConstructorCall.getExecutable().getSignature());
+                spoonResults.setErrorInfo(getMavenErrorLog(ctConstructorCall.getPosition().getLine()));
+                results.add(spoonResults);
+            }
+        }
         super.visitCtConstructorCall(ctConstructorCall);
     }
 

@@ -38,13 +38,9 @@ public class SpoonCtInvocation {
             case METHOD_NOW_ABSTRACT:
                 return methodNowAbstract();
 
-            case ANNOTATION_DEPRECATED_ADDED:
-                annotationDeprecatedAdded();
-                break;
-
             case METHOD_RETURN_TYPE_CHANGED:
-                methodReturnTypeChanged();
-                break;
+                return methodReturnTypeChanged();
+
             default:
                 return false;
 
@@ -52,10 +48,10 @@ public class SpoonCtInvocation {
         return false;
     }
 
-    private void methodReturnTypeChanged() {
-    }
-
-    private void annotationDeprecatedAdded() {
+    private boolean methodReturnTypeChanged() {
+        String invocationName = Util.fullyQualifiedName(invocation.getExecutable());
+        String apiReference = apiChange.getReference().getFullQualifiedName();
+        return invocationName.equals(apiReference);
     }
 
     private boolean methodNowAbstract() {

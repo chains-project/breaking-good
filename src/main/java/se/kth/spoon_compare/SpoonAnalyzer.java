@@ -44,12 +44,30 @@ public class SpoonAnalyzer {
         List<CtElement> elements = model.filterChildren(element ->
                 !shouldBeIgnored(element)
                         && element.getPosition().isValidPosition()
-                        && errorLines.contains(element.getPosition().getLine())
                         && element.getPosition().toString().contains(fileInClient)
+                        && errorLines.contains(element.getPosition().getLine())
+
         ).list();
 
+        //add imports manually because they are not in the children list
+//        model.getRootPackage().getFactory().CompilationUnit().getMap().forEach((k, v) -> {
+//            if (v.getPosition().toString().contains(fileInClient)) {
+//                v.getImports().forEach(imp -> {
+//                    if (!shouldBeIgnored(imp)
+//                            && imp.getPosition().isValidPosition()
+//                            && errorLines.contains(imp.getPosition().getLine())) {
+//                        elements.add(imp);
+//                    }
+//                });
+//            }
+//        });
+
         BreakingGoodScanner scanner = new BreakingGoodScanner(apiChanges, mavenErrorLog);
-        scanner.scan(elements);
+        try {
+            scanner.scan(elements);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return scanner.getResults();
 
     }

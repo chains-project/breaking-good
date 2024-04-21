@@ -27,11 +27,11 @@ public class Main {
     static List<BreakingUpdateMetadata> list = new ArrayList<>();
 
     public static void main(String[] args) {
-        String fileName = "1d43bce1de6a81ac017c233d72f348d3c850299e";
+        String fileName = "d3af06df4613be146bb9f8034e1a8a3098050c82";
 
-        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark"));
+//        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark"));
 //      list = getBreakingCommit(Path.of("examples/Benchmark"));
-//        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark/%s.json".formatted(fileName)));
+        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark/%s.json".formatted(fileName)));
 //
         List<BreakingUpdateMetadata> compilationErrors = list.stream().filter(b -> b.failureCategory().equals("COMPILATION_FAILURE")).toList();
 

@@ -35,7 +35,7 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
 
     public String logLineErrorMessage(SpoonResults spoonResults) {
         try {
-            return "            *   >[%s](%s)\n".formatted(spoonResults.getErrorInfo().getErrorMessage(), spoonResults.getErrorInfo().getErrorLogGithubLink());
+            return "            *   >[%s](%s)\n".formatted(spoonResults.getErrorInfo().getErrorMessage().concat("<br>&nbsp;&nbsp;&nbsp;&nbsp;"+spoonResults.getErrorInfo().getAdditionalInfo()), spoonResults.getErrorInfo().getErrorLogGithubLink());
         } catch (
                 Exception e) {
 
@@ -50,7 +50,6 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
             try {
                 message.append(logLineErrorMessage(spoonResults)).append(clientErrorLine(spoonResults));
             } catch (Exception e) {
-
                 return "";
             }
 

@@ -22,4 +22,14 @@ public class FieldBreakingChange extends AbstractApiChange {
     }
 
 
+    @Override
+    public String variantName() {
+        return null;
+    }
+
+    @Override
+    public String getFullQualifiedName() {
+        return jApiField.getjApiClass().getFullyQualifiedName() + "." + jApiField.getName();
+
+    }
 }

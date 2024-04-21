@@ -63,7 +63,7 @@ public class CombineResults {
                 findBreakingChanges(results, change);
             });
         } catch (Exception e) {
-            System.out.println("Error creating model");
+            System.out.println("Error identifying breaking changes in client "+ e.toString());
             throw new RuntimeException(e);
         }
 
@@ -72,6 +72,7 @@ public class CombineResults {
     }
 
     public void findBreakingChanges(List<SpoonResults> spoonResults, Set<BreakingChange> change) {
+
         spoonResults.forEach(spoonResult -> {
             apiChanges.forEach(apiChange -> {
                 if ((apiChange.getChangeType().equals(JApiChangeStatus.REMOVED) ||

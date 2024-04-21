@@ -21,9 +21,13 @@ public final class Util {
 
         if (ref instanceof CtTypeReference<?> tRef)
             fqn = tRef.getQualifiedName();
-        else if (ref instanceof CtExecutableReference<?> eRef)
-            fqn = eRef.getDeclaringType().getQualifiedName().concat(".").concat(eRef.getSimpleName());
-        else if (ref instanceof CtFieldReference<?> fRef)
+        else if (ref instanceof CtExecutableReference<?> eRef) {
+            if (eRef.getDeclaringType() != null) {
+                fqn = eRef.getDeclaringType().getQualifiedName().concat(".").concat(eRef.getSimpleName());
+            } else {
+                fqn = eRef.getSimpleName();
+            }
+        } else if (ref instanceof CtFieldReference<?> fRef)
             fqn = fRef.getDeclaringType().getQualifiedName().concat(".").concat(fRef.getSimpleName());
 
         return fqn;

@@ -20,15 +20,16 @@ public class JApiCmpElements implements JApiCompareScan {
     public void visit(JApiClass cls) {
 
         Collection<JApiCompatibilityChange> bcs = cls.getCompatibilityChanges();
-        changes.addAll(bcs.stream().map(c -> {
+        bcs.forEach(c -> {
             ApiChange apiChange = new ApiChange();
             apiChange.setCategory(cls.getChangeStatus().toString());
             apiChange.setName(cls.getFullyQualifiedName());
             apiChange.setChangeType(cls.getChangeStatus());
             apiChange.setCompatibilityChange(c);
             apiChange.setInstruction(Instruction.Class.toString());
-            return apiChange;
-        }).toList());
+            apiChange.setReference(new TypeBreakingChange(cls));
+            changes.add(apiChange);
+        });
 
         //handle interfaces
         cls.getInterfaces().forEach(i ->

@@ -9,16 +9,18 @@ public class ErrorInfo {
     String clientLinePosition;
     String clientFilePath;
     String errorMessage;
+    String additionalInfo;
     String clientLineContent;
     String clientGithubLink;
     int errorLinePositionInFile;
     String errorLogGithubLink;
 
-    public ErrorInfo(String clientLinePosition, String clientFilePath, String errorMessage, int errorLinePositionInFile) {
+    public ErrorInfo(String clientLinePosition, String clientFilePath, String errorMessage, int errorLinePositionInFile,String additionalInfo) {
         this.clientLinePosition = clientLinePosition;
         this.clientFilePath = clientFilePath;
         this.errorMessage = errorMessage;
         this.clientLineContent = "";
+        this.additionalInfo = additionalInfo;
         this.errorLinePositionInFile = errorLinePositionInFile;
 
     }

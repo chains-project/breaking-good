@@ -34,16 +34,16 @@ public class BreakingGoodScanner extends CtScanner {
 
     @Override
     public <T> void visitCtTypeReference(CtTypeReference<T> reference) {
-        if (reference.getPosition().isValidPosition() && clientLine.contains(reference.getPosition().getLine())) {
-            SpoonResults spoonResults = new SpoonResults();
-            spoonResults.setElement(reference.toString());
-            spoonResults.setName(reference.getQualifiedName());
-            spoonResults.setClientLine(reference.toString());
-            spoonResults.setPattern("");
-            spoonResults.setErrorInfo(getMavenErrorLog(reference.getPosition().getLine()));
-            spoonResults.setCtElement(reference);
-            results.add(spoonResults);
-        }
+//        if (reference.getPosition().isValidPosition() && clientLine.contains(reference.getPosition().getLine())) {
+//            SpoonResults spoonResults = new SpoonResults();
+//            spoonResults.setElement(reference.toString());
+//            spoonResults.setName(reference.getQualifiedName());
+//            spoonResults.setClientLine(reference.toString());
+//            spoonResults.setPattern("");
+//            spoonResults.setErrorInfo(getMavenErrorLog(reference.getPosition().getLine()));
+//            spoonResults.setCtElement(reference);
+//            results.add(spoonResults);
+//        }
         super.visitCtTypeReference(reference);
 
     }
@@ -310,15 +310,15 @@ public class BreakingGoodScanner extends CtScanner {
     @Override
     public <T> void visitCtLocalVariable(CtLocalVariable<T> localVariable) {
         // visitors.forEach(v -> v.visitCtLocalVariable(localVariable));
-        if (localVariable.getPosition().isValidPosition() && clientLine.contains(localVariable.getPosition().getLine())) {
-            SpoonResults spoonResults = new SpoonResults();
-            spoonResults.setName(localVariable.getSimpleName());
-            spoonResults.setCtElement(localVariable);
-            spoonResults.setClientLine(localVariable.toString());
-            spoonResults.setElement(localVariable.getType().toString());
-            spoonResults.setErrorInfo(getMavenErrorLog(localVariable.getPosition().getLine()));
-            results.add(spoonResults);
-        }
+//        if (localVariable.getPosition().isValidPosition() && clientLine.contains(localVariable.getPosition().getLine())) {
+//            SpoonResults spoonResults = new SpoonResults();
+//            spoonResults.setName(localVariable.getSimpleName());
+//            spoonResults.setCtElement(localVariable);
+//            spoonResults.setClientLine(localVariable.toString());
+//            spoonResults.setElement(localVariable.getType().toString());
+//            spoonResults.setErrorInfo(getMavenErrorLog(localVariable.getPosition().getLine()));
+//            results.add(spoonResults);
+//        }
         super.visitCtLocalVariable(localVariable);
     }
 
@@ -360,7 +360,7 @@ public class BreakingGoodScanner extends CtScanner {
             boolean match = new SpoonCtConstructorCall(ctConstructorCall, apiChange).compare();
             if (match) {
                 SpoonResults spoonResults = new SpoonResults();
-                spoonResults.setName(ctConstructorCall.getExecutable().getSimpleName());
+                spoonResults.setName(ctConstructorCall.getExecutable().getDeclaringType().getSimpleName());
                 spoonResults.setCtElement(ctConstructorCall);
                 spoonResults.setClientLine(ctConstructorCall.toString());
                 spoonResults.setElement(ctConstructorCall.getExecutable().getSignature());
@@ -563,6 +563,20 @@ public class BreakingGoodScanner extends CtScanner {
     @Override
     public void visitCtImport(CtImport ctImport) {
         // visitors.forEach(v -> v.visitCtImport(ctImport));
+
+        for (ApiChange apiChange : apiChanges) {
+            boolean match = new SpoonCtImport(ctImport, apiChange).compare();
+            if (match) {
+                SpoonResults spoonResults = new SpoonResults();
+                spoonResults.setName(ctImport.getReference().toString());
+                spoonResults.setCtElement(ctImport);
+                spoonResults.setClientLine(ctImport.toString());
+                spoonResults.setElement(ctImport.getReference().toString());
+                spoonResults.setErrorInfo(getMavenErrorLog(ctImport.getPosition().getLine()));
+                results.add(spoonResults);
+            }
+        }
+
         super.visitCtImport(ctImport);
     }
 

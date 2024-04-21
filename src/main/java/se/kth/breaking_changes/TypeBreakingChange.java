@@ -10,4 +10,13 @@ public class TypeBreakingChange extends AbstractApiChange{
         this.jApiClass = jApiClass;
     }
 
+    @Override
+    public String variantName() {
+        return null;
+    }
+
+    @Override
+    public String getFullQualifiedName() {
+        return jApiClass.getFullyQualifiedName();
+    }
 }

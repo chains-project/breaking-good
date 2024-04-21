@@ -57,7 +57,7 @@ public class MavenLogAnalyzer {
                     }
                     if (currentPath != null) {
 
-                        ErrorInfo errorInfo = new ErrorInfo(String.valueOf(lineNumber), currentPath, line, lineNumberInFile);
+                        ErrorInfo errorInfo = new ErrorInfo(String.valueOf(lineNumber), currentPath, line, lineNumberInFile,extractAdditionalInfo(reader));
                         errorInfo.setErrorLogGithubLink(generateLogsLink(projectURL, 4, lineNumberInFile));
                         mavenErrorLogs.addErrorInfo(currentPath, errorInfo);
                     }
@@ -68,6 +68,38 @@ public class MavenLogAnalyzer {
             e.printStackTrace();
         }
         return mavenErrorLogs;
+    }
+
+    /**
+     * Extracts additional information from the log file
+     * Reused from @bumper
+     * @param fromReader BufferedReader object
+     * @return Additional information
+     */
+    private String extractAdditionalInfo(BufferedReader fromReader) {
+        String line = null;
+        int charRead = -1;
+
+        try {
+            // Read first char of new line and reset the buffer
+            fromReader.mark(1);
+            charRead = fromReader.read();
+            fromReader.reset();
+
+            if (((char) charRead) == ' ') {
+                line = fromReader.readLine();
+                if (line == null) {
+                    return "";
+                } else {
+                    return line + "\n" + extractAdditionalInfo(fromReader);
+                }
+            } else {
+                return "";
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
     private String generateLogsLink(String projectURL, int step, int lineNumber) {

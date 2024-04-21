@@ -69,7 +69,7 @@ public class ApiChange {
         if (this == that) return true;
         if (that == null || getClass() != that.getClass()) return false;
         ApiChange thatLibraryChange = (ApiChange) that;
-        return this.getCategory().equals(thatLibraryChange.getCategory())
+        return this.getCompatibilityChange().equals(thatLibraryChange.getCompatibilityChange())
                 && this.getName().equals(thatLibraryChange.getName());
     }
 

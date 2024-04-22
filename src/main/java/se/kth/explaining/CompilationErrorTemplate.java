@@ -38,7 +38,6 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
             return "            *   >[%s](%s)\n".formatted(spoonResults.getErrorInfo().getErrorMessage().concat("<br>&nbsp;&nbsp;&nbsp;&nbsp;"+spoonResults.getErrorInfo().getAdditionalInfo()), spoonResults.getErrorInfo().getErrorLogGithubLink());
         } catch (
                 Exception e) {
-
             return "";
         }
 

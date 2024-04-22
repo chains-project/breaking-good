@@ -1,24 +1,29 @@
 package se.kth.data;
 
-import com.fasterxml.jackson.databind.type.MapType;
 import se.kth.breaking_changes.ApiChange;
 import se.kth.breaking_changes.ApiMetadata;
+import se.kth.breaking_changes.BreakingGoodOptions;
 import se.kth.breaking_changes.JApiCmpAnalyze;
 import se.kth.core.Changes;
+import se.kth.core.Changes_V2;
 import se.kth.core.CombineResults;
 import se.kth.explaining.CompilationErrorTemplate;
 import se.kth.explaining.ExplanationTemplate;
+import se.kth.japianalysis.BreakingChange;
 import se.kth.log_Analyzer.MavenErrorLog;
-import se.kth.log_Analyzer.MavenLogAnalyzer;
+import se.kth.sponvisitors.BreakingChangeVisitor;
 import se.kth.spoon_compare.Client;
 import spoon.reflect.CtModel;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static se.kth.data.Main_v2.*;
 
 public class Main {
     static List<BreakingUpdateMetadata> list = new ArrayList<>();
@@ -28,51 +33,14 @@ public class Main {
         String fileName = "0abf7148300f40a1da0538ab060552bca4a2f1d8";
 
 //        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark"));
-        list = getBreakingCommit(Path.of("examples/Benchmark"));
-//        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark/%s.json".formatted(fileName)));
+//        list = getBreakingCommit(Path.of("examples/Benchmark"));
+        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark/%s.json".formatted(fileName)));
 //
         List<BreakingUpdateMetadata> compilationErrors = list.stream().filter(b -> b.failureCategory().equals("COMPILATION_FAILURE")).toList();
 
 
 //        compilationErrors = read(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/explanationStatistics-data-old.json"), compilationErrors);
         generateTemplate(compilationErrors);
-    }
-
-    public void metadata() {
-        final var path = Path.of("breaking_good_stats.json");
-        if (!Files.exists(path)) {
-            try {
-                Files.createFile(path);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-
-    public static List<BreakingUpdateMetadata> getBreakingCommit(Path benchmarkDir) {
-        File[] breakingUpdates = null;
-
-        if (Files.isDirectory(benchmarkDir)) {
-            breakingUpdates = benchmarkDir.toFile().listFiles();
-        } else {
-            breakingUpdates = new File[]{benchmarkDir.toFile()};
-        }
-
-        MapType buJsonType = JsonUtils.getTypeFactory().constructMapType(Map.class, String.class, Object.class);
-        List<BreakingUpdateMetadata> breakingUpdateList = new ArrayList<>();
-
-        if (breakingUpdates != null) {
-            for (File breakingUpdate : breakingUpdates) {
-                // read each breaking update json file
-                BreakingUpdateMetadata bu = JsonUtils.readFromFile(breakingUpdate.toPath(), BreakingUpdateMetadata.class);
-                // convert to BreakingUpdate object
-                breakingUpdateList.add(bu);
-            }
-        } else {
-            System.out.println("No breaking update found in " + benchmarkDir);
-        }
-        return breakingUpdateList;
     }
 
 
@@ -136,6 +104,9 @@ public class Main {
             );
 
             Set<ApiChange> apiChanges = jApiCmpAnalyze.useJApiCmp();
+
+            List<BreakingChange> breakingChanges = jApiCmpAnalyze.useJApiCmp_v2();
+
             bg.setJApiCmpChanges(apiChanges.size());
             System.out.println("Number of changes: " + apiChanges.size());
 
@@ -147,6 +118,12 @@ public class Main {
             combineResults.setProject("projects/%s".formatted(breakingUpdate.breakingCommit()));
 
             try {
+
+                List<BreakingChangeVisitor> visitors = jApiCmpAnalyze.getVisitors(breakingChanges);
+                BreakingGoodOptions options = new BreakingGoodOptions();
+
+                Changes_V2 changesV2 = combineResults.analyze_v2(visitors, options);
+
                 Changes changes = combineResults.analyze();
                 changesCount(changes, bg);
                 System.out.println("Project: " + breakingUpdate.project());
@@ -191,33 +168,8 @@ public class Main {
         }
     }
 
-    private static void changesCount(Changes changes, BreakingGoodInfo bg) {
-        int breakingChanges = 0;
-        for (var change : changes.changes()) {
-            breakingChanges += change.getErrorInfo().size();
-        }
-        bg.setTotalErrorsInExplanation(breakingChanges);
+    public static record ExplanationStatistics(String project, String commit, int changes) {
     }
 
-    private static MavenErrorLog mavenLogParser(BreakingUpdateMetadata breakingUpdate, BreakingGoodInfo bg) throws IOException {
-        MavenLogAnalyzer mavenLogAnalyzer = new MavenLogAnalyzer(
-                new File("projects/%s/%s/%s.log".formatted(breakingUpdate.breakingCommit(), breakingUpdate.project(), breakingUpdate.breakingCommit())));
 
-        MavenErrorLog errorLog = mavenLogAnalyzer.analyzeCompilationErrors();
-        AtomicInteger errorsCount = new AtomicInteger();
-        errorLog.getErrorInfo().forEach((k, v) -> {
-            System.out.println("Path: " + k);
-            errorsCount.addAndGet(v.size());
-            v.forEach(errorInfo -> {
-                System.out.println("Line: " + errorInfo.getClientLinePosition());
-                System.out.println("Error: " + errorInfo.getErrorMessage());
-            });
-        });
-
-        bg.setErrorsFromLog(errorsCount.get());
-        return errorLog;
-    }
-
-    public record ExplanationStatistics(String project, String commit, int changes) {
-    }
 }

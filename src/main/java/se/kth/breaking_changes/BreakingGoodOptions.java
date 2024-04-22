@@ -3,10 +3,11 @@ package se.kth.breaking_changes;
 import japicmp.cli.JApiCli;
 import japicmp.config.Options;
 import japicmp.model.AccessModifier;
-import japicmp.model.JApiCompatibilityChange;
+import japicmp.model.JApiCompatibilityChangeType;
 import japicmp.model.JApiCompatibilityChangeType;
 import japicmp.util.Optional;
 
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,6 +17,13 @@ public class BreakingGoodOptions {
 
     private Options options;
 
+    private int maxClassLines = Integer.MAX_VALUE;
+    private int clientsPerModule = Integer.MAX_VALUE;
+    private int minStarsPerClient = 0;
+    private Duration cloneTimeout = Duration.ofSeconds(Integer.MAX_VALUE);
+    private Duration buildTimeout = Duration.ofSeconds(Integer.MAX_VALUE);
+
+
     // based en study from `Maracas` and `JApiCmp`
     private Set<JApiCompatibilityChangeType> exclude = new HashSet<>();
 
@@ -23,7 +31,7 @@ public class BreakingGoodOptions {
         Options defaultOptions = Options.newDefault();
         defaultOptions.setAccessModifier(AccessModifier.PROTECTED);
         defaultOptions.setOutputOnlyModifications(true);
-        defaultOptions.setClassPathMode(JApiCli.ClassPathMode.TWO_SEPARATE_CLASSPATHS);
+        defaultOptions.setClassPathMode(JApiCli.ClassPathMode.ONE_COMMON_CLASSPATH);
         defaultOptions.setIgnoreMissingClasses(true);
         String[] excl = {"(*.)?tests(.*)?", "(*.)?test(.*)?",
                 "@org.junit.After", "@org.junit.AfterClass",

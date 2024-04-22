@@ -15,7 +15,7 @@ public class SpoonCtConstructorCall {
     public SpoonCtConstructorCall(CtConstructorCall<?> invocation, ApiChange apiChange) {
         Objects.requireNonNull(invocation);
         Objects.requireNonNull(apiChange);
-        this.compatibilityChangeType = apiChange.getCompatibilityChange().getType();
+        this.compatibilityChangeType = apiChange.getCompatibilityChange();
         this.invocation = invocation;
         this.apiChange = apiChange;
     }

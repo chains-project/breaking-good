@@ -14,7 +14,7 @@ public class SpoonCtInvocation {
     private ApiChange apiChange;
 
     public SpoonCtInvocation(CtInvocation<?> invocation, ApiChange apiChange) {
-        this.compatibilityChangeType = apiChange.getCompatibilityChange().getType();
+        this.compatibilityChangeType = apiChange.getCompatibilityChange();
         this.invocation = invocation;
         this.apiChange = apiChange;
     }

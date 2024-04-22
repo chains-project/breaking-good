@@ -3,8 +3,11 @@ package se.kth.core;
 import japicmp.model.JApiChangeStatus;
 import se.kth.breaking_changes.ApiChange;
 import se.kth.breaking_changes.ApiMetadata;
+import se.kth.breaking_changes.BreakingGoodOptions;
 import se.kth.log_Analyzer.MavenErrorLog;
-import se.kth.spoon_compare.Client;
+import se.kth.sponvisitors.BreakingChangeVisitor;
+import se.kth.sponvisitors.BrokenChanges;
+import se.kth.sponvisitors.BrokenUse;
 import se.kth.spoon_compare.SpoonAnalyzer;
 import se.kth.spoon_compare.SpoonResults;
 import spoon.reflect.CtModel;
@@ -63,13 +66,58 @@ public class CombineResults {
                 findBreakingChanges(results, change);
             });
         } catch (Exception e) {
-            System.out.println("Error identifying breaking changes in client "+ e.toString());
+            System.out.println("Error identifying breaking changes in client " + e.toString());
             throw new RuntimeException(e);
         }
 
 
         return new Changes(oldVersion, newVersion, change);
     }
+
+    public Changes_V2 analyze_v2(List<BreakingChangeVisitor> breakingChangeVisitors, BreakingGoodOptions opts) throws IOException {
+
+        Set<BrokenUse> results = new HashSet<>();
+
+
+        try {
+            // client.setClasspath(List.of(oldVersion.getFile()));
+
+            mavenLog.getErrorInfo().forEach((k, v) -> {
+                SpoonAnalyzer spoonAnalyzer = new SpoonAnalyzer(v, apiChanges, model);
+                results.addAll(spoonAnalyzer.applySpoonV2(breakingChangeVisitors, opts, project + k));
+//            System.out.printf("Amount of instructions %d%n", results.size());
+
+            });
+
+            Set<BrokenChanges> changes = addErrorInfo(results);
+            return new Changes_V2(oldVersion, newVersion, changes);
+
+        } catch (Exception e) {
+            System.out.println("Error identifying breaking changes in client " + e.toString());
+            throw new RuntimeException(e);
+        }
+
+    }
+
+
+    public Set<BrokenChanges> addErrorInfo(Set<BrokenUse> results) {
+        Set<BrokenChanges> brokenChanges = new HashSet<>();
+
+        results.forEach(brokenUse -> {
+            BrokenChanges brokenChange = new BrokenChanges(brokenUse);
+            mavenLog.getErrorInfo().forEach((k, v) -> {
+                v.forEach(errorInfo -> {
+                    if (brokenUse.element().getPosition().getLine() == Integer.parseInt(errorInfo.getClientLinePosition())) {
+                        brokenChange.addErrorInfo(errorInfo);
+                    }
+                });
+            });
+            brokenChanges.add(brokenChange);
+        });
+
+        return brokenChanges;
+    }
+
 
     public void findBreakingChanges(List<SpoonResults> spoonResults, Set<BreakingChange> change) {
 

@@ -1,7 +1,11 @@
 package se.kth.spoon_compare;
 
 import se.kth.breaking_changes.ApiChange;
+import se.kth.breaking_changes.BreakingGoodOptions;
 import se.kth.log_Analyzer.ErrorInfo;
+import se.kth.sponvisitors.BreakingChangeVisitor;
+import se.kth.sponvisitors.BrokenUse;
+import se.kth.sponvisitors.CombinedVisitor;
 import spoon.reflect.CtModel;
 import spoon.reflect.code.CtComment;
 import spoon.reflect.code.CtConstructorCall;
@@ -37,6 +41,21 @@ public class SpoonAnalyzer {
 
     private static boolean shouldBeIgnored(CtElement element) {
         return element instanceof CtComment || element.isImplicit();
+    }
+
+
+    public Set<BrokenUse> applySpoonV2(List<BreakingChangeVisitor> breakingChangeVisitors, BreakingGoodOptions opts, String fileInClient) {
+        CombinedVisitor visitor = new CombinedVisitor(breakingChangeVisitors, opts);
+        List<CtElement> elements = model.filterChildren(element ->
+                !shouldBeIgnored(element)
+                        && element.getPosition().isValidPosition()
+                        && element.getPosition().toString().contains(fileInClient)
+                        && errorLines.contains(element.getPosition().getLine())
+        ).list();
+        visitor.scan(elements);
+        // We still need to visit the root package afterwards.
+//        visitor.scan(model.getRootPackage());
+        return visitor.getBrokenUses();
     }
 
     public List<SpoonResults> applySpoon(String fileInClient) {

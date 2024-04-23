@@ -1,5 +1,6 @@
 # Breaking-good
 
+[![Build](https://github.com/frankreyesgarcia/breaking-good/actions/workflows/maven.yml/badge.svg)](https://github.com/frankreyesgarcia/breaking-good/actions/workflows/maven.yml)
 # Template
 
 CI detected that the dependency upgrade from version <**label indicating the previous version of the dependency**> to <**label indicating the new version of the dependency**> has failed. Here are details to help you understand and fix the problem:

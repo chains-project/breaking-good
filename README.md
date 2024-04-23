@@ -3,7 +3,7 @@
 # Template
 
 CI detected that the dependency upgrade from version <**label indicating the previous version of the dependency**> to <**label indicating the new version of the dependency**> has failed. Here are details to help you understand and fix the problem:
-1. Your client utilizes <**label indicate amount of instructions**> instructions which has been modified in the new version of the dependency.
+1. Your client utilizes <**label indicate amount of instructions**> constructs which has been modified in the new version of the dependency.
     * <summary> < Method | Class | Field | Import | Constructor> <b>< instruction name ></b> which has been < <b>Removed | Modified </b> > in the new version of the dependency</summary>
 
         *  <summary>The failure is identified from the logs generated in the build process. </summary>

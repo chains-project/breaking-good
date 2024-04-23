@@ -8,7 +8,7 @@ import spoon.reflect.reference.CtExecutableReference;
 import spoon.reflect.reference.CtTypeReference;
 
 /**
- * Broken uses of METHOD_NOW_ABSTRACT are:
+ * Broken brokenChanges of METHOD_NOW_ABSTRACT are:
  * - Non-abstract types extending/implementing the enclosing type of the now-abstract method unless:
  * - The now-abstract method is already implemented somewhere in the hierarchy
  * - Invocations in subtypes of the now-abstract method

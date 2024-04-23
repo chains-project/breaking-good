@@ -52,7 +52,7 @@ public class FieldBreakingChange extends AbstractBreakingChange {
 				// TODO: To be implemented
 				case FIELD_STATIC_AND_OVERRIDES_STATIC, FIELD_GENERICS_CHANGED -> null;
 				default ->
-					throw new IllegalStateException(this + " was somehow associated to a non-field-level breaking change: " + change);
+					null;
 			};
 	}
 }

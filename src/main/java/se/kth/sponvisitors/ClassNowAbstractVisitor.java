@@ -5,7 +5,7 @@ import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.reference.CtTypeReference;
 
 /**
- * Broken uses of CLASS_NOW_ABSTRACT are:
+ * Broken brokenChanges of CLASS_NOW_ABSTRACT are:
  * - Instantiations of the now-abstract class
  * <p>
  * Note: In JApiCmp, types that go from {@code class} to {@code interface} are impacted

@@ -78,10 +78,8 @@ public class CombineResults {
 
         Set<BrokenUse> results = new HashSet<>();
 
-
         try {
             // client.setClasspath(List.of(oldVersion.getFile()));
-
             mavenLog.getErrorInfo().forEach((k, v) -> {
                 SpoonAnalyzer spoonAnalyzer = new SpoonAnalyzer(v, apiChanges, model);
                 results.addAll(spoonAnalyzer.applySpoonV2(breakingChangeVisitors, opts, project + k));
@@ -116,6 +114,16 @@ public class CombineResults {
         });
 
         return brokenChanges;
+    }
+
+    private void addBrokenUse(Set<BrokenChanges> results, BrokenChanges brokenChange) {
+        for (BrokenChanges b : results) {
+            if (b.getBrokenUse().usedApiElement().toString().equals(brokenChange.getBrokenUse().usedApiElement().toString())) {
+                b.getErrorInfo().addAll(brokenChange.getErrorInfo());
+                return;
+            }
+        }
+        results.add(brokenChange);
     }
 
 

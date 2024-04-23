@@ -60,8 +60,8 @@ public class Main {
                 combineResults.setProject(project.toString().substring(0, project.toString().lastIndexOf("/")));
                 Changes changes = combineResults.analyze();
 
-                ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, "Explanations/" + project.toFile().getName() + ".md");
-                explanationTemplate.generateTemplate();
+//                ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, "Explanations/" + project.toFile().getName() + ".md");
+//                explanationTemplate.generateTemplate();
 
             } catch (IOException e) {
                 throw new RuntimeException(e);

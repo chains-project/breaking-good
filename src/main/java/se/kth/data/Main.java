@@ -4,7 +4,6 @@ import se.kth.breaking_changes.ApiChange;
 import se.kth.breaking_changes.ApiMetadata;
 import se.kth.breaking_changes.BreakingGoodOptions;
 import se.kth.breaking_changes.JApiCmpAnalyze;
-import se.kth.core.Changes;
 import se.kth.core.Changes_V2;
 import se.kth.core.CombineResults;
 import se.kth.explaining.CompilationErrorTemplate;
@@ -30,7 +29,7 @@ public class Main {
     static Set<BreakingGoodInfo> breakingGoodInfoList = new HashSet<>();
 
     public static void main(String[] args) {
-        String fileName = "0abf7148300f40a1da0538ab060552bca4a2f1d8";
+        String fileName = "6c53cd904bd66fc79af8687571e607c259226b81";
 
 //        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark"));
 //        list = getBreakingCommit(Path.of("examples/Benchmark"));
@@ -56,9 +55,14 @@ public class Main {
 
         for (BreakingUpdateMetadata breakingUpdate : breakingUpdateList) {
 
-            if (breakingUpdate.project().equals("google-cloud-java")) {
-                continue;
-            }
+//            if (breakingUpdate.project().equals("google-cloud-java")) {
+//                continue;
+//            }
+
+//            Path explaining = Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/Explanations/%s.md".formatted(breakingUpdate.breakingCommit()));
+//            if (Files.exists(explaining)) {
+//                continue;
+//            }
 
             Path jarsFile = Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/");
 
@@ -124,11 +128,11 @@ public class Main {
 
                 Changes_V2 changesV2 = combineResults.analyze_v2(visitors, options);
 
-                Changes changes = combineResults.analyze();
-                changesCount(changes, bg);
+//                Changes changes = combineResults.analyze();
+                changesCount(changesV2, bg);
                 System.out.println("Project: " + breakingUpdate.project());
                 System.out.println("Breaking Commit: " + breakingUpdate.breakingCommit());
-                System.out.println("Changes: " + changes.changes().size());
+                System.out.println("Changes: " + changesV2.brokenChanges().size());
 
                 String explanationFolder = list.size() > 1 ? "Explanations/" : "Explanations_tmp/";
                 final var dir = Path.of(explanationFolder);
@@ -136,8 +140,8 @@ public class Main {
                     Files.createDirectory(dir);
                 }
 
-                explanationStatistics.add(new ExplanationStatistics(breakingUpdate.project(), breakingUpdate.breakingCommit(), changes.changes().size()));
-                ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, explanationFolder + "/" + breakingUpdate.breakingCommit() + ".md");
+                explanationStatistics.add(new ExplanationStatistics(breakingUpdate.project(), breakingUpdate.breakingCommit(), changesV2.brokenChanges().size()));
+                ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changesV2, explanationFolder + "/" + breakingUpdate.breakingCommit() + ".md");
                 explanationTemplate.generateTemplate();
                 System.out.println("**********************************************************");
                 if (Files.exists(Path.of(explanationFolder + "/" + breakingUpdate.breakingCommit() + ".md"))) {

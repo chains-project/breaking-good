@@ -2,8 +2,9 @@ package se.kth.sponvisitors;
 
 import se.kth.log_Analyzer.ErrorInfo;
 
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Objects;
+import java.util.List;
 import java.util.Set;
 
 @lombok.Getter
@@ -13,6 +14,8 @@ public class BrokenChanges {
     BrokenUse brokenUse;
 
     Set<ErrorInfo> errorInfo;
+
+    List<BreakingChangeVisitor> newVariants;
 
 
     @Override
@@ -25,18 +28,16 @@ public class BrokenChanges {
 
     public BrokenChanges(BrokenUse brokenUse) {
         this.brokenUse = brokenUse;
-        this.errorInfo = new HashSet<>()    ;
+        this.errorInfo = new HashSet<>();
+        newVariants = new ArrayList<>();
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
+        if (!(o instanceof BrokenChanges)) return false;
         BrokenChanges that = (BrokenChanges) o;
+        return that.getBrokenUse().usedApiElement().equals(this.getBrokenUse().usedApiElement());
 
-        if (!Objects.equals(brokenUse, that.brokenUse)) return false;
-        return Objects.equals(errorInfo, that.errorInfo);
     }
 
     @Override

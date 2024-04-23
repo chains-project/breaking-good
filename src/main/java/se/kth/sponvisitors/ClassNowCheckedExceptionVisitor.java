@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Broken uses of CLASS_NOW_CHECKED_EXCEPTION are:
+ * Broken brokenChanges of CLASS_NOW_CHECKED_EXCEPTION are:
  * - All expression throwing the now-checked-exception or one of its subtypes unless:
  * - It is caught locally
  * - The enclosing method declares the exception

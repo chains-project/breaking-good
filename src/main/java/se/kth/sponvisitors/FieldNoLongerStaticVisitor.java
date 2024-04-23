@@ -10,7 +10,7 @@ import spoon.reflect.reference.CtFieldReference;
 import spoon.reflect.reference.CtTypeReference;
 
 /**
- * Broken uses of FIELD_NO_LONGER_STATIC are:
+ * Broken brokenChanges of FIELD_NO_LONGER_STATIC are:
  * - Attempting to access a no-longer-static field in a static way
  */
 public class FieldNoLongerStaticVisitor extends BreakingChangeVisitor {

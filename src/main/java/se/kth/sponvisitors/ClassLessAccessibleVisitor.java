@@ -55,7 +55,7 @@ public class ClassLessAccessibleVisitor extends BreakingChangeVisitor {
 	}
 
 	/*
-	  Uncomment if we want to include broken uses for every access to a field or
+	  Uncomment if we want to include broken brokenChanges for every access to a field or
 	  invocation of a method that is declared by the no-more-visible class.
 
 	  @Override public <T> void visitCtFieldReference(CtFieldReference<T>

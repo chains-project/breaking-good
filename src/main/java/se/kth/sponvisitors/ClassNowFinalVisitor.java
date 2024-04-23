@@ -7,7 +7,7 @@ import spoon.reflect.declaration.CtClass;
 import spoon.reflect.reference.CtTypeReference;
 
 /**
- * Broken uses of CLASS_NOW_FINAL are:
+ * Broken brokenChanges of CLASS_NOW_FINAL are:
  * - Classes (regular and anonymous) extending the now-final class
  * <p>
  * Note that JApiCmp reports a CLASS_NOW_FINAL on types that go from {@code class}

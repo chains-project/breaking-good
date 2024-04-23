@@ -60,7 +60,7 @@ public class MethodBreakingChange extends AbstractBreakingChange {
 					CLASS_GENERIC_TEMPLATE_CHANGED,
 					CLASS_GENERIC_TEMPLATE_GENERICS_CHANGED -> null;
 				default ->
-					throw new IllegalStateException(this + " was somehow associated to a non-method-level breaking change: " + change);
+					null;
 			};
 	}
 }

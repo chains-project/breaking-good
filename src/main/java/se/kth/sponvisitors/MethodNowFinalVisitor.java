@@ -9,7 +9,7 @@ import spoon.reflect.reference.CtExecutableReference;
 import java.util.Optional;
 
 /**
- * Broken uses of METHOD_NOW_FINAL are:
+ * Broken brokenChanges of METHOD_NOW_FINAL are:
  * - Methods overriding the now-final method (with or w/o explicit @Override)
  */
 public class MethodNowFinalVisitor extends BreakingChangeVisitor {

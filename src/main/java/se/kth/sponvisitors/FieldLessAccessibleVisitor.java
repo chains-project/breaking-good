@@ -12,7 +12,7 @@ import spoon.reflect.reference.CtFieldReference;
 import util.SpoonHelpers;
 
 /**
- * Broken uses of FIELD_LESS_ACCESSIBLE are:
+ * Broken brokenChanges of FIELD_LESS_ACCESSIBLE are:
  * - Any access to a now-private field
  * - Any access to a now-package-private field outside the package
  * - Any access to a now-protected field outside its subtype hierarchy or package

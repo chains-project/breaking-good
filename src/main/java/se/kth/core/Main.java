@@ -44,8 +44,8 @@ public class Main {
 
             Changes changes = combineResults.analyze();
             changes.changes().forEach(change -> {
-                        ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, "change");
-                        explanationTemplate.generateTemplate();
+//                        ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, "change");
+//                        explanationTemplate.generateTemplate();
                     }
             );
 

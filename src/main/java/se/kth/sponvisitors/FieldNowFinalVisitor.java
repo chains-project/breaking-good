@@ -6,7 +6,7 @@ import spoon.reflect.code.CtFieldWrite;
 import spoon.reflect.reference.CtFieldReference;
 
 /**
- * Broken uses of FIELD_NOW_FINAL are:
+ * Broken brokenChanges of FIELD_NOW_FINAL are:
  * - Attempting to write-access a now-final field
  */
 public class FieldNowFinalVisitor extends BreakingChangeVisitor {

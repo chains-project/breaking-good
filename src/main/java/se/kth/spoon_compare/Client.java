@@ -32,7 +32,7 @@ public class Client {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public  Client(Path sourcePath) {
+    public Client(Path sourcePath) {
         this.sourcePath = sourcePath;
     }
 
@@ -61,7 +61,6 @@ public class Client {
         launcher.getEnvironment().setSourceClasspath(cp);
 
         CtModel spoonModel = launcher.buildModel();
-        System.out.println("Building Spoon model for " + this + " [classpath=" + classpath + "] took " + sw.elapsed().toMillis() + "ms");
         log.info("Building Spoon model for {} [classpath={}] took {}ms", this, classpath, sw.elapsed().toMillis());
         return spoonModel;
     }

@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Abstract visitor in charge of gathering broken uses in client code.
+ * Abstract visitor in charge of gathering broken brokenChanges in client code.
  */
 public abstract class BreakingChangeVisitor extends CtAbstractVisitor {
 	/**
@@ -22,7 +22,7 @@ public abstract class BreakingChangeVisitor extends CtAbstractVisitor {
 	protected final JApiCompatibilityChangeType change;
 
 	/**
-	 * Set of detected broken uses.
+	 * Set of detected broken brokenChanges.
 	 */
 	protected final Set<BrokenUse> brokenUses = new HashSet<>();
 
@@ -41,16 +41,16 @@ public abstract class BreakingChangeVisitor extends CtAbstractVisitor {
 	}
 
 	/**
-	 * Returns the set of detected broken uses.
+	 * Returns the set of detected broken brokenChanges.
 	 *
-	 * @return set of broken uses
+	 * @return set of broken brokenChanges
 	 */
 	public Set<BrokenUse> getBrokenUses() {
 		return brokenUses;
 	}
 
 	/**
-	 * Add a new broken use to the set of detected broken uses.
+	 * Add a new broken use to the set of detected broken brokenChanges.
 	 *
 	 * @param element        client code impacted by the breaking change
 	 * @param usedApiElement API declaration used by the impacted client code

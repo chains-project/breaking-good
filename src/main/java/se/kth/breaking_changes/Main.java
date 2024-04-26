@@ -1,6 +1,9 @@
 package se.kth.breaking_changes;
 
+import se.kth.japianalysis.BreakingChange;
+
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Set;
 
 public class Main {
@@ -17,13 +20,17 @@ public class Main {
         );
 
 
-        Set<ApiChange> apiChanges = jApiCmpAnalyze.useJApiCmp();
+//        Set<ApiChange> apiChanges = jApiCmpAnalyze.useJApiCmp();
+
+        List<BreakingChange> apiChanges = jApiCmpAnalyze.useJApiCmp_v2();
+
+
 
         System.out.println("Number of changes: " + apiChanges.size());
 
-        for (ApiChange apiChange : apiChanges) {
-            System.out.println(apiChange);
-        }
+//        for (ApiChange apiChange : apiChanges) {
+//            System.out.println(apiChange);
+//        }
 
 
 //        List<BreakingUpdateMetadata> list =

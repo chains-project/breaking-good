@@ -78,7 +78,7 @@ public class ApiMetadata {
 
     private List<String> buildClasspath() {
         Stopwatch sw = Stopwatch.createStarted();
-        Path pom = extractPomFromJar();
+        Path pom = extractPomFromJar(null);
 
         List<String> cp =
                 pom != null
@@ -88,6 +88,7 @@ public class ApiMetadata {
 
         return cp;
     }
+
     private List<String> buildClasspathFromPom(Path pom) {
         System.out.println("Building classpath from " + pom);
         try {
@@ -108,7 +109,8 @@ public class ApiMetadata {
 
         return Collections.emptyList();
     }
-    private Path extractPomFromJar() {
+
+    public  Path extractPomFromJar(Path toSave) {
         try (JarFile jarFile = new JarFile(file.toFile())) {
             List<JarEntry> poms = jarFile.stream().filter(e -> e.getName().endsWith("pom.xml")).toList();
 
@@ -116,7 +118,7 @@ public class ApiMetadata {
                 JarEntry pom = poms.get(0);
                 InputStream pomStream = jarFile.getInputStream(pom);
 
-                Path out = Files.createTempFile(TMP_DIR, "pom", ".xml");
+                Path out = toSave != null ? toSave : Files.createTempFile(TMP_DIR, "pom", ".xml");
                 Files.copy(pomStream, out, StandardCopyOption.REPLACE_EXISTING);
                 return out;
             } else

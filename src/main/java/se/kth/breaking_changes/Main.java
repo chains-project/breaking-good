@@ -1,27 +1,36 @@
 package se.kth.breaking_changes;
 
-import se.kth.data.BreakingUpdateMetadata;
+import se.kth.japianalysis.BreakingChange;
 
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
-import static se.kth.data.Main.getBreakingCommit;
-
 public class Main {
 
     public static void main(String[] args) {
 
+        ApiMetadata apiMetadata = new ApiMetadata(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/0abf7148300f40a1da0538ab060552bca4a2f1d8/jasperreports-6.18.1.jar"));
+        ApiMetadata apiMetadata1 = new ApiMetadata(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/0abf7148300f40a1da0538ab060552bca4a2f1d8/jasperreports-6.19.1.jar"));
+
+
         JApiCmpAnalyze jApiCmpAnalyze = new JApiCmpAnalyze(
-                Path.of("/Users/frank/Documents/Work/PHD/Tools/bump_experiments/jars/0abf7148300f40a1da0538ab060552bca4a2f1d8/jasperreports-6.18.1.jar"),
-                Path.of("/Users/frank/Documents/Work/PHD/Tools/bump_experiments/jars/0abf7148300f40a1da0538ab060552bca4a2f1d8/jasperreports-6.19.1.jar")
+                apiMetadata,
+                apiMetadata1
         );
 
-        Set<ApiChange> apiChanges = jApiCmpAnalyze.useJApiCmp();
 
-        for (ApiChange apiChange : apiChanges) {
-            System.out.println(apiChange);
-        }
+//        Set<ApiChange> apiChanges = jApiCmpAnalyze.useJApiCmp();
+
+        List<BreakingChange> apiChanges = jApiCmpAnalyze.useJApiCmp_v2();
+
+
+
+        System.out.println("Number of changes: " + apiChanges.size());
+
+//        for (ApiChange apiChange : apiChanges) {
+//            System.out.println(apiChange);
+//        }
 
 
 //        List<BreakingUpdateMetadata> list =

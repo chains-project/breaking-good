@@ -45,7 +45,7 @@ public class Download {
     private static String getUrlOfRequestedJar(String indexPageContent, String indexPageUrl) {
         List<String> candidates = Jsoup.parse(indexPageContent).select("a").stream()
                 .map(e -> e.attr("href"))
-                .collect(Collectors.toList());
+                .toList();
 
         Optional<String> artifactJar = candidates.stream()
                 .filter(c -> c.endsWith(".jar"))

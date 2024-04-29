@@ -1,7 +1,6 @@
 package se.kth.data;
 
 import com.fasterxml.jackson.databind.type.MapType;
-import se.kth.core.Changes;
 import se.kth.core.Changes_V2;
 import se.kth.log_Analyzer.MavenErrorLog;
 import se.kth.log_Analyzer.MavenLogAnalyzer;
@@ -15,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Main_v2 {
+public class BuildHelp {
     public static void main(String[] args) {
         System.out.println("Hello World!");
     }

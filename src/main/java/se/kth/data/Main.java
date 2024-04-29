@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static se.kth.data.Main_v2.*;
+import static se.kth.data.BuildHelp.*;
 
 public class Main {
     static List<BreakingUpdateMetadata> list = new ArrayList<>();
@@ -32,8 +32,8 @@ public class Main {
         String fileName = "1ef97ea6c5b6e34151fe6167001b69e003449f95";
 
 //        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark"));
-//        list = getBreakingCommit(Path.of("examples/Benchmark"));
-        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark/%s.json".formatted(fileName)));
+        list = getBreakingCommit(Path.of("examples/Benchmark"));
+//        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark/%s.json".formatted(fileName)));
 //
         List<BreakingUpdateMetadata> compilationErrors = list.stream().filter(b -> b.failureCategory().equals("COMPILATION_FAILURE")).toList();
 

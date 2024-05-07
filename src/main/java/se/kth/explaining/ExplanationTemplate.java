@@ -74,6 +74,8 @@ public abstract class ExplanationTemplate {
                     METHOD_ABSTRACT_ADDED_TO_CLASS,
                     METHOD_NEW_DEFAULT:
                 yield "Interface";
+            case CONSTRUCTOR_REMOVED:
+                yield "Constructor";    // Constructor
 
             default:
                 yield "";

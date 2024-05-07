@@ -48,7 +48,7 @@ public class ApiMetadata {
     static {
         Path tmp = Path.of(".");
         try {
-            tmp = Files.createTempDirectory("maracas-pom-tmp");
+            tmp = Files.createTempDirectory("pom-tmp");
         } catch (IOException e) {
             System.out.println(e);
         }

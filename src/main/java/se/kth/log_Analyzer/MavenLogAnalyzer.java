@@ -76,7 +76,7 @@ public class MavenLogAnalyzer {
      * @param fromReader BufferedReader object
      * @return Additional information
      */
-    private String extractAdditionalInfo(BufferedReader fromReader) {
+    public static String extractAdditionalInfo(BufferedReader fromReader) {
         String line = null;
         int charRead = -1;
 

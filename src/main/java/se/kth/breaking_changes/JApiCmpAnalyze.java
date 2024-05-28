@@ -37,7 +37,7 @@ public class JApiCmpAnalyze {
     public List<BreakingChangeVisitor> getVisitors(List<BreakingChange> breakingChanges) {
         return breakingChanges.stream()
                 .map(BreakingChange::getVisitor)
-                .filter(Objects::nonNull) // FIXME: Until every visitor is implemented
+                .filter(Objects::nonNull)
                 .toList();
     }
 

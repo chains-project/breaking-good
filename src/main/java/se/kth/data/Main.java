@@ -31,9 +31,9 @@ public class Main {
     public static void main(String[] args) {
         String fileName = "72c6b8dd53be12cc675d6c49ca55b18c27e94f1a";
 
-//        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark"));
+        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark"));
 //        list = getBreakingCommit(Path.of("examples/Benchmark"));
-        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark/%s.json".formatted(fileName)));
+//        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark/%s.json".formatted(fileName)));
 //
         List<BreakingUpdateMetadata> compilationErrors = list.stream().filter(b -> b.failureCategory().equals("COMPILATION_FAILURE")).toList();
 
@@ -55,14 +55,14 @@ public class Main {
 
         for (BreakingUpdateMetadata breakingUpdate : breakingUpdateList) {
 
-//            if (breakingUpdate.project().equals("google-cloud-java")) {
-//                continue;
-//            }
+            if (breakingUpdate.project().equals("google-cloud-java")) {
+                continue;
+            }
 
-//            Path explaining = Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/Explanations/%s.md".formatted(breakingUpdate.breakingCommit()));
-//            if (Files.exists(explaining)) {
-//                continue;
-//            }
+            Path explaining = Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/Explanations/%s.md".formatted(breakingUpdate.breakingCommit()));
+            if (Files.exists(explaining)) {
+                continue;
+            }
 
             Path jarsFile = Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/");
 
@@ -144,11 +144,11 @@ public class Main {
                 ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changesV2, explanationFolder + "/" + breakingUpdate.breakingCommit() + ".md");
                 explanationTemplate.generateTemplate();
                 System.out.println("**********************************************************");
-//                if (Files.exists(Path.of(explanationFolder + "/" + breakingUpdate.breakingCommit() + ".md"))) {
-//                    bg.setHasExplanation(true);
-//                } else {
-//                    System.out.println("Error generating explanation template for breaking update " + breakingUpdate.breakingCommit());
-//                }
+                if (Files.exists(Path.of(explanationFolder + "/" + breakingUpdate.breakingCommit() + ".md"))) {
+                    bg.setHasExplanation(true);
+                } else {
+                    System.out.println("Error generating explanation template for breaking update " + breakingUpdate.breakingCommit());
+                }
                 breakingGoodInfoList.add(bg);
             } catch (IOException e) {
                 System.out.println("Error analyzing breaking update " + breakingUpdate.breakingCommit());

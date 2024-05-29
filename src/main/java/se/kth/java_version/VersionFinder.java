@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 public class VersionFinder {
 
 
-    public static Map<String, List<Integer>> findJavaVersions(String projectPath) {
+    public  Map<String, List<Integer>> findJavaVersions(String projectPath) {
         Map<String, List<Integer>> javaVersions = new HashMap<>();
         File projectFolder = new File(projectPath);
         if (!projectFolder.exists() || !projectFolder.isDirectory()) {
@@ -26,7 +26,7 @@ public class VersionFinder {
         return javaVersions;
     }
 
-    private static void searchJavaVersionsInFolder(File folder, Map<String, List<Integer>> javaVersions) {
+    private  void searchJavaVersionsInFolder(File folder, Map<String, List<Integer>> javaVersions) {
         File[] files = folder.listFiles();
         if (files == null) {
             return;
@@ -45,7 +45,7 @@ public class VersionFinder {
     }
 
 
-    private static List<Integer> getJavaVersionsFromFile(File file) {
+    private  List<Integer> getJavaVersionsFromFile(File file) {
         List<Integer> versions = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;

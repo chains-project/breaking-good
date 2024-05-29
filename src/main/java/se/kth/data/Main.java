@@ -13,6 +13,7 @@ import se.kth.japianalysis.BreakingChange;
 import se.kth.java_version.JavaIncompatibilityAnalyzer;
 import se.kth.java_version.JavaVersionFailure;
 import se.kth.java_version.JavaVersionIncompatibility;
+
 import se.kth.java_version.VersionFinder;
 import se.kth.log_Analyzer.MavenErrorLog;
 import se.kth.sponvisitors.BreakingChangeVisitor;
@@ -127,7 +128,9 @@ public class Main {
 
         Client client = new Client(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/%s/%s".formatted(breakingUpdate.breakingCommit(), breakingUpdate.project())));
 
-        Map<String, List<Integer>> javaVersions = VersionFinder.findJavaVersions(client.getSourcePath().toString());
+        VersionFinder versionFinder = new VersionFinder();
+
+        Map<String, List<Integer>> javaVersions = versionFinder.findJavaVersions(client.getSourcePath().toString());
         JavaIncompatibilityAnalyzer javaIncompatibilityAnalyzer = new JavaIncompatibilityAnalyzer();
         Set<String> errorList = javaIncompatibilityAnalyzer.parseErrors(client.getSourcePath().toString()+"/%s.log".formatted(breakingUpdate.breakingCommit()));
         Map<JavaVersionIncompatibility, Set<String>> versionFailures = JavaIncompatibilityAnalyzer.extractVersionErrors(errorList);

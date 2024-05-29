@@ -19,7 +19,8 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
 
-        Map<String, List<Integer>> javaVersions = VersionFinder.findJavaVersions("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/11be71ab8713fe987785e9e25e4f3e410e709ab9/camunda-platform-7-mockito");
+        VersionFinder versionFinder = new VersionFinder();
+        Map<String, List<Integer>> javaVersions = versionFinder.findJavaVersions("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/11be71ab8713fe987785e9e25e4f3e410e709ab9/camunda-platform-7-mockito");
 
 
         Changes_V2 changes = new Changes_V2(

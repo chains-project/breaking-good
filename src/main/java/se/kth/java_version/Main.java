@@ -2,8 +2,6 @@ package se.kth.java_version;
 
 import se.kth.breaking_changes.ApiMetadata;
 import se.kth.core.Changes_V2;
-import se.kth.data.BreakingUpdateMetadata;
-import se.kth.data.BuildHelp;
 import se.kth.explaining.ExplanationTemplate;
 import se.kth.explaining.JavaVersionIncompatibilityTemplate;
 
@@ -13,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static se.kth.data.JavaVersionFinder.readProjectList;
 
 public class Main {
 
@@ -47,7 +44,7 @@ public class Main {
         javaVersionFailure.setErrorMessages(errorList);
         javaVersionFailure.setJavaInWorkflowFiles(javaVersions);
 
-        javaVersionFailure.setIncompatibility(new JavaVersionIncompatibility("11", "17",""));
+        javaVersionFailure.setIncompatibility(new JavaVersionIncompatibility("11", "17", ""));
 
 
         ExplanationTemplate explanationTemplate = new JavaVersionIncompatibilityTemplate(
@@ -57,8 +54,6 @@ public class Main {
         );
 
         explanationTemplate.generateTemplate();
-
-
 
 
     }

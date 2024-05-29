@@ -20,13 +20,16 @@ import se.kth.sponvisitors.BreakingChangeVisitor;
 import se.kth.spoon_compare.Client;
 import spoon.reflect.CtModel;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
 import static se.kth.data.BuildHelp.*;
-import static se.kth.data.JavaVersionFinder.readJavaIncompatibilityFile;
+
 
 public class Main {
     static List<BreakingUpdateMetadata> list = new ArrayList<>();
@@ -221,6 +224,21 @@ public class Main {
     }
 
     public static record ExplanationStatistics(String project, String commit, int changes) {
+    }
+
+    public static List<String> readJavaIncompatibilityFile(String filePath) {
+
+        File file = new File(filePath);
+        List<String> lines = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                lines.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return lines;
     }
 
 

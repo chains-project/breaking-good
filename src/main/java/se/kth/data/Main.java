@@ -10,6 +10,7 @@ import se.kth.explaining.CompilationErrorTemplate;
 import se.kth.explaining.ExplanationTemplate;
 import se.kth.explaining.JavaVersionIncompatibilityTemplate;
 import se.kth.japianalysis.BreakingChange;
+import se.kth.java_version.JavaIncompatibilityAnalyzer;
 import se.kth.java_version.JavaVersionFailure;
 import se.kth.java_version.JavaVersionIncompatibility;
 import se.kth.java_version.VersionFinder;
@@ -61,10 +62,10 @@ public class Main {
                 continue;
             }
 
-            Path explaining = Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/Explanations/%s.md".formatted(breakingUpdate.breakingCommit()));
-            if (Files.exists(explaining)) {
-                continue;
-            }
+//            Path explaining = Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/Explanations/%s.md".formatted(breakingUpdate.breakingCommit()));
+//            if (Files.exists(explaining)) {
+//                continue;
+//            }
 
             Path jarsFile = Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/");
 
@@ -116,7 +117,7 @@ public class Main {
         }
     }
 
-    private static void generateJavaVersionIncompatibilityTemplate(BreakingUpdateMetadata breakingUpdate, ApiMetadata oldApiVersion, ApiMetadata newApiVersion) {
+    private static void generateJavaVersionIncompatibilityTemplate(BreakingUpdateMetadata breakingUpdate, ApiMetadata oldApiVersion, ApiMetadata newApiVersion) throws IOException {
 
         List<String> projects = readJavaIncompatibilityFile("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/client_java_version_failure.txt");
 
@@ -127,14 +128,19 @@ public class Main {
         Client client = new Client(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/%s/%s".formatted(breakingUpdate.breakingCommit(), breakingUpdate.project())));
 
         Map<String, List<Integer>> javaVersions = VersionFinder.findJavaVersions(client.getSourcePath().toString());
+        JavaIncompatibilityAnalyzer javaIncompatibilityAnalyzer = new JavaIncompatibilityAnalyzer();
+        Set<String> errorList = javaIncompatibilityAnalyzer.parseErrors(client.getSourcePath().toString()+"/%s.log".formatted(breakingUpdate.breakingCommit()));
+        Map<JavaVersionIncompatibility, Set<String>> versionFailures = JavaIncompatibilityAnalyzer.extractVersionErrors(errorList);
 
 
         Changes_V2 changes = new Changes_V2(oldApiVersion, newApiVersion);
 
         JavaVersionFailure javaVersionFailure = new JavaVersionFailure();
         javaVersionFailure.setJavaInWorkflowFiles(javaVersions);
-        javaVersionFailure.setErrorMessages("Error message");
-        javaVersionFailure.setIncompatibility(new JavaVersionIncompatibility("11", "17"));
+
+        javaVersionFailure.setDiffVersionErrors(versionFailures);
+        javaVersionFailure.setErrorMessages(errorList);
+        javaVersionFailure.setIncompatibility(new JavaVersionIncompatibility("11", "17", ""));
 
 
         ExplanationTemplate explanationTemplate = new JavaVersionIncompatibilityTemplate(

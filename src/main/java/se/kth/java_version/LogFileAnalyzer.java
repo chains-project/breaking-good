@@ -7,25 +7,45 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static se.kth.java_version.JavaIncompatibilityAnalyzer.extractVersionErrors;
+
 public class LogFileAnalyzer {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         String logFilePath = "/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/11be71ab8713fe987785e9e25e4f3e410e709ab9/camunda-platform-7-mockito/11be71ab8713fe987785e9e25e4f3e410e709ab9.log";
 
-//        JavaIncompatibilityAnalyzer analyzer = new JavaIncompatibilityAnalyzer();
-//        analyzer.extractErrorLines(logFilePath);
+        JavaIncompatibilityAnalyzer analyzer = new JavaIncompatibilityAnalyzer();
+       Set<String> errorList = analyzer.parseErrors(logFilePath);
+
+        for (String error : errorList) {
+            System.out.println("Error:");
+            System.out.println(error);
+            System.out.println("----");
+        }
+
+        Set<String> errorsSet = new HashSet<>();
+        Map<JavaVersionIncompatibility, Set<String>> versionErrors = extractVersionErrors(errorList);
+        for (Map.Entry<JavaVersionIncompatibility, Set<String>> entry : versionErrors.entrySet()) {
+            System.out.println("Java version incompatibility:");
+            System.out.println(entry.getKey());
+            System.out.println("Errors:");
+            for (String error : entry.getValue()) {
+                System.out.println(error);
+            }
+            System.out.println("----");
+        }
 
 //        extracted(logFilePath);
 //
 //        Set<String> errors = extractErrors(logFilePath);
 //        System.out.println(errors.size() + " errors found in the log file.");
 
-        Map<String, List<Integer>> javaVersions =   VersionFinder.findJavaVersions("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/11be71ab8713fe987785e9e25e4f3e410e709ab9/camunda-platform-7-mockito");
-
-        for (Map.Entry<String, List<Integer>> entry : javaVersions.entrySet()) {
-            System.out.println("File: " + entry.getKey());
-            System.out.println("Java versions: " + entry.getValue());
-        }
+//        Map<String, List<Integer>> javaVersions =   VersionFinder.findJavaVersions("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/11be71ab8713fe987785e9e25e4f3e410e709ab9/camunda-platform-7-mockito");
+//
+//        for (Map.Entry<String, List<Integer>> entry : javaVersions.entrySet()) {
+//            System.out.println("File: " + entry.getKey());
+//            System.out.println("Java versions: " + entry.getValue());
+//        }
 
     }
 

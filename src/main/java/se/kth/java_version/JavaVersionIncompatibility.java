@@ -1,18 +1,19 @@
 package se.kth.java_version;
 
-public record JavaVersionIncompatibility (
-        String expectedVersion,
-        String actualVersion
+public record JavaVersionIncompatibility(
+        String wrongVersion,
+        String shouldBeVersion,
+        String errorMessage
 ) {
 
     public JavaVersionIncompatibility {
-        if (expectedVersion == null || actualVersion == null) {
+        if (wrongVersion == null || shouldBeVersion == null) {
             throw new IllegalArgumentException("Version cannot be null");
         }
     }
 
     public String toString() {
-        return "Expected version: " + expectedVersion + ", Actual version: " + actualVersion;
+        return "Expected version: " + wrongVersion + ", Actual version: " + shouldBeVersion;
     }
 
     public boolean equals(Object obj) {
@@ -23,15 +24,10 @@ public record JavaVersionIncompatibility (
             return false;
         }
         JavaVersionIncompatibility other = (JavaVersionIncompatibility) obj;
-        return expectedVersion.equals(other.expectedVersion) && actualVersion.equals(other.actualVersion);
+        return wrongVersion.equals(other.wrongVersion) && shouldBeVersion.equals(other.shouldBeVersion);
     }
 
     public int hashCode() {
-        return expectedVersion.hashCode() + actualVersion.hashCode();
-    }
-
-    public static void main(String[] args) {
-        JavaVersionIncompatibility incompatibility = new JavaVersionIncompatibility("1.8", "1.7");
-        System.out.println(incompatibility);
+        return wrongVersion.hashCode() + shouldBeVersion.hashCode();
     }
 }

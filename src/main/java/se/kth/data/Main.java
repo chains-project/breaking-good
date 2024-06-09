@@ -13,7 +13,6 @@ import se.kth.japianalysis.BreakingChange;
 import se.kth.java_version.JavaIncompatibilityAnalyzer;
 import se.kth.java_version.JavaVersionFailure;
 import se.kth.java_version.JavaVersionIncompatibility;
-
 import se.kth.java_version.VersionFinder;
 import se.kth.log_Analyzer.MavenErrorLog;
 import se.kth.sponvisitors.BreakingChangeVisitor;
@@ -29,6 +28,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 import static se.kth.data.BuildHelp.*;
+import static se.kth.java_version.JavaVersion.generateVersionExplanation;
 
 
 public class Main {
@@ -129,24 +129,25 @@ public class Main {
             return;
         }
 
+        Changes_V2 changes = new Changes_V2(oldApiVersion, newApiVersion);
         Client client = new Client(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/%s/%s".formatted(breakingUpdate.breakingCommit(), breakingUpdate.project())));
 
         VersionFinder versionFinder = new VersionFinder();
 
+//        generateVersionExplanation(changes, client.getSourcePath().toString(), client.getSourcePath().toString() + "/%s.log".formatted(breakingUpdate.breakingCommit()));
+
         Map<String, List<Integer>> javaVersions = versionFinder.findJavaVersions(client.getSourcePath().toString());
         JavaIncompatibilityAnalyzer javaIncompatibilityAnalyzer = new JavaIncompatibilityAnalyzer();
-        Set<String> errorList = javaIncompatibilityAnalyzer.parseErrors(client.getSourcePath().toString()+"/%s.log".formatted(breakingUpdate.breakingCommit()));
+        Set<String> errorList = javaIncompatibilityAnalyzer.parseErrors(client.getSourcePath().toString() + "/%s.log".formatted(breakingUpdate.breakingCommit()));
         Map<JavaVersionIncompatibility, Set<String>> versionFailures = JavaIncompatibilityAnalyzer.extractVersionErrors(errorList);
 
 
-        Changes_V2 changes = new Changes_V2(oldApiVersion, newApiVersion);
 
         JavaVersionFailure javaVersionFailure = new JavaVersionFailure();
         javaVersionFailure.setJavaInWorkflowFiles(javaVersions);
-
         javaVersionFailure.setDiffVersionErrors(versionFailures);
         javaVersionFailure.setErrorMessages(errorList);
-        javaVersionFailure.setIncompatibility(new JavaVersionIncompatibility("11", "17", ""));
+        javaVersionFailure.setIncompatibilityVersion();
 
 
         ExplanationTemplate explanationTemplate = new JavaVersionIncompatibilityTemplate(

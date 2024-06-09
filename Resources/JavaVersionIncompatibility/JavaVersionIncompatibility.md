@@ -1,29 +1,30 @@
-CI detected that the dependency upgrade from version **1.0.1** to **1.0.0** has failed. 
+CI detected that the dependency upgrade from version **spring-core-6.0.9** to **spring-core-5.3.27** has failed. 
 The new version of the dependency require a different version of Java. 
 
-CI uses **Java 17**. The new version of the dependency requires **Java 11**. 
+CI uses **Java 11** (class version **55.0**). The new version of the dependency requires **Java 17** (class version **61.0**). 
 
-To resolve this issue, you need to update the Java version in the following files: 
+To resolve this issue, you need to update the Java version to **Java 17** in the following files: 
+- `test-suite.yml`
 - `build.yml`
-- `deploy.yml`
+- `findbugs.yml`
 
 <details>
 <summary>Here you can find a list of failures identified from the logs generated in the build process</summary>
 
-*    > [ERROR] /camunda-platform-7-mockito/src/main/java/org/camunda/community/mockito/process/CallActivityMockForSpringContext.java:[53,41] cannot find symbol<br>[ERROR]   symbol:   class ConfigurableApplicationContext<br>[ERROR]   location: class org.camunda.community.mockito.process.CallActivityMockForSpringContext 
+*    > [ERROR] /LPVS/src/main/java/com/lpvs/LicensePreValidationSystem.java:[15,37] cannot access org.springframework.core.task.TaskExecutor<br>[ERROR]   bad class file: /root/.m2/repository/org/springframework/spring-core/6.0.9/spring-core-6.0.9.jar(/org/springframework/core/task/TaskExecutor.class)<br>[ERROR]     class file has wrong version 61.0, should be 55.0<br>[ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath. 
 
-*    > [ERROR] /camunda-platform-7-mockito/src/main/java/org/camunda/community/mockito/process/CallActivityMockForSpringContext.java:[6,35] cannot access org.springframework.context.ConfigurableApplicationContext<br>[ERROR]   bad class file: /root/.m2/repository/org/springframework/spring-context/6.0.2/spring-context-6.0.2.jar(/org/springframework/context/ConfigurableApplicationContext.class)<br>[ERROR]     class file has wrong version 61.0, should be 55.0<br>[ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath. 
+*    > [ERROR] /LPVS/src/main/java/com/lpvs/controller/GitHubWebhooksController.java:[27,32] cannot access org.springframework.util.StringUtils<br>  bad class file: /root/.m2/repository/org/springframework/spring-core/6.0.9/spring-core-6.0.9.jar(/org/springframework/util/StringUtils.class)<br>    class file has wrong version 61.0, should be 55.0<br>    Please remove or make sure it appears in the correct subdirectory of the classpath. 
 
-*    > [ERROR] /camunda-platform-7-mockito/src/main/java/org/camunda/community/mockito/process/CallActivityMockForSpringContext.java:[33,11] cannot find symbol<br>[ERROR]   symbol:   class ApplicationContext<br>[ERROR]   location: class org.camunda.community.mockito.process.CallActivityMockForSpringContext 
+*    > [ERROR] /LPVS/src/main/java/com/lpvs/util/LPVSFileUtil.java:[15,32] cannot access org.springframework.util.FileSystemUtils<br>[ERROR]   bad class file: /root/.m2/repository/org/springframework/spring-core/6.0.9/spring-core-6.0.9.jar(/org/springframework/util/FileSystemUtils.class)<br>[ERROR]     class file has wrong version 61.0, should be 55.0<br>[ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath. 
 
-*    > [ERROR] /camunda-platform-7-mockito/src/main/java/org/camunda/community/mockito/process/CallActivityMockForSpringContext.java:[5,35] cannot access org.springframework.context.ApplicationContext<br>[ERROR]   bad class file: /root/.m2/repository/org/springframework/spring-context/6.0.2/spring-context-6.0.2.jar(/org/springframework/context/ApplicationContext.class)<br>[ERROR]     class file has wrong version 61.0, should be 55.0<br>[ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath. 
+*    > [ERROR] /LPVS/src/main/java/com/lpvs/LicensePreValidationSystem.java:[37,12] cannot find symbol<br>[ERROR]   symbol:   class TaskExecutor<br>[ERROR]   location: class com.lpvs.LicensePreValidationSystem 
 
-*    > [ERROR] /camunda-platform-7-mockito/src/main/java/org/camunda/community/mockito/process/CallActivityMockForSpringContext.java:[52,65] cannot find symbol<br>[ERROR]   symbol:   class ApplicationContext<br>[ERROR]   location: class org.camunda.community.mockito.process.CallActivityMockForSpringContext 
+*    > [ERROR] /LPVS/src/main/java/com/lpvs/controller/GitHubWebhooksController.java:[27,32] cannot access org.springframework.util.StringUtils<br>[ERROR]   bad class file: /root/.m2/repository/org/springframework/spring-core/6.0.9/spring-core-6.0.9.jar(/org/springframework/util/StringUtils.class)<br>[ERROR]     class file has wrong version 61.0, should be 55.0<br>[ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath. 
 
-*    > [ERROR] /camunda-platform-7-mockito/src/main/java/org/camunda/community/mockito/process/CallActivityMockForSpringContext.java:[41,5] reference to CallActivityMockForSpringContext is ambiguous<br>[ERROR]   both constructor CallActivityMockForSpringContext(java.lang.String,org.camunda.community.mockito.process.CallActivityMock.MockedModelConfigurer,org.springframework.beans.factory.config.SingletonBeanRegistry) in org.camunda.community.mockito.process.CallActivityMockForSpringContext and constructor CallActivityMockForSpringContext(java.lang.String,org.camunda.community.mockito.process.CallActivityMock.MockedModelConfigurer,ApplicationContext) in org.camunda.community.mockito.process.CallActivityMockForSpringContext match 
+*    > [ERROR] /LPVS/src/main/java/com/lpvs/util/LPVSFileUtil.java:[15,32] cannot access org.springframework.util.FileSystemUtils<br>  bad class file: /root/.m2/repository/org/springframework/spring-core/6.0.9/spring-core-6.0.9.jar(/org/springframework/util/FileSystemUtils.class)<br>    class file has wrong version 61.0, should be 55.0<br>    Please remove or make sure it appears in the correct subdirectory of the classpath. 
 
-*    > [ERROR] /camunda-platform-7-mockito/src/main/java/org/camunda/community/mockito/process/CallActivityMockForSpringContext.java:[48,73] cannot find symbol<br>[ERROR]   symbol:   class ApplicationContext<br>[ERROR]   location: class org.camunda.community.mockito.process.CallActivityMockForSpringContext 
+*    > [ERROR] /LPVS/src/main/java/com/lpvs/LicensePreValidationSystem.java:[15,37] cannot access org.springframework.core.task.TaskExecutor<br>  bad class file: /root/.m2/repository/org/springframework/spring-core/6.0.9/spring-core-6.0.9.jar(/org/springframework/core/task/TaskExecutor.class)<br>    class file has wrong version 61.0, should be 55.0<br>    Please remove or make sure it appears in the correct subdirectory of the classpath. 
 
-*    > [ERROR] /camunda-platform-7-mockito/src/main/java/org/camunda/community/mockito/process/CallActivityMockForSpringContext.java:[56,14] cannot find symbol<br>[ERROR]   symbol:   class ConfigurableApplicationContext<br>[ERROR]   location: class org.camunda.community.mockito.process.CallActivityMockForSpringContext 
+*    > [ERROR] /LPVS/src/main/java/com/lpvs/LicensePreValidationSystem.java:[37,12] cannot find symbol<br>  symbol:   class TaskExecutor<br>  location: class com.lpvs.LicensePreValidationSystem 
 
 </details>

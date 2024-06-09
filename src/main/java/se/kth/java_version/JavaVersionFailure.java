@@ -26,4 +26,15 @@ public class JavaVersionFailure {
     }
 
 
+    public void setIncompatibilityVersion() {
+        diffVersionErrors.forEach((incompatibility, errors) -> {
+            if (incompatibility == null) {
+                return;
+            }
+            this.incompatibility = incompatibility;
+            return;
+        });
+
+
+    }
 }

@@ -37,7 +37,7 @@ public class JavaVersionIncompatibilityTemplate extends ExplanationTemplate {
         StringBuilder listFiles = new StringBuilder();
 
         errorMessages.forEach(error -> {
-            listFiles.append("*    > %s \n".formatted(error.replace(System.lineSeparator(), "<br>"  )));
+            listFiles.append("*    > %s \n".formatted(error.replace(System.lineSeparator(), "<br>")));
             listFiles.append("\n");
         });
         listFiles.append("</details>\n");
@@ -48,21 +48,20 @@ public class JavaVersionIncompatibilityTemplate extends ExplanationTemplate {
     @Override
     public String brokenElement() {
         // Get the incompatibility version
+
         JavaVersionIncompatibility incompatibility = javaVersionFailure.getIncompatibility();
 
-        String CIJAVA = "";
-
-        if (incompatibility.shouldBeVersion().equals("11")) {
-            CIJAVA = "Java 11";
-        } else if (incompatibility.shouldBeVersion().equals("17")) {
-            CIJAVA = "Java 17";
-        }
 
         // Create a string with the incompatibility version
-        String CI = "CI uses **Java %s**. The new version of the dependency requires **Java %s**. \n"
-                .formatted(incompatibility.shouldBeVersion(), incompatibility.wrongVersion());
+        String CI = "CI uses **%s** (class version **%s**). The new version of the dependency requires **%s** (class version **%s**). \n"
+                .formatted(
+                        incompatibility.mapVersions(incompatibility.shouldBeVersion()),
+                        incompatibility.shouldBeVersion(),
+                        incompatibility.mapVersions(incompatibility.wrongVersion())
+                        , incompatibility.wrongVersion()
+                );
 
-        String files = "To resolve this issue, you need to update the Java version in the following files:" +
+        String files = "To resolve this issue, you need to update the Java version to **%s** in the following files:".formatted(incompatibility.mapVersions(incompatibility.wrongVersion())) +
                 " \n";
 
         StringBuilder listFiles = new StringBuilder();

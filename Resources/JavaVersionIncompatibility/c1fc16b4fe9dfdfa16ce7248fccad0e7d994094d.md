@@ -1,4 +1,4 @@
-CI detected that the dependency upgrade from version **spring-core-6.0.2** to **spring-core-5.3.23** has failed. 
+CI detected that the dependency upgrade from version **spring-core-5.3.23** to **spring-core-6.0.2** has failed. 
 The new version of the dependency require a different version of Java. 
 
 CI uses **Java 11** (class version **55.0**). The new version of the dependency requires **Java 17** (class version **61.0**). 

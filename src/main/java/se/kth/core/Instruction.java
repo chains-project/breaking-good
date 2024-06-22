@@ -5,4 +5,5 @@ public enum Instruction {
     Class,
     Import,
     Field,
+    Constructor
 }

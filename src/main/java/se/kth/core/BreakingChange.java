@@ -21,6 +21,19 @@ public class BreakingChange {
     public BreakingChange() {
     }
 
+    public void addErrorInfo(SpoonResults spoonResults) {
+        errorInfo.stream().findFirst().ifPresentOrElse(
+                s -> {
+                    if (s.getCtElement().getPosition().getLine() == spoonResults.getCtElement().getPosition().getLine()
+                            && s.getCtElement().getPosition().toString().equals(spoonResults.getCtElement().getPosition().toString())
+                    ) {
+                        return;
+                    }
+                },
+                () -> errorInfo.add(spoonResults)
+        );
+    }
+
     public String toString() {
         return "BreakingChange{" + "apiChanges=" + apiChanges.toString() + ", errorInfo=" + errorInfo.toString() + '}';
     }

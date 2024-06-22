@@ -1,0 +1,48 @@
+{
+  "jtcop": {
+    "maven.test.yaml": [11, 17],
+    "maven.release.yml": [11],
+    "codecov.yaml": [11]
+  },
+  "LPVS": {
+    "test-suite.yml": [11],
+    "build.yml": [11],
+    "findbugs.yml": [11]
+  },
+  "log-record": {
+    "ci.yml": [8]
+  },
+  "lti-launch": {
+    "maven.yml": [11]
+  },
+  "micronaut-openapi-codegen": {
+    "release.yaml": [11],
+    "ci.yaml": [11]
+  },
+  "dropwizard-graphql": {
+    "maven.yml": [11, 14]
+  },
+  "jooq-meta-postgres-flyway": {
+    "codeql-analysis.yml": [11],
+    "maven.yml": [11]
+  },
+  "openhospital-core": {
+    "maven.yml": [11]
+  },
+  "nldi-services": {
+    "spotless.yml": [11],
+    "maven-tests.yml": [11]
+  },
+  "camunda-platform-7-mockito": {
+    "build.yml": [11],
+    "deploy.yml": [11]
+  },
+  "future-converter": {
+    "ci.yml": [8, 17, 18]
+  },
+  "IDS-Messaging-Services": {
+    "development-maven-build.yml": [11],
+    "maven-build-push.yml": [11],
+    "maven-build.yml": [11]
+  }
+}

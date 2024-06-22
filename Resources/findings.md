@@ -19,3 +19,8 @@
   * >[ERROR] /myfaces-tobago/tobago-core/src/test/java/org/apache/myfaces/tobago/internal/mock/servlet/MockHttpSession.java:[24,28] cannot find symbol
     symbol:   class HttpSessionContext
     location: package jakarta.servlet.http
+    > 
+
+
+### User Study
+Compilation failure: 1d43bce1de6a81ac017c233d72f348d3c850299e

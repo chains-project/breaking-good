@@ -11,20 +11,12 @@ To resolve this issue, you need to update the Java version to **Java 17** in the
 <details>
 <summary>Here you can find a list of failures identified from the logs generated in the build process</summary>
 
-*    > [ERROR] /LPVS/src/main/java/com/lpvs/controller/GitHubWebhooksController.java:[25,32] cannot access org.springframework.util.StringUtils<br>  bad class file: /root/.m2/repository/org/springframework/spring-core/6.0.2/spring-core-6.0.2.jar(/org/springframework/util/StringUtils.class)<br>    class file has wrong version 61.0, should be 55.0<br>    Please remove or make sure it appears in the correct subdirectory of the classpath. 
-
-*    > [ERROR] /LPVS/src/main/java/com/lpvs/util/FileUtil.java:[13,32] cannot access org.springframework.util.FileSystemUtils<br>  bad class file: /root/.m2/repository/org/springframework/spring-core/6.0.2/spring-core-6.0.2.jar(/org/springframework/util/FileSystemUtils.class)<br>    class file has wrong version 61.0, should be 55.0<br>    Please remove or make sure it appears in the correct subdirectory of the classpath. 
-
 *    > [ERROR] /LPVS/src/main/java/com/lpvs/LicensePreValidationSystem.java:[39,12] cannot find symbol<br>[ERROR]   symbol:   class TaskExecutor<br>[ERROR]   location: class com.lpvs.LicensePreValidationSystem 
 
 *    > [ERROR] /LPVS/src/main/java/com/lpvs/LicensePreValidationSystem.java:[17,37] cannot access org.springframework.core.task.TaskExecutor<br>[ERROR]   bad class file: /root/.m2/repository/org/springframework/spring-core/6.0.2/spring-core-6.0.2.jar(/org/springframework/core/task/TaskExecutor.class)<br>[ERROR]     class file has wrong version 61.0, should be 55.0<br>[ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath. 
 
-*    > [ERROR] /LPVS/src/main/java/com/lpvs/LicensePreValidationSystem.java:[17,37] cannot access org.springframework.core.task.TaskExecutor<br>  bad class file: /root/.m2/repository/org/springframework/spring-core/6.0.2/spring-core-6.0.2.jar(/org/springframework/core/task/TaskExecutor.class)<br>    class file has wrong version 61.0, should be 55.0<br>    Please remove or make sure it appears in the correct subdirectory of the classpath. 
-
 *    > [ERROR] /LPVS/src/main/java/com/lpvs/controller/GitHubWebhooksController.java:[25,32] cannot access org.springframework.util.StringUtils<br>[ERROR]   bad class file: /root/.m2/repository/org/springframework/spring-core/6.0.2/spring-core-6.0.2.jar(/org/springframework/util/StringUtils.class)<br>[ERROR]     class file has wrong version 61.0, should be 55.0<br>[ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath. 
 
 *    > [ERROR] /LPVS/src/main/java/com/lpvs/util/FileUtil.java:[13,32] cannot access org.springframework.util.FileSystemUtils<br>[ERROR]   bad class file: /root/.m2/repository/org/springframework/spring-core/6.0.2/spring-core-6.0.2.jar(/org/springframework/util/FileSystemUtils.class)<br>[ERROR]     class file has wrong version 61.0, should be 55.0<br>[ERROR]     Please remove or make sure it appears in the correct subdirectory of the classpath. 
-
-*    > [ERROR] /LPVS/src/main/java/com/lpvs/LicensePreValidationSystem.java:[39,12] cannot find symbol<br>  symbol:   class TaskExecutor<br>  location: class com.lpvs.LicensePreValidationSystem 
 
 </details>

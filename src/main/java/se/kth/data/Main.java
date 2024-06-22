@@ -36,7 +36,7 @@ public class Main {
     static Set<BreakingGoodInfo> breakingGoodInfoList = new HashSet<>();
 
     public static void main(String[] args) {
-//        String fileName = "0c60d0b08c999769313bfe2335fa792efcfb0300";
+        String fileName = "0cdcc1f1319311f383676a89808c9b8eb190145c";
 
         list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark"));
 //        list = getBreakingCommit(Path.of("examples/Benchmark"));

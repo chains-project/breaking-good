@@ -14,6 +14,8 @@ import java.util.regex.Pattern;
 public class JavaIncompatibilityAnalyzer {
 
     static String errorPattern = "class file has wrong version (\\d+\\.\\d+), should be (\\d+\\.\\d+)";
+    String startLine = "[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin";
+    String endLine = "[ERROR] -> [Help 1]";
 
     /**
      * Parse the log file and extract the error messages
@@ -30,26 +32,36 @@ public class JavaIncompatibilityAnalyzer {
 
         // Define the regular expression pattern to find error lines
         Pattern errorPattern = Pattern.compile("\\[ERROR\\] /[\\w\\-/]+\\.java");
-
+        boolean parseStart = false;
         while ((line = reader.readLine()) != null) {
-            Matcher matcher = errorPattern.matcher(line);
+            if (line.startsWith(endLine)) {
+                break;
+            }
+            if (line.startsWith(startLine)) {
+                parseStart = true;
+            }
+            if (parseStart) {
 
-            if (line.startsWith("[ERROR]") && matcher.find()) {
-                if (currentError != null) {
-                    errors.add(currentError.toString().trim());
-                }
-                currentError = new StringBuilder();
-                currentError.append(line);
-            } else if (currentError != null && !line.trim().isEmpty() && line.contains("  ")) {
-                // Line with more than one space
-                currentError.append(System.lineSeparator()).append(line);
-            } else {
-                // Line that doesn't follow the pattern
-                if (currentError != null) {
-                    errors.add(currentError.toString().trim());
-                    currentError = null;
+
+                Matcher matcher = errorPattern.matcher(line);
+                if (line.startsWith("[ERROR]") && matcher.find()) {
+                    if (currentError != null) {
+                        errors.add(currentError.toString().trim());
+                    }
+                    currentError = new StringBuilder();
+                    currentError.append(line);
+                } else if (currentError != null && !line.trim().isEmpty() && line.contains("  ")) {
+                    // Line with more than one space
+                    currentError.append(System.lineSeparator()).append(line);
+                } else {
+                    // Line that doesn't follow the pattern
+                    if (currentError != null) {
+                        errors.add(currentError.toString().trim());
+                        currentError = null;
+                    }
                 }
             }
+
         }
 
         if (currentError != null) {

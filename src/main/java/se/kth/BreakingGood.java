@@ -2,6 +2,12 @@ package se.kth;
 
 import se.kth.breaking_changes.ApiMetadata;
 import se.kth.core.Changes_V2;
+import se.kth.explaining.ExplanationTemplate;
+import se.kth.explaining.JavaVersionIncompatibilityTemplate;
+import se.kth.java_version.JavaIncompatibilityAnalyzer;
+import se.kth.java_version.JavaVersionFailure;
+import se.kth.java_version.JavaVersionIncompatibility;
+import se.kth.java_version.VersionFinder;
 import se.kth.log_Analyzer.MavenLogAnalyzer;
 import se.kth.spoon_compare.Client;
 import se.kth.werror.WError;
@@ -12,6 +18,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 public class BreakingGood {
@@ -84,6 +92,43 @@ public class BreakingGood {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Generate the explanation for a Java version incompatibility error
+     *
+     * @param project       The project path
+     * @param logFile       The log file path
+     * @param oldApiVersion The old API version
+     * @param newApiVersion The new API version
+     * @throws IOException If the explanation could not be generated
+     */
+    public static void javaVersionIncompatibilityErrorExplanation(Path project, Path logFile, ApiMetadata oldApiVersion, ApiMetadata newApiVersion) throws IOException {
+        Changes_V2 changes = new Changes_V2(oldApiVersion, newApiVersion);
+        Client client = new Client(project);
+
+        VersionFinder versionFinder = new VersionFinder();
+
+//        generateVersionExplanation(changes, client.getSourcePath().toString(), client.getSourcePath().toString() + "/%s.log".formatted(breakingUpdate.breakingCommit()));
+
+        Map<String, List<Integer>> javaVersions = versionFinder.findJavaVersions(client.getSourcePath().toString());
+        JavaIncompatibilityAnalyzer javaIncompatibilityAnalyzer = new JavaIncompatibilityAnalyzer();
+        Set<String> errorList = javaIncompatibilityAnalyzer.parseErrors(logFile.toString());
+
+        Map<JavaVersionIncompatibility, Set<String>> versionFailures = JavaIncompatibilityAnalyzer.extractVersionErrors(errorList);
+
+        JavaVersionFailure javaVersionFailure = new JavaVersionFailure();
+        javaVersionFailure.setJavaInWorkflowFiles(javaVersions);
+        javaVersionFailure.setDiffVersionErrors(versionFailures);
+        javaVersionFailure.setErrorMessages(errorList);
+        javaVersionFailure.setIncompatibilityVersion();
+
+
+        ExplanationTemplate explanationTemplate = new JavaVersionIncompatibilityTemplate(
+                changes, "JavaVersionIncompatibility.md",
+                javaVersionFailure
+        );
+        explanationTemplate.generateTemplate();
     }
 
 

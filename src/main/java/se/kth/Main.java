@@ -2,25 +2,20 @@ package se.kth;
 
 
 import picocli.CommandLine;
-import se.kth.breaking_changes.ApiChange;
 import se.kth.breaking_changes.ApiMetadata;
-import se.kth.breaking_changes.JApiCmpAnalyze;
-import se.kth.core.Changes;
-import se.kth.core.CombineResults;
 import se.kth.data.JsonUtils;
-import se.kth.log_Analyzer.MavenErrorLog;
 import se.kth.log_Analyzer.MavenLogAnalyzer;
 import se.kth.spoon_compare.Client;
 import se.kth.transitive_changes.CompareTransitiveDependency;
 import se.kth.transitive_changes.Dependency;
 import se.kth.transitive_changes.MavenTree;
 import se.kth.transitive_changes.PairTransitiveDependency;
-import spoon.reflect.CtModel;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Set;
 
+import static se.kth.BreakingGood.javaVersionIncompatibilityErrorExplanation;
 import static se.kth.BreakingGood.wErrorAnalysis;
 
 public class Main {
@@ -73,22 +68,35 @@ public class Main {
                     System.out.println("The log contains the -Werror flag");
                     wErrorAnalysis(mavenLogAnalyzer.getLogFile().getAbsolutePath(), project.toString(), oldApiMetadata, newApiMetadata);
                 } else {
+                    // Check if the log contains a Java version incompatibility error
+                    boolean isJavaVersionIncompatibility = mavenLogAnalyzer.isJavaVersionIncompatibilityError(mavenLogAnalyzer.getLogFile().getAbsolutePath());
 
-                    JApiCmpAnalyze jApiCmpAnalyze = new JApiCmpAnalyze(oldApiMetadata, newApiMetadata);
-
-                    Set<ApiChange> apiChanges = jApiCmpAnalyze.useJApiCmp();
-
-                    MavenErrorLog errorLog = mavenLogAnalyzer.analyzeCompilationErrors();
-
-                    CtModel model = BreakingGood.spoonAnalyzer(client, oldApiMetadata, project);
-
-                    CombineResults combineResults = new CombineResults(apiChanges, oldApiMetadata, newApiMetadata, errorLog, model);
-                    //remove project name folder
-                    combineResults.setProject(project.toString().substring(0, project.toString().lastIndexOf("/")));
-                    Changes changes = combineResults.analyze();
+                    if (isJavaVersionIncompatibility) {
+                        System.out.println("The log file contains a Java version incompatibility error.");
+                        javaVersionIncompatibilityErrorExplanation(
+                                project,
+                                mavenLog,
+                                oldApiMetadata,
+                                newApiMetadata);
+                    } else {
+                        System.out.println("The log file does not contain a Java version incompatibility error.");
+                        return;
+//                        JApiCmpAnalyze jApiCmpAnalyze = new JApiCmpAnalyze(oldApiMetadata, newApiMetadata);
+//
+//                        Set<ApiChange> apiChanges = jApiCmpAnalyze.useJApiCmp();
+//
+//                        MavenErrorLog errorLog = mavenLogAnalyzer.analyzeCompilationErrors();
+//
+//                        CtModel model = BreakingGood.spoonAnalyzer(client, oldApiMetadata, project);
+//
+//                        CombineResults combineResults = new CombineResults(apiChanges, oldApiMetadata, newApiMetadata, errorLog, model);
+//                        //remove project name folder
+//                        combineResults.setProject(project.toString().substring(0, project.toString().lastIndexOf("/")));
+//                        Changes changes = combineResults.analyze();
 
 //                ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, "Explanations/" + project.toFile().getName() + ".md");
 //                explanationTemplate.generateTemplate();
+                    }
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);

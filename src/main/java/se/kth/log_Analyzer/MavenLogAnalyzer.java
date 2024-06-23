@@ -89,7 +89,6 @@ public class MavenLogAnalyzer {
     }
 
     public boolean isWerror(String logFilePath) throws IOException {
-
         try {
             FileInputStream fileInputStream = new FileInputStream(logFilePath);
             InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, StandardCharsets.ISO_8859_1);
@@ -100,6 +99,27 @@ public class MavenLogAnalyzer {
 
             while ((line = reader.readLine()) != null) {
                 Matcher matcher = errorPattern.matcher(line);
+                if (matcher.find()) {
+                    return true;
+                }
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean isJavaVersionIncompatibilityError(String logFilePath) throws IOException {
+        try {
+            FileInputStream fileInputStream = new FileInputStream(logFilePath);
+            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, StandardCharsets.ISO_8859_1);
+            BufferedReader reader = new BufferedReader(inputStreamReader);
+            String line;
+            Pattern versionPattern = Pattern.compile("class file has wrong version");
+
+            while ((line = reader.readLine()) != null) {
+                Matcher matcher = versionPattern.matcher(line);
                 if (matcher.find()) {
                     return true;
                 }

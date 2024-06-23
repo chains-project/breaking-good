@@ -1,0 +1,104 @@
+CI detected that the dependency upgrade from version **spring-cloud-stream-3.0.7.RELEASE** to **spring-cloud-stream-4.0.2** has failed. Here are details to help you understand and fix the problem:
+1. Your client utilizes **6** constructs which has been modified in the new version of the dependency.
+   * <details>
+        <summary>Class <b>org.springframework.cloud.stream.annotation.Output</b> which has been <b>removed</b> in the new version of the dependency</summary>
+            
+        * <details>
+          <summary>The failure is identified from the logs generated in the build process. </summary>
+          
+            *   >[[ERROR] /log-record/src/main/java/cn/monitor4all/logRecord/configuration/StreamSenderConfiguration.java:[77,10] cannot find symbol<br>&nbsp;&nbsp;&nbsp;&nbsp;  symbol:   class Output
+  location: interface cn.monitor4all.logRecord.configuration.StreamSenderConfiguration.LogRecordChannel
+](https://github.com/chains-project/breaking-good/actions/runs/8110103454/job/22166641300#step:4:1774)
+            *   An error was detected in line 77 which is making use of an outdated API.
+             ``` java
+             77   @org.springframework.cloud.stream.annotation.Output(cn.monitor4all.logRecord.configuration.StreamSenderConfiguration.LogRecordChannel.OUTPUT);
+            ```
+
+          </details>
+            
+     </details>
+   * <details>
+        <summary>Class <b>org.springframework.cloud.stream.annotation.EnableBinding</b> which has been <b>removed</b> in the new version of the dependency</summary>
+            
+        * <details>
+          <summary>The failure is identified from the logs generated in the build process. </summary>
+          
+            *   >[[ERROR] /log-record/src/main/java/cn/monitor4all/logRecord/configuration/StreamSenderConfiguration.java:[29,2] cannot find symbol<br>&nbsp;&nbsp;&nbsp;&nbsp;  symbol: class EnableBinding
+](https://github.com/chains-project/breaking-good/actions/runs/8110103454/job/22166641300#step:4:1769)
+            *   An error was detected in line 29 which is making use of an outdated API.
+             ``` java
+             29   @org.springframework.cloud.stream.annotation.EnableBinding(cn.monitor4all.logRecord.configuration.StreamSenderConfiguration.LogRecordChannel.class);
+            ```
+
+          </details>
+            
+     </details>
+   * <details>
+        <summary>Class <b>org.springframework.cloud.stream.annotation.Output</b> which has been <b>removed</b> in the new version of the dependency</summary>
+            
+        * <details>
+          <summary>The failure is identified from the logs generated in the build process. </summary>
+          
+            *   >[[ERROR] /log-record/src/main/java/cn/monitor4all/logRecord/configuration/StreamSenderConfiguration.java:[77,10] cannot find symbol<br>&nbsp;&nbsp;&nbsp;&nbsp;  symbol:   class Output
+  location: interface cn.monitor4all.logRecord.configuration.StreamSenderConfiguration.LogRecordChannel
+](https://github.com/chains-project/breaking-good/actions/runs/8110103454/job/22166641300#step:4:1774)
+            *   An error was detected in line 77 which is making use of an outdated API.
+             ``` java
+             77   @org.springframework.cloud.stream.annotation.Output(cn.monitor4all.logRecord.configuration.StreamSenderConfiguration.LogRecordChannel.OUTPUT);
+            ```
+
+          </details>
+            
+     </details>
+   * <details>
+        <summary>Class <b>org.springframework.cloud.stream.annotation.EnableBinding</b> which has been <b>removed</b> in the new version of the dependency</summary>
+            
+        * <details>
+          <summary>The failure is identified from the logs generated in the build process. </summary>
+          
+            *   >[[ERROR] /log-record/src/main/java/cn/monitor4all/logRecord/configuration/StreamSenderConfiguration.java:[29,2] cannot find symbol<br>&nbsp;&nbsp;&nbsp;&nbsp;  symbol: class EnableBinding
+](https://github.com/chains-project/breaking-good/actions/runs/8110103454/job/22166641300#step:4:1769)
+            *   An error was detected in line 29 which is making use of an outdated API.
+             ``` java
+             29   @org.springframework.cloud.stream.annotation.EnableBinding(cn.monitor4all.logRecord.configuration.StreamSenderConfiguration.LogRecordChannel.class);
+            ```
+
+          </details>
+            
+     </details>
+   * <details>
+        <summary>Class <b>org.springframework.cloud.stream.annotation.Output</b> which has been <b>removed</b> in the new version of the dependency</summary>
+            
+        * <details>
+          <summary>The failure is identified from the logs generated in the build process. </summary>
+          
+            *   >[[ERROR] /log-record/src/main/java/cn/monitor4all/logRecord/configuration/StreamSenderConfiguration.java:[11,51] cannot find symbol<br>&nbsp;&nbsp;&nbsp;&nbsp;  symbol:   class Output
+  location: package org.springframework.cloud.stream.annotation
+](https://github.com/chains-project/breaking-good/actions/runs/8110103454/job/22166641300#step:4:1768)
+            *   An error was detected in line 11 which is making use of an outdated API.
+             ``` java
+             11   import org.springframework.cloud.stream.annotation.Output;;
+            ```
+
+          </details>
+            
+     </details>
+   * <details>
+        <summary>Class <b>org.springframework.cloud.stream.annotation.EnableBinding</b> which has been <b>removed</b> in the new version of the dependency</summary>
+            
+        * <details>
+          <summary>The failure is identified from the logs generated in the build process. </summary>
+          
+            *   >[[ERROR] /log-record/src/main/java/cn/monitor4all/logRecord/configuration/StreamSenderConfiguration.java:[10,51] cannot find symbol<br>&nbsp;&nbsp;&nbsp;&nbsp;  symbol:   class EnableBinding
+  location: package org.springframework.cloud.stream.annotation
+](https://github.com/chains-project/breaking-good/actions/runs/8110103454/job/22166641300#step:4:1767)
+            *   An error was detected in line 10 which is making use of an outdated API.
+             ``` java
+             10   import org.springframework.cloud.stream.annotation.EnableBinding;;
+            ```
+
+          </details>
+            
+     </details>
+
+

@@ -2,17 +2,21 @@ package se.kth.breaking_changes;
 
 import japicmp.model.JApiBehavior;
 import japicmp.model.JApiChangeStatus;
+import japicmp.model.JApiCompatibilityChangeType;
+import spoon.reflect.reference.CtReference;
 
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * Represents a method-level breaking change
+ * Result from the comparison of two versions of an API
+  */
 @lombok.Getter
 @lombok.Setter
 public class ApiChange {
 
-    private String oldElement;
-
-    private String newElement;
+    private String Element;
 
     private String category;
 
@@ -22,35 +26,26 @@ public class ApiChange {
 
     private String newLongName;
 
-    private ApiMetadata newVersion;
-
-    private ApiMetadata oldVersion;
-
     private JApiChangeStatus changeType;
 
-    private JApiBehavior behavior;
+    private JApiCompatibilityChangeType compatibilityChange;
+
+    private AbstractApiChange reference;
 
     Set<ApiChange> newVariants;
+
     String instruction;
 
-    public ApiChange(String oldElement, String newElement, String category, String name) {
-        this.oldElement = oldElement;
-        this.newElement = newElement;
+    public ApiChange(String category, String name) {
         this.category = category;
         this.name = name;
-
     }
 
-    public ApiChange(String oldElement, String newElement, String category, String name, String newLongName, JApiChangeStatus changeType, ApiMetadata newVersion, ApiMetadata oldVersion, JApiBehavior behavior, String instruction) {
-        this.oldElement = oldElement;
-        this.newElement = newElement;
+    public ApiChange(String category, String name, String newLongName, JApiChangeStatus changeType, ApiMetadata newVersion, ApiMetadata oldVersion, JApiBehavior behavior, String instruction) {
         this.category = category;
         this.name = name;
         this.newLongName = newLongName;
-        this.newVersion = newVersion;
-        this.oldVersion = oldVersion;
         this.changeType = changeType;
-        this.behavior = behavior;
         this.instruction = instruction;
     }
 
@@ -59,7 +54,14 @@ public class ApiChange {
 
     @Override
     public String toString() {
-        return "LibraryChange(oldElement=" + this.getOldElement() + ", newElement=" + this.getNewElement() + ", category=" + this.getCategory() + ", name=" + this.getName() + ")";
+        return "ApiChange{" +
+                "category='" + category.toString() + '\'' +
+                ", name='" + name + '\'' +
+                ", newLongName='" + newLongName + '\'' +
+                ", changeType=" + changeType.toString() +
+                ", instruction='" + instruction + '\'' +
+                ", compatibilityChange=" + compatibilityChange +
+                '}';
     }
 
     @Override
@@ -67,14 +69,12 @@ public class ApiChange {
         if (this == that) return true;
         if (that == null || getClass() != that.getClass()) return false;
         ApiChange thatLibraryChange = (ApiChange) that;
-        return this.getOldElement().equals(thatLibraryChange.getOldElement())
-                && this.getNewElement().equals(thatLibraryChange.getNewElement())
-                && this.getCategory().equals(thatLibraryChange.getCategory())
+        return this.getCompatibilityChange().equals(thatLibraryChange.getCompatibilityChange())
                 && this.getName().equals(thatLibraryChange.getName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(oldElement, newElement, category, name);
+        return Objects.hash(category, name);
     }
 }

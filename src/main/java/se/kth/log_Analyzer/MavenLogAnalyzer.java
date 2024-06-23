@@ -10,8 +10,25 @@ import java.util.regex.Pattern;
 
 public class MavenLogAnalyzer {
 
-    private final File logFile;
+    public static final Map<Pattern, FailureCategory> FAILURE_PATTERNS = new HashMap<>();
 
+
+    static {
+        FAILURE_PATTERNS.put(Pattern.compile("(?i)(COMPILATION ERROR|Failed to execute goal io\\.takari\\.maven\\.plugins:takari-lifecycle-plugin.*?:compile)"),
+                FailureCategory.COMPILATION_FAILURE);
+        FAILURE_PATTERNS.put(Pattern.compile("(?i)(\\[ERROR] Tests run:|There are test failures|There were test failures|" +
+                        "Failed to execute goal org\\.apache\\.maven\\.plugins:maven-surefire-plugin)"),
+                FailureCategory.TEST_FAILURE);
+        FAILURE_PATTERNS.put(Pattern.compile("(?i)(warnings found and -Werror specified)"),
+                FailureCategory.WERROR_FAILURE);
+        FAILURE_PATTERNS.put(Pattern.compile("(?i)(class file has wrong version (\\d+\\.\\d+), should be (\\d+\\.\\d+))"),
+                FailureCategory.JAVA_VERSION_FAILURE);
+    }
+
+
+    // Path to the log file
+    private final File logFile;
+    // URL of the project
     private String projectURL;
 
     public MavenLogAnalyzer(File logFile) {
@@ -56,7 +73,7 @@ public class MavenLogAnalyzer {
                     }
                     if (currentPath != null) {
 
-                        MavenErrorLog.ErrorInfo errorInfo = new MavenErrorLog.ErrorInfo(String.valueOf(lineNumber), currentPath, line, lineNumberInFile);
+                        ErrorInfo errorInfo = new ErrorInfo(String.valueOf(lineNumber), currentPath, line, lineNumberInFile,extractAdditionalInfo(reader));
                         errorInfo.setErrorLogGithubLink(generateLogsLink(projectURL, 4, lineNumberInFile));
                         mavenErrorLogs.addErrorInfo(currentPath, errorInfo);
                     }
@@ -67,6 +84,38 @@ public class MavenLogAnalyzer {
             e.printStackTrace();
         }
         return mavenErrorLogs;
+    }
+
+    /**
+     * Extracts additional information from the log file
+     * Reused from @bumper
+     * @param fromReader BufferedReader object
+     * @return Additional information
+     */
+    public static String extractAdditionalInfo(BufferedReader fromReader) {
+        String line = null;
+        int charRead = -1;
+
+        try {
+            // Read first char of new line and reset the buffer
+            fromReader.mark(1);
+            charRead = fromReader.read();
+            fromReader.reset();
+
+            if (((char) charRead) == ' ') {
+                line = fromReader.readLine();
+                if (line == null) {
+                    return "";
+                } else {
+                    return line + "\n" + extractAdditionalInfo(fromReader);
+                }
+            } else {
+                return "";
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
     private String generateLogsLink(String projectURL, int step, int lineNumber) {

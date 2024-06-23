@@ -1,14 +1,21 @@
 package se.kth.spoon_compare;
 
-import se.kth.log_Analyzer.MavenErrorLog;
-import spoon.Launcher;
+import se.kth.breaking_changes.ApiChange;
+import se.kth.breaking_changes.BreakingGoodOptions;
+import se.kth.log_Analyzer.ErrorInfo;
+import se.kth.sponvisitors.BreakingChangeVisitor;
+import se.kth.sponvisitors.BrokenUse;
+import se.kth.sponvisitors.CombinedVisitor;
 import spoon.reflect.CtModel;
+import spoon.reflect.code.CtComment;
 import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
+import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtType;
 import spoon.reflect.visitor.filter.TypeFilter;
+import spoon.support.reflect.declaration.CtFieldImpl;
 
 import java.util.*;
 
@@ -17,20 +24,84 @@ import java.util.*;
 public class SpoonAnalyzer {
 
     private String dependencyGroupID;
+    private Set<ErrorInfo> mavenErrorLog;
+    private Set<ApiChange> apiChanges;
+    private List<Integer> errorLines = new ArrayList<>();
+    private CtModel model;
 
-    private Set<MavenErrorLog.ErrorInfo> mavenErrorLog;
 
-    public SpoonAnalyzer(String dependencyGroupID, Set<MavenErrorLog.ErrorInfo> mavenErrorLog) {
-        this.dependencyGroupID = dependencyGroupID;
+    public SpoonAnalyzer(Set<ErrorInfo> mavenErrorLog, Set<ApiChange> apiChanges, CtModel model) {
         this.mavenErrorLog = mavenErrorLog;
+        this.apiChanges = apiChanges;
+        this.model = model;
+
+        errorLines.addAll(mavenErrorLog.stream().map(m -> Integer.parseInt(m.getClientLinePosition())).toList());
+
     }
 
-    public List<SpoonResults> applySpoon(String projectFilePath) {
-        Launcher spoon = new Launcher();
-        spoon.addInputResource(projectFilePath);
-        spoon.buildModel();
+    private static boolean shouldBeIgnored(CtElement element) {
+        return element instanceof CtComment || element.isImplicit();
+    }
 
-        return getElementFromSourcePosition(spoon.getModel(), dependencyGroupID);
+
+    public Set<BrokenUse> applySpoonV2(List<BreakingChangeVisitor> breakingChangeVisitors, BreakingGoodOptions opts, String fileInClient) {
+        CombinedVisitor visitor = new CombinedVisitor(breakingChangeVisitors, opts);
+        List<CtElement> elements = model.filterChildren(element ->
+                !shouldBeIgnored(element)
+                        && element.getPosition().isValidPosition()
+                        && element.getPosition().toString().contains(fileInClient)
+                        && errorLines.contains(element.getPosition().getLine())
+        ).list();
+
+//        add imports manually because they are not in the children list
+        model.getRootPackage().getFactory().CompilationUnit().getMap().forEach((k, v) -> {
+            if (v.getPosition().toString().contains(fileInClient)) {
+                v.getImports().forEach(imp -> {
+                    if (!shouldBeIgnored(imp)
+                            && imp.getPosition().isValidPosition()
+                            && errorLines.contains(imp.getPosition().getLine())) {
+                        elements.add(imp);
+                    }
+                });
+            }
+        });
+        visitor.scan(elements);
+        // We still need to visit the root package afterwards.
+//        visitor.scan(model.getRootPackage());
+        return visitor.getBrokenUses();
+    }
+
+    public List<SpoonResults> applySpoon(String fileInClient) {
+        // filter elements for breaking positions
+        List<CtElement> elements = model.filterChildren(element ->
+                !shouldBeIgnored(element)
+                        && element.getPosition().isValidPosition()
+                        && element.getPosition().toString().contains(fileInClient)
+                        && errorLines.contains(element.getPosition().getLine())
+
+        ).list();
+
+        //add imports manually because they are not in the children list
+//        model.getRootPackage().getFactory().CompilationUnit().getMap().forEach((k, v) -> {
+//            if (v.getPosition().toString().contains(fileInClient)) {
+//                v.getImports().forEach(imp -> {
+//                    if (!shouldBeIgnored(imp)
+//                            && imp.getPosition().isValidPosition()
+//                            && errorLines.contains(imp.getPosition().getLine())) {
+//                        elements.add(imp);
+//                    }
+//                });
+//            }
+//        });
+
+        BreakingGoodScanner scanner = new BreakingGoodScanner(apiChanges, mavenErrorLog);
+        try {
+            scanner.scan(elements);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return scanner.getResults();
+
     }
 
 
@@ -44,38 +115,73 @@ public class SpoonAnalyzer {
 
             if (!e.isImplicit() && e.getPosition().isValidPosition() && isInvalidLine(e.getPosition().getLine())) {
                 SpoonResults spoonResults = new SpoonResults();
-                MavenErrorLog.ErrorInfo mavenErrorLog = getMavenErrorLog(e.getPosition().getLine());
-////
-                if (e instanceof CtInvocation<?>) {
-                    String parsedElement = parseProject(((CtInvocation<?>) e).getExecutable(), depGrpId);
-                    if (parsedElement != null) {
-                        spoonResults.setElement(String.valueOf(((CtInvocation<?>) e).getExecutable()));
-                        spoonResults.setName(parsedElement);
-                        spoonResults.setClientLine(e.toString());
-                        spoonResults.setPattern(replacePatterns(mavenErrorLog.getErrorMessage()));
-                        spoonResults.setErrorInfo(mavenErrorLog);
-                        results.add(spoonResults);
+                ErrorInfo mavenErrorLog = getMavenErrorLog(e.getPosition().getLine());
 
-                    }
+                if (e instanceof CtInvocation<?>) {
+
+//                    String parsedElement = parseProject(((CtInvocation<?>) e).getExecutable(), depGrpId);
+//                    if (parsedElement != null) {
+                    spoonResults.setElement(String.valueOf(((CtInvocation<?>) e).getExecutable()));
+                    spoonResults.setName(((CtInvocation<?>) e).getExecutable().getSimpleName());
+                    spoonResults.setClientLine(e.toString());
+                    spoonResults.setPattern(replacePatterns(mavenErrorLog.getErrorMessage()));
+                    spoonResults.setErrorInfo(mavenErrorLog);
+                    spoonResults.setCtElement(e);
+                    results.add(spoonResults);
+
+//                    }
                 }
                 if (e instanceof CtConstructorCall<?>) {
-                    String parsedElement = parseProject(((CtConstructorCall<?>) e).getExecutable(), depGrpId);
-                    if (parsedElement != null) {
-                        spoonResults.setElement(String.valueOf(((CtConstructorCall<?>) e).getExecutable()));
-                        spoonResults.setName(parsedElement);
-                        spoonResults.setClientLine(e.toString());
-                        spoonResults.setPattern(replacePatterns(mavenErrorLog.getErrorMessage()));
-                        spoonResults.setErrorInfo(mavenErrorLog);
-                        results.add(spoonResults);
+//                    String parsedElement = parseProject(((CtConstructorCall<?>) e).getExecutable(), depGrpId);
+//                    if (parsedElement != null) {
+                    spoonResults.setElement(String.valueOf(((CtConstructorCall<?>) e).getExecutable()));
+                    spoonResults.setName(String.valueOf(((CtConstructorCall<?>) e).getExecutable()));
+                    spoonResults.setClientLine(e.toString());
+                    spoonResults.setPattern(replacePatterns(mavenErrorLog.getErrorMessage()));
+                    spoonResults.setErrorInfo(mavenErrorLog);
+                    spoonResults.setCtElement(e);
+                    results.add(spoonResults);
+                    System.out.println(((CtConstructorCall<?>) e).getExecutable());
 
-                    }
+
+//                    }
+                }
+                if (e instanceof CtClass<?>) {
+                    spoonResults.setElement(String.valueOf(e));
+                    spoonResults.setName(String.valueOf(e));
+                    spoonResults.setClientLine(e.toString());
+                    spoonResults.setPattern(replacePatterns(mavenErrorLog.getErrorMessage()));
+                    spoonResults.setErrorInfo(mavenErrorLog);
+                    spoonResults.setCtElement(e);
+                    results.add(spoonResults);
+                    System.out.println(((CtClass<?>) e).getReference());
+                }
+
+                if (e instanceof CtFieldImpl<?>) {
+                    spoonResults.setElement(String.valueOf(e));
+                    spoonResults.setName(String.valueOf(e));
+                    spoonResults.setClientLine(e.toString());
+                    spoonResults.setPattern(replacePatterns(mavenErrorLog.getErrorMessage()));
+                    spoonResults.setErrorInfo(mavenErrorLog);
+                    spoonResults.setCtElement(e);
+                    results.add(spoonResults);
+                    System.out.println(((CtFieldImpl<?>) e).getType());
+                    System.out.println(Arrays.toString(((CtFieldImpl<?>) e).getReferencedTypes().toArray()));
+                }
+                if (e instanceof CtMethod<?>) {
+                    System.out.println(((CtMethod<?>) e).getSignature());
+
+                }
+
+                if (e instanceof CtType<?>) {
+                    System.out.println(((CtType<?>) e).getReference());
                 }
             }
         }
         return results;
     }
 
-    private MavenErrorLog.ErrorInfo getMavenErrorLog(int line) {
+    private ErrorInfo getMavenErrorLog(int line) {
         return mavenErrorLog.stream().filter(mavenErrorLog -> mavenErrorLog.getClientLinePosition().equals(String.valueOf(line))).findFirst().orElse(null);
     }
 

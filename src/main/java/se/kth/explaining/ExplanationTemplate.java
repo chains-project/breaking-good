@@ -87,7 +87,7 @@ public abstract class ExplanationTemplate {
 
     public void generateTemplate() {
 
-        if (changes.brokenChanges().isEmpty()) {
+        if (changes == null || changes.brokenChanges().isEmpty()) {
             return;
         }
 

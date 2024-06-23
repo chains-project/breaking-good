@@ -9,6 +9,7 @@ import se.kth.core.Changes;
 import se.kth.core.CombineResults;
 import se.kth.data.JsonUtils;
 import se.kth.log_Analyzer.MavenErrorLog;
+import se.kth.log_Analyzer.MavenLogAnalyzer;
 import se.kth.spoon_compare.Client;
 import se.kth.transitive_changes.CompareTransitiveDependency;
 import se.kth.transitive_changes.Dependency;
@@ -16,10 +17,11 @@ import se.kth.transitive_changes.MavenTree;
 import se.kth.transitive_changes.PairTransitiveDependency;
 import spoon.reflect.CtModel;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Set;
+
+import static se.kth.BreakingGood.wErrorAnalysis;
 
 public class Main {
     public static void main(String[] args) {
@@ -49,7 +51,7 @@ public class Main {
         Path newDependency;
 
         @CommandLine.Option(names = {"-l", "--log"}, paramLabel = "Maven log", description = "The maven log to analyze.")
-        File mavenLog;
+        Path mavenLog;
 
         @Override
         public void run() {
@@ -58,23 +60,36 @@ public class Main {
             ApiMetadata newApiMetadata = new ApiMetadata(newDependency.toFile().getName(), newDependency);
             Client client = new Client(project);
 
-            JApiCmpAnalyze jApiCmpAnalyze = new JApiCmpAnalyze(oldApiMetadata, newApiMetadata);
-
-            Set<ApiChange> apiChanges = jApiCmpAnalyze.useJApiCmp();
 
             try {
-                MavenErrorLog errorLog = BreakingGood.parseLog(mavenLog.toPath(), project);
 
-                CtModel model = BreakingGood.spoonAnalyzer(client, oldApiMetadata, project);
+                MavenLogAnalyzer mavenLogAnalyzer = BreakingGood.parseLog(mavenLog, project);
 
-                CombineResults combineResults = new CombineResults(apiChanges, oldApiMetadata, newApiMetadata, errorLog, model);
-                //remove project name folder
-                combineResults.setProject(project.toString().substring(0, project.toString().lastIndexOf("/")));
-                Changes changes = combineResults.analyze();
+                // Check if the log contains the -Werror flag
+                boolean isWerror = mavenLogAnalyzer.isWerror(mavenLogAnalyzer.getLogFile().getAbsolutePath());
+
+                if (isWerror) {
+                    // If the log contain the -Werror flag, analyze the log and generate a new log with the -Werror flag
+                    System.out.println("The log contains the -Werror flag");
+                    wErrorAnalysis(mavenLogAnalyzer.getLogFile().getAbsolutePath(), project.toString(), oldApiMetadata, newApiMetadata);
+                } else {
+
+                    JApiCmpAnalyze jApiCmpAnalyze = new JApiCmpAnalyze(oldApiMetadata, newApiMetadata);
+
+                    Set<ApiChange> apiChanges = jApiCmpAnalyze.useJApiCmp();
+
+                    MavenErrorLog errorLog = mavenLogAnalyzer.analyzeCompilationErrors();
+
+                    CtModel model = BreakingGood.spoonAnalyzer(client, oldApiMetadata, project);
+
+                    CombineResults combineResults = new CombineResults(apiChanges, oldApiMetadata, newApiMetadata, errorLog, model);
+                    //remove project name folder
+                    combineResults.setProject(project.toString().substring(0, project.toString().lastIndexOf("/")));
+                    Changes changes = combineResults.analyze();
 
 //                ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, "Explanations/" + project.toFile().getName() + ".md");
 //                explanationTemplate.generateTemplate();
-
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

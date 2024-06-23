@@ -8,6 +8,6 @@ import java.util.Set;
 
 public record Changes_V2(ApiMetadata oldApiVersion, ApiMetadata newApiVersion, Set<BrokenChanges> brokenChanges) {
     public Changes_V2(ApiMetadata oldApiVersion, ApiMetadata newApiVersion) {
-        this(newApiVersion, oldApiVersion, new HashSet<>());
+        this(oldApiVersion, newApiVersion, new HashSet<>());
     }
 }

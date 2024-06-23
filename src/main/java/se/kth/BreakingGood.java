@@ -1,9 +1,10 @@
 package se.kth;
 
 import se.kth.breaking_changes.ApiMetadata;
-import se.kth.log_Analyzer.MavenErrorLog;
+import se.kth.core.Changes_V2;
 import se.kth.log_Analyzer.MavenLogAnalyzer;
 import se.kth.spoon_compare.Client;
+import se.kth.werror.WError;
 import spoon.reflect.CtModel;
 
 import java.io.File;
@@ -22,17 +23,17 @@ public class BreakingGood {
      * @return The error log
      * @throws IOException If the log could not be read
      */
-    public static MavenErrorLog parseLog(Path logPath, Path client) throws IOException {
+    public static MavenLogAnalyzer parseLog(Path logPath, Path client) throws IOException {
         // Parse log
-        if (!Files.exists(logPath)) {
+        if (logPath == null || !Files.exists(logPath)) {
             String log = executeMvnCleanTest(client);
             if (log != null) {
                 logPath = Path.of(log);
             }
         }
-        MavenLogAnalyzer mavenLogAnalyzer = new MavenLogAnalyzer(
+        assert logPath != null;
+        return new MavenLogAnalyzer(
                 new File(logPath.toString()));
-        return mavenLogAnalyzer.analyzeCompilationErrors();
     }
 
 
@@ -56,13 +57,13 @@ public class BreakingGood {
 
         File tempFile;
         try {
-            tempFile = Files.createTempFile("mvn-clean-test-", ".log").toFile();
+            tempFile = Files.createTempFile("mvn-clean-test2-", ".log").toFile();
             processBuilder.redirectOutput(tempFile);
             Process process = processBuilder.start();
             int exitCode = process.waitFor();
             if (exitCode != 0) {
                 System.out.println("Maven clean test command failed with exit code " + exitCode);
-                return null;
+                return tempFile.getAbsolutePath();
             } else {
                 System.out.println("Maven clean test command executed successfully. Output saved to " + tempFile.getAbsolutePath());
                 return tempFile.getAbsolutePath();
@@ -70,6 +71,18 @@ public class BreakingGood {
         } catch (IOException | InterruptedException e) {
             System.out.println("Error executing Maven clean test command: " + e.getMessage());
             return null;
+        }
+    }
+
+
+    public static void wErrorAnalysis(String logPath, String client, ApiMetadata oldApiVersion, ApiMetadata newApiVersion) throws IOException {
+
+        Changes_V2 changes = new Changes_V2(oldApiVersion, newApiVersion);
+        WError werror = new WError("Explanation.md");
+        try {
+            werror.analyzeWerror(logPath, client, changes);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

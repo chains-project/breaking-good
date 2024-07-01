@@ -4,41 +4,38 @@ import se.kth.breaking_changes.ApiChange;
 import se.kth.breaking_changes.ApiMetadata;
 import se.kth.breaking_changes.BreakingGoodOptions;
 import se.kth.breaking_changes.JApiCmpAnalyze;
-import se.kth.core.Changes_V2;
+import se.kth.core.ChangesBetweenVersions;
 import se.kth.core.CombineResults;
 import se.kth.explaining.CompilationErrorTemplate;
 import se.kth.explaining.ExplanationTemplate;
-import se.kth.explaining.JavaVersionIncompatibilityTemplate;
 import se.kth.japianalysis.BreakingChange;
-import se.kth.java_version.JavaIncompatibilityAnalyzer;
-import se.kth.java_version.JavaVersionFailure;
-import se.kth.java_version.JavaVersionIncompatibility;
-import se.kth.java_version.VersionFinder;
 import se.kth.log_Analyzer.MavenErrorLog;
 import se.kth.sponvisitors.BreakingChangeVisitor;
 import se.kth.spoon_compare.Client;
+import se.kth.transitive_changes.Dependency;
+import se.kth.transitive_changes.TransitiveDependencyAnalysis;
 import spoon.reflect.CtModel;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static se.kth.data.BuildHelp.*;
-import static se.kth.java_version.JavaVersion.generateVersionExplanation;
-
 
 public class Main {
     static List<BreakingUpdateMetadata> list = new ArrayList<>();
     static Set<BreakingGoodInfo> breakingGoodInfoList = new HashSet<>();
 
     public static void main(String[] args) {
-        String fileName = "0cdcc1f1319311f383676a89808c9b8eb190145c";
+        String fileName = "b8f92ff37d1aed054d8320283fd6d6a492703a55";
 
-        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark"));
+//        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark"));
+        list = BuildHelp.getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/RQ3/transitive_jsons"));
+
 //        list = getBreakingCommit(Path.of("examples/Benchmark"));
 //        list = getBreakingCommit(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/benchmark/data/benchmark/%s.json".formatted(fileName)));
 //
@@ -68,8 +65,14 @@ public class Main {
 
 //            Path explaining = Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/Explanations/%s.md".formatted(breakingUpdate.breakingCommit()));
 //            if (Files.exists(explaining)) {
+//                System.out.println("Explanation already exists for breaking update " + breakingUpdate.breakingCommit());
 //                continue;
 //            }
+            Path explaining = Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/Explanations/RemAddMod/%s.md".formatted(breakingUpdate.breakingCommit()));
+            if (Files.exists(explaining)) {
+                System.out.println("Explanation already exists for breaking update " + breakingUpdate.breakingCommit());
+                continue;
+            }
 
             Path jarsFile = Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/");
 
@@ -84,6 +87,7 @@ public class Main {
                 processingBreakingUpdate(breakingUpdate, jarsFile, explanationStatistics);
 
             } catch (Exception e) {
+                e.printStackTrace();
                 System.out.println("Error processing breaking update " + breakingUpdate.breakingCommit());
                 System.out.println(e.toString());
                 continue;
@@ -102,6 +106,7 @@ public class Main {
             bg.setFailureCategory(breakingUpdate.failureCategory());
             MavenErrorLog mavenLogAnalyzer = mavenLogParser(breakingUpdate, bg);
 
+            String logPath = "projects/%s/%s/%s.log".formatted(breakingUpdate.breakingCommit(), breakingUpdate.project(), breakingUpdate.breakingCommit());
 
             Path oldDependency = jarsFile.resolve("%s/%s-%s.jar".formatted(breakingUpdate.breakingCommit(), breakingUpdate.updatedDependency().dependencyArtifactID(), breakingUpdate.updatedDependency().previousVersion()));
             Path newDependency = jarsFile.resolve("%s/%s-%s.jar".formatted(breakingUpdate.breakingCommit(), breakingUpdate.updatedDependency().dependencyArtifactID(), breakingUpdate.updatedDependency().newVersion()));
@@ -109,10 +114,116 @@ public class Main {
             ApiMetadata newApiVersion = new ApiMetadata(newDependency.toFile().getName(), newDependency);
             ApiMetadata oldApiVersion = new ApiMetadata(oldDependency.toFile().getName(), oldDependency);
 
+            JApiCmpAnalyze jApiCmpAnalyze = new JApiCmpAnalyze(
+                    oldApiVersion,
+                    newApiVersion
+            );
 
-            generateJavaVersionIncompatibilityTemplate(breakingUpdate, oldApiVersion, newApiVersion);
+            Set<ApiChange> apiChanges = jApiCmpAnalyze.useJApiCmp();
+            ChangesBetweenVersions changesV2;
 
-//            generateCompilationExplanations(breakingUpdate, explanationStatistics, oldApiVersion, newApiVersion, bg, mavenLogAnalyzer);
+            List<BreakingChange> breakingChanges = jApiCmpAnalyze.useJApiCmp_v2();
+
+            bg.setJApiCmpChanges(apiChanges.size());
+            System.out.println("Number of changes: " + apiChanges.size());
+
+            Client client = new Client(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/%s/%s".formatted(breakingUpdate.breakingCommit(), breakingUpdate.project())));
+            client.setClasspath(List.of(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/%s/%s-%s.jar".formatted(breakingUpdate.breakingCommit(), breakingUpdate.updatedDependency().dependencyArtifactID(), breakingUpdate.updatedDependency().previousVersion()))));
+
+            CtModel model = client.createModel();
+            CombineResults combineResults = new CombineResults(apiChanges, oldApiVersion, newApiVersion, mavenLogAnalyzer, model);
+            combineResults.setProject("projects/%s".formatted(breakingUpdate.breakingCommit()));
+
+            try {
+
+                List<BreakingChangeVisitor> visitors = jApiCmpAnalyze.getVisitors(breakingChanges);
+                BreakingGoodOptions options = new BreakingGoodOptions();
+
+                changesV2 = combineResults.analyze_v2(visitors, options);
+
+//                Changes changes = combineResults.analyze();
+                changesCount(changesV2, bg);
+                System.out.println("Project: " + breakingUpdate.project());
+                System.out.println("Breaking Commit: " + breakingUpdate.breakingCommit());
+                System.out.println("Changes: " + changesV2.brokenChanges().size());
+
+                if (!changesV2.brokenChanges().isEmpty()) {
+                    String explanationFolder = list.size() > 1 ? "Explanations/" : "Explanations_tmp/";
+                    final var dir = Path.of(explanationFolder);
+                    if (Files.notExists(dir)) {
+                        Files.createDirectory(dir);
+                    }
+
+                    explanationStatistics.add(new ExplanationStatistics(breakingUpdate.project(), breakingUpdate.breakingCommit(), changesV2.brokenChanges().size()));
+                    ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changesV2, explanationFolder + "/" + breakingUpdate.breakingCommit() + ".md");
+                    explanationTemplate.generateTemplate();
+                    if (Files.exists(Path.of(explanationFolder + "/" + breakingUpdate.breakingCommit() + ".md"))) {
+                        bg.setHasExplanation(true);
+                        System.out.println("Explanation template generated for breaking update " + breakingUpdate.breakingCommit());
+                    } else {
+                        System.out.println("Error generating explanation template for breaking update " + breakingUpdate.breakingCommit());
+                    }
+                    breakingGoodInfoList.add(bg);
+                } else {
+                    System.out.println("No breaking changes found for breaking update " + breakingUpdate.breakingCommit() + "in the direct dependency.");
+                }
+                System.out.println("**********************************************************");
+
+
+                if (!changesV2.brokenChanges().isEmpty()) {
+                    System.out.println("RETURNNN");
+                    return;
+                }
+
+                /*
+                 ************************************************************
+                 * Handle transitive dependencies and generate explanation
+                 * **********************************************************
+                 */
+
+                Dependency oldVersion = new Dependency(
+                        breakingUpdate.updatedDependency().dependencyGroupID(),
+                        breakingUpdate.updatedDependency().dependencyArtifactID(),
+                        breakingUpdate.updatedDependency().previousVersion(),
+                        "jar", "compile");
+                Dependency newVersion = new Dependency(
+                        breakingUpdate.updatedDependency().dependencyGroupID(),
+                        breakingUpdate.updatedDependency().dependencyArtifactID(),
+                        breakingUpdate.updatedDependency().newVersion()
+                        , "jar", "compile");
+//
+//
+                TransitiveDependencyAnalysis.compareTransitiveDependency(
+                        oldApiVersion,
+                        oldVersion,
+                        newApiVersion,
+                        newVersion,
+                        jApiCmpAnalyze,
+                        client,
+                        apiChanges,
+                        mavenLogAnalyzer,
+                        breakingUpdate.breakingCommit(),
+                        model,
+                        logPath
+
+                        );
+
+//                transitive(breakingUpdate, explanationStatistics, oldApiVersion, oldVersion, newApiVersion, newVersion, jApiCmpAnalyze, client, apiChanges, mavenLogAnalyzer, bg);
+
+            } catch (IOException e) {
+                System.out.println("Error analyzing breaking update " + breakingUpdate.breakingCommit());
+                System.out.println(e);
+                throw new RuntimeException(e);
+            }
+            try {
+                Path file = (list.size() > 1) ? Path.of("explanationStatistics-last.json") : Path.of("tmpStatistics.json");
+                Files.deleteIfExists(file);
+                Files.createFile(file);
+                JsonUtils.writeToFile(file, explanationStatistics);
+                JsonUtils.writeToFile(Path.of("breaking_good_stats.json"), breakingGoodInfoList);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
         } catch (Exception e) {
             System.out.println("Error processing breaking update " + breakingUpdate.breakingCommit());
@@ -121,128 +232,11 @@ public class Main {
         }
     }
 
-    private static void generateJavaVersionIncompatibilityTemplate(BreakingUpdateMetadata breakingUpdate, ApiMetadata oldApiVersion, ApiMetadata newApiVersion) throws IOException {
+    private static void transitive(BreakingUpdateMetadata breakingUpdate, List<ExplanationStatistics> explanationStatistics, ApiMetadata oldApiVersion, Dependency oldVersion, ApiMetadata newApiVersion, Dependency newVersion, JApiCmpAnalyze jApiCmpAnalyze, Client client, Set<ApiChange> apiChanges, MavenErrorLog mavenLogAnalyzer, BreakingGoodInfo bg) {
 
-        List<String> projects = readJavaIncompatibilityFile("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/client_java_version_failure.txt");
-
-        if (!projects.contains(breakingUpdate.breakingCommit())) {
-            return;
-        }
-
-        generateJavaVersionIncompatibilityErrorExplanation(breakingUpdate, oldApiVersion, newApiVersion);
-    }
-
-    private static void generateJavaVersionIncompatibilityErrorExplanation(BreakingUpdateMetadata breakingUpdate, ApiMetadata oldApiVersion, ApiMetadata newApiVersion) throws IOException {
-        Changes_V2 changes = new Changes_V2(oldApiVersion, newApiVersion);
-        Client client = new Client(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/%s/%s".formatted(breakingUpdate.breakingCommit(), breakingUpdate.project())));
-
-        VersionFinder versionFinder = new VersionFinder();
-
-//        generateVersionExplanation(changes, client.getSourcePath().toString(), client.getSourcePath().toString() + "/%s.log".formatted(breakingUpdate.breakingCommit()));
-
-        Map<String, List<Integer>> javaVersions = versionFinder.findJavaVersions(client.getSourcePath().toString());
-        JavaIncompatibilityAnalyzer javaIncompatibilityAnalyzer = new JavaIncompatibilityAnalyzer();
-        Set<String> errorList = javaIncompatibilityAnalyzer.parseErrors(client.getSourcePath().toString() + "/%s.log".formatted(breakingUpdate.breakingCommit()));
-        Map<JavaVersionIncompatibility, Set<String>> versionFailures = JavaIncompatibilityAnalyzer.extractVersionErrors(errorList);
-
-
-        JavaVersionFailure javaVersionFailure = new JavaVersionFailure();
-        javaVersionFailure.setJavaInWorkflowFiles(javaVersions);
-        javaVersionFailure.setDiffVersionErrors(versionFailures);
-        javaVersionFailure.setErrorMessages(errorList);
-        javaVersionFailure.setIncompatibilityVersion();
-
-
-        ExplanationTemplate explanationTemplate = new JavaVersionIncompatibilityTemplate(
-                changes,
-                "Explanations/JavaVersionIncompatibility/%s.md".formatted(breakingUpdate.breakingCommit()),
-                javaVersionFailure
-        );
-
-        explanationTemplate.generateTemplate();
-    }
-
-    private static void generateCompilationExplanations(BreakingUpdateMetadata breakingUpdate, List<ExplanationStatistics> explanationStatistics, ApiMetadata oldApiVersion, ApiMetadata newApiVersion, BreakingGoodInfo bg, MavenErrorLog mavenLogAnalyzer) {
-        JApiCmpAnalyze jApiCmpAnalyze = new JApiCmpAnalyze(
-                oldApiVersion,
-                newApiVersion
-        );
-
-        Set<ApiChange> apiChanges = jApiCmpAnalyze.useJApiCmp();
-
-        List<BreakingChange> breakingChanges = jApiCmpAnalyze.useJApiCmp_v2();
-
-        bg.setJApiCmpChanges(apiChanges.size());
-        System.out.println("Number of changes: " + apiChanges.size());
-
-        Client client = new Client(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/%s/%s".formatted(breakingUpdate.breakingCommit(), breakingUpdate.project())));
-        client.setClasspath(List.of(Path.of("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/%s/%s-%s.jar".formatted(breakingUpdate.breakingCommit(), breakingUpdate.updatedDependency().dependencyArtifactID(), breakingUpdate.updatedDependency().previousVersion()))));
-
-        CtModel model = client.createModel();
-        CombineResults combineResults = new CombineResults(apiChanges, oldApiVersion, newApiVersion, mavenLogAnalyzer, model);
-        combineResults.setProject("projects/%s".formatted(breakingUpdate.breakingCommit()));
-
-        try {
-
-            List<BreakingChangeVisitor> visitors = jApiCmpAnalyze.getVisitors(breakingChanges);
-            BreakingGoodOptions options = new BreakingGoodOptions();
-
-            Changes_V2 changesV2 = combineResults.analyze_v2(visitors, options);
-
-//                Changes changes = combineResults.analyze();
-            changesCount(changesV2, bg);
-            System.out.println("Project: " + breakingUpdate.project());
-            System.out.println("Breaking Commit: " + breakingUpdate.breakingCommit());
-            System.out.println("Changes: " + changesV2.brokenChanges().size());
-
-            String explanationFolder = list.size() > 1 ? "Explanations/" : "Explanations_tmp/";
-            final var dir = Path.of(explanationFolder);
-            if (Files.notExists(dir)) {
-                Files.createDirectory(dir);
-            }
-
-            explanationStatistics.add(new ExplanationStatistics(breakingUpdate.project(), breakingUpdate.breakingCommit(), changesV2.brokenChanges().size()));
-            ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changesV2, explanationFolder + "/" + breakingUpdate.breakingCommit() + ".md");
-            explanationTemplate.generateTemplate();
-            System.out.println("**********************************************************");
-            if (Files.exists(Path.of(explanationFolder + "/" + breakingUpdate.breakingCommit() + ".md"))) {
-                bg.setHasExplanation(true);
-            } else {
-                System.out.println("Error generating explanation template for breaking update " + breakingUpdate.breakingCommit());
-            }
-            breakingGoodInfoList.add(bg);
-        } catch (IOException e) {
-            System.out.println("Error analyzing breaking update " + breakingUpdate.breakingCommit());
-            System.out.println(e);
-            throw new RuntimeException(e);
-        }
-        try {
-            Path file = (list.size() > 1) ? Path.of("explanationStatistics-last.json") : Path.of("tmpStatistics.json");
-            Files.deleteIfExists(file);
-            Files.createFile(file);
-            JsonUtils.writeToFile(file, explanationStatistics);
-            JsonUtils.writeToFile(Path.of("breaking_good_stats.json"), breakingGoodInfoList);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public static record ExplanationStatistics(String project, String commit, int changes) {
-    }
-
-    public static List<String> readJavaIncompatibilityFile(String filePath) {
-
-        File file = new File(filePath);
-        List<String> lines = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                lines.add(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return lines;
     }
 
 

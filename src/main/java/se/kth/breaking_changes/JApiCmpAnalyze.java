@@ -22,8 +22,6 @@ import java.util.Set;
 @lombok.Setter
 @lombok.Getter
 public class JApiCmpAnalyze {
-    private static final Logger log = LoggerFactory.getLogger(JApiCmpAnalyze.class);
-
 
     private final ApiMetadata oldJar;
     private final ApiMetadata newJar;

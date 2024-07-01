@@ -1,6 +1,7 @@
 package se.kth.explaining;
 
-import se.kth.core.Changes_V2;
+import se.kth.core.ChangesBetweenVersions;
+
 import se.kth.java_version.JavaVersionFailure;
 import se.kth.java_version.JavaVersionIncompatibility;
 
@@ -14,7 +15,7 @@ public class JavaVersionIncompatibilityTemplate extends ExplanationTemplate {
 
     private final JavaVersionFailure javaVersionFailure;
 
-    public JavaVersionIncompatibilityTemplate(Changes_V2 changes, String fileName, JavaVersionFailure javaVersionFailure) {
+    public JavaVersionIncompatibilityTemplate(ChangesBetweenVersions changes, String fileName, JavaVersionFailure javaVersionFailure) {
         super(changes, fileName);
         this.javaVersionFailure = javaVersionFailure;
     }

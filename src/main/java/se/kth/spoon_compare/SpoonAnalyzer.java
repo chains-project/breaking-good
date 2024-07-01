@@ -39,7 +39,16 @@ public class SpoonAnalyzer {
 
     }
 
-    private static boolean shouldBeIgnored(CtElement element) {
+    public SpoonAnalyzer(Set<ErrorInfo> mavenErrorLog, CtModel model) {
+        this.mavenErrorLog = mavenErrorLog;
+        this.model = model;
+
+        errorLines.addAll(mavenErrorLog.stream().map(m -> Integer.parseInt(m.getClientLinePosition())).toList());
+
+    }
+
+
+    public static boolean shouldBeIgnored(CtElement element) {
         return element instanceof CtComment || element.isImplicit();
     }
 

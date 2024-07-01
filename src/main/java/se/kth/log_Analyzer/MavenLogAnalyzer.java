@@ -171,7 +171,7 @@ public class MavenLogAnalyzer {
 
 
     private MavenErrorLog extractLineNumbersWithPaths(String logFilePath) throws IOException {
-
+        Map<String, Map<Integer, String>> lineNumbersWithPaths = new HashMap<>();
         MavenErrorLog mavenErrorLogs = new MavenErrorLog();
 
         try {
@@ -196,7 +196,6 @@ public class MavenLogAnalyzer {
                         currentPath = pathMatcher.group();
                     }
                     if (currentPath != null) {
-
                         ErrorInfo errorInfo = new ErrorInfo(String.valueOf(lineNumber), currentPath, line, lineNumberInFile, extractAdditionalInfo(reader));
                         errorInfo.setErrorLogGithubLink(generateLogsLink(projectURL, 4, lineNumberInFile));
                         mavenErrorLogs.addErrorInfo(currentPath, errorInfo);

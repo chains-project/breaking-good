@@ -79,7 +79,7 @@ public class DockerImages {
                     log.error("Could not copy the project {}", project);
                     return;
                 }
-            }else {
+            } else {
                 log.info("Project {} already exists.", project);
             }
 
@@ -88,13 +88,13 @@ public class DockerImages {
                     Files.createDirectories(breaking);
                     File prev = Download.getJarFile(breakingUpdates.updatedDependency().dependencyGroupID(),
                             breakingUpdates.updatedDependency().dependencyArtifactID(),
-                            breakingUpdates.updatedDependency().previousVersion(), breaking);
+                            breakingUpdates.updatedDependency().previousVersion(), breaking, "jar");
                     System.out.println((prev != null ? "Downloaded " : "Fail to download  ") + breakingUpdates.updatedDependency().dependencyArtifactID() + "-" + breakingUpdates.updatedDependency().previousVersion());
                 }
                 if (!existNewVersion) {
                     File newV = Download.getJarFile(breakingUpdates.updatedDependency().dependencyGroupID(),
                             breakingUpdates.updatedDependency().dependencyArtifactID(),
-                            breakingUpdates.updatedDependency().newVersion(), breaking);
+                            breakingUpdates.updatedDependency().newVersion(), breaking, "jar");
                     System.out.println((newV != null ? "Downloaded " : "Fail to download  ") + breakingUpdates.updatedDependency().dependencyArtifactID() + "-" + breakingUpdates.updatedDependency().newVersion());
                 }
             } catch (IOException | InterruptedException e) {

@@ -3,8 +3,6 @@ package se.kth.spoon_compare;
 import com.google.common.base.Stopwatch;
 import lombok.Getter;
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import spoon.Launcher;
 import spoon.MavenLauncher;
 import spoon.reflect.CtModel;
@@ -29,8 +27,6 @@ public class Client {
     private final Path sourcePath;
 
     private List<Path> classpath = Collections.emptyList();
-
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     public Client(Path sourcePath) {
         this.sourcePath = sourcePath;
@@ -61,7 +57,6 @@ public class Client {
         launcher.getEnvironment().setSourceClasspath(cp);
 
         CtModel spoonModel = launcher.buildModel();
-        log.info("Building Spoon model for {} [classpath={}] took {}ms", this, classpath, sw.elapsed().toMillis());
         return spoonModel;
     }
 

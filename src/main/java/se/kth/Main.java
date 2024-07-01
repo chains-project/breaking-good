@@ -2,17 +2,30 @@ package se.kth;
 
 
 import picocli.CommandLine;
+import se.kth.breaking_changes.ApiChange;
 import se.kth.breaking_changes.ApiMetadata;
+import se.kth.breaking_changes.BreakingGoodOptions;
+import se.kth.breaking_changes.JApiCmpAnalyze;
+import se.kth.core.ChangesBetweenVersions;
+import se.kth.core.CombineResults;
 import se.kth.data.JsonUtils;
+import se.kth.explaining.CompilationErrorTemplate;
+import se.kth.explaining.ExplanationTemplate;
+import se.kth.japianalysis.BreakingChange;
+import se.kth.log_Analyzer.MavenErrorLog;
 import se.kth.log_Analyzer.MavenLogAnalyzer;
+import se.kth.sponvisitors.BreakingChangeVisitor;
 import se.kth.spoon_compare.Client;
 import se.kth.transitive_changes.CompareTransitiveDependency;
 import se.kth.transitive_changes.Dependency;
 import se.kth.transitive_changes.MavenTree;
 import se.kth.transitive_changes.PairTransitiveDependency;
+import spoon.reflect.CtModel;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Set;
 
 import static se.kth.BreakingGood.javaVersionIncompatibilityErrorExplanation;
@@ -46,19 +59,19 @@ public class Main {
         Path newDependency;
 
         @CommandLine.Option(names = {"-l", "--log"}, paramLabel = "Maven log", description = "The maven log to analyze.")
-        Path mavenLog;
+        File mavenLog;
 
         @Override
         public void run() {
 
             ApiMetadata oldApiMetadata = new ApiMetadata(oldDependency.toFile().getName(), oldDependency);
             ApiMetadata newApiMetadata = new ApiMetadata(newDependency.toFile().getName(), newDependency);
-            Client client = new Client(project);
 
 
             try {
 
                 MavenLogAnalyzer mavenLogAnalyzer = BreakingGood.parseLog(mavenLog, project);
+
 
                 // Check if the log contains the -Werror flag
                 boolean isWerror = mavenLogAnalyzer.isWerror(mavenLogAnalyzer.getLogFile().getAbsolutePath());
@@ -75,27 +88,34 @@ public class Main {
                         System.out.println("The log file contains a Java version incompatibility error.");
                         javaVersionIncompatibilityErrorExplanation(
                                 project,
-                                mavenLog,
+                                mavenLog.toPath(),
                                 oldApiMetadata,
                                 newApiMetadata);
                     } else {
-                        System.out.println("The log file does not contain a Java version incompatibility error.");
-                        return;
-//                        JApiCmpAnalyze jApiCmpAnalyze = new JApiCmpAnalyze(oldApiMetadata, newApiMetadata);
-//
-//                        Set<ApiChange> apiChanges = jApiCmpAnalyze.useJApiCmp();
-//
-//                        MavenErrorLog errorLog = mavenLogAnalyzer.analyzeCompilationErrors();
-//
-//                        CtModel model = BreakingGood.spoonAnalyzer(client, oldApiMetadata, project);
-//
-//                        CombineResults combineResults = new CombineResults(apiChanges, oldApiMetadata, newApiMetadata, errorLog, model);
-//                        //remove project name folder
-//                        combineResults.setProject(project.toString().substring(0, project.toString().lastIndexOf("/")));
-//                        Changes changes = combineResults.analyze();
 
-//                ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, "Explanations/" + project.toFile().getName() + ".md");
-//                explanationTemplate.generateTemplate();
+                        JApiCmpAnalyze jApiCmpAnalyze = new JApiCmpAnalyze(oldApiMetadata, newApiMetadata);
+                        Set<ApiChange> apiChanges = jApiCmpAnalyze.useJApiCmp();
+                        List<BreakingChange> breakingChanges = jApiCmpAnalyze.useJApiCmp_v2();
+                        Client client = new Client(project);
+                        client.setClasspath(List.of(oldDependency));
+                        CtModel model = client.createModel();
+
+                        MavenErrorLog errorLog = mavenLogAnalyzer.analyzeCompilationErrors();
+
+                        CombineResults combineResults = new CombineResults(apiChanges, oldApiMetadata, newApiMetadata, errorLog, model);
+                        //remove project name folder
+                        combineResults.setProject(project.toString().substring(0, project.toString().lastIndexOf("/")));
+
+                        List<BreakingChangeVisitor> visitors = jApiCmpAnalyze.getVisitors(breakingChanges);
+                        BreakingGoodOptions options = new BreakingGoodOptions();
+
+                        ChangesBetweenVersions changesV2 = combineResults.analyze_v2(visitors, options);
+
+                        if (!changesV2.brokenChanges().isEmpty()) {
+                            ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changesV2, "Explanation.md");
+                            explanationTemplate.generateTemplate();
+                        }
+
                     }
                 }
             } catch (IOException e) {
@@ -118,15 +138,18 @@ public class Main {
             ApiMetadata oldApiMetadata = new ApiMetadata(oldDependency.toFile().getName(), oldDependency);
             ApiMetadata newApiMetadata = new ApiMetadata(newDependency.toFile().getName(), newDependency);
 
-            Set<Dependency> v1 = MavenTree.read(oldApiMetadata);
-            Set<Dependency> v2 = MavenTree.read(newApiMetadata);
+            Dependency o = new Dependency("com.google.guava", "guava", "30.1-jre", "jar", "compile");
+            Dependency n = new Dependency("com.google.guava", "guava", "30.1.1-jre", "jar", "compile");
+
+            Set<Dependency> v1 = MavenTree.read(oldApiMetadata, o);
+            Set<Dependency> v2 = MavenTree.read(newApiMetadata, n);
 
             Set<PairTransitiveDependency> transitiveDependencies = MavenTree.diff(v1, v2);
 
             for (PairTransitiveDependency pair : transitiveDependencies) {
                 try {
                     CompareTransitiveDependency compareTransitiveDependency = new CompareTransitiveDependency(pair.newVersion(), pair.oldVersion());
-                    compareTransitiveDependency.compareDependency();
+                    compareTransitiveDependency.getChangesBetweenDependencies();
                     System.out.println("Breaking changes for " + pair.newVersion() + " and " + pair.oldVersion());
                     System.out.println("Breaking Changes amount: " + compareTransitiveDependency.getBreakingChanges().size());
 

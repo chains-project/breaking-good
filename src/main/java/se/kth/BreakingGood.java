@@ -1,7 +1,7 @@
 package se.kth;
 
 import se.kth.breaking_changes.ApiMetadata;
-import se.kth.core.Changes_V2;
+import se.kth.core.ChangesBetweenVersions;
 import se.kth.explaining.ExplanationTemplate;
 import se.kth.explaining.JavaVersionIncompatibilityTemplate;
 import se.kth.java_version.JavaIncompatibilityAnalyzer;
@@ -31,17 +31,19 @@ public class BreakingGood {
      * @return The error log
      * @throws IOException If the log could not be read
      */
-    public static MavenLogAnalyzer parseLog(Path logPath, Path client) throws IOException {
+    public static MavenLogAnalyzer parseLog(File logPath, Path client) throws IOException {
+        Path mavenLog = null;
         // Parse log
-        if (logPath == null || !Files.exists(logPath)) {
+        if (logPath == null || !Files.exists(logPath.toPath())) {
             String log = executeMvnCleanTest(client);
             if (log != null) {
-                logPath = Path.of(log);
+                mavenLog = Path.of(log);
             }
+        } else {
+            mavenLog = logPath.toPath();
         }
-        assert logPath != null;
         return new MavenLogAnalyzer(
-                new File(logPath.toString()));
+                new File(mavenLog.toString()));
     }
 
 
@@ -65,13 +67,13 @@ public class BreakingGood {
 
         File tempFile;
         try {
-            tempFile = Files.createTempFile("mvn-clean-test2-", ".log").toFile();
+            tempFile = Files.createTempFile("mvn-clean-test-", ".log").toFile();
             processBuilder.redirectOutput(tempFile);
             Process process = processBuilder.start();
             int exitCode = process.waitFor();
-            if (exitCode != 0) {
+            if (exitCode == 0) {
                 System.out.println("Maven clean test command failed with exit code " + exitCode);
-                return tempFile.getAbsolutePath();
+                return null;
             } else {
                 System.out.println("Maven clean test command executed successfully. Output saved to " + tempFile.getAbsolutePath());
                 return tempFile.getAbsolutePath();
@@ -85,7 +87,7 @@ public class BreakingGood {
 
     public static void wErrorAnalysis(String logPath, String client, ApiMetadata oldApiVersion, ApiMetadata newApiVersion) throws IOException {
 
-        Changes_V2 changes = new Changes_V2(oldApiVersion, newApiVersion);
+        ChangesBetweenVersions changes = new ChangesBetweenVersions(oldApiVersion, newApiVersion);
         WError werror = new WError("Explanation.md");
         try {
             werror.analyzeWerror(logPath, client, changes);
@@ -104,7 +106,7 @@ public class BreakingGood {
      * @throws IOException If the explanation could not be generated
      */
     public static void javaVersionIncompatibilityErrorExplanation(Path project, Path logFile, ApiMetadata oldApiVersion, ApiMetadata newApiVersion) throws IOException {
-        Changes_V2 changes = new Changes_V2(oldApiVersion, newApiVersion);
+        ChangesBetweenVersions changes = new ChangesBetweenVersions(oldApiVersion, newApiVersion);
         Client client = new Client(project);
 
         VersionFinder versionFinder = new VersionFinder();

@@ -1,5 +1,6 @@
 package se.kth.sponvisitors;
 
+import se.kth.breaking_changes.ApiChange;
 import se.kth.log_Analyzer.ErrorInfo;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ public class BrokenChanges {
 
     Set<ErrorInfo> errorInfo;
 
-    List<BreakingChangeVisitor> newVariants;
+    Set<ApiChange> newVariants;
 
 
     @Override
@@ -29,7 +30,7 @@ public class BrokenChanges {
     public BrokenChanges(BrokenUse brokenUse) {
         this.brokenUse = brokenUse;
         this.errorInfo = new HashSet<>();
-        newVariants = new ArrayList<>();
+        newVariants = new HashSet<>();
     }
 
     @Override

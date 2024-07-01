@@ -42,12 +42,12 @@ public class Main {
 
             combineResults.setProject("/Users/frank/Downloads/Test_Failures");
 
-            Changes changes = combineResults.analyze();
-            changes.changes().forEach(change -> {
+//            Changes changes = combineResults.analyze();
+//            changes.changes().forEach(change -> {
 //                        ExplanationTemplate explanationTemplate = new CompilationErrorTemplate(changes, "change");
 //                        explanationTemplate.generateTemplate();
-                    }
-            );
+//                    }
+//            );
 
 
         } catch (IOException e) {

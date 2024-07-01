@@ -29,7 +29,7 @@ import java.util.jar.JarFile;
 @lombok.Getter
 public class ApiMetadata {
 
-    private static final Logger log = LoggerFactory.getLogger(ApiMetadata.class);
+
 
     String name;
 
@@ -90,7 +90,7 @@ public class ApiMetadata {
     }
 
     private List<String> buildClasspathFromPom(Path pom) {
-        System.out.println("Building classpath from " + pom);
+
         try {
             if (pom.toFile().exists()) {
                 SpoonPom spoonPom = new SpoonPom(
@@ -110,7 +110,7 @@ public class ApiMetadata {
         return Collections.emptyList();
     }
 
-    public  Path extractPomFromJar(Path toSave) {
+    public Path extractPomFromJar(Path toSave) {
         try (JarFile jarFile = new JarFile(file.toFile())) {
             List<JarEntry> poms = jarFile.stream().filter(e -> e.getName().endsWith("pom.xml")).toList();
 

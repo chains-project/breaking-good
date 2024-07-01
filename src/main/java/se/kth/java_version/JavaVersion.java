@@ -1,6 +1,7 @@
 package se.kth.java_version;
 
-import se.kth.core.Changes_V2;
+import se.kth.core.ChangesBetweenVersions;
+
 import se.kth.explaining.ExplanationTemplate;
 import se.kth.explaining.JavaVersionIncompatibilityTemplate;
 
@@ -12,7 +13,7 @@ import java.util.Set;
 public class JavaVersion {
 
 
-    public static void generateVersionExplanation(Changes_V2 changes, String projectPath, String logFile) throws IOException {
+    public static void generateVersionExplanation(ChangesBetweenVersions changes, String projectPath, String logFile) throws IOException {
         VersionFinder versionFinder = new VersionFinder();
         Map<String, List<Integer>> javaVersions = versionFinder.findJavaVersions(projectPath);
 

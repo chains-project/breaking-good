@@ -1,7 +1,7 @@
 package se.kth.data;
 
 import com.fasterxml.jackson.databind.type.MapType;
-import se.kth.core.Changes_V2;
+import se.kth.core.ChangesBetweenVersions;
 import se.kth.log_Analyzer.MavenErrorLog;
 import se.kth.log_Analyzer.MavenLogAnalyzer;
 
@@ -56,7 +56,7 @@ public class BuildHelp {
         }
     }
 
-    public static void changesCount(Changes_V2 changes, BreakingGoodInfo bg) {
+    public static void changesCount(ChangesBetweenVersions changes, BreakingGoodInfo bg) {
         int breakingChanges = 0;
         for (var change : changes.brokenChanges()) {
             breakingChanges += change.getErrorInfo().size();
@@ -70,14 +70,14 @@ public class BuildHelp {
 
         MavenErrorLog errorLog = mavenLogAnalyzer.analyzeCompilationErrors();
         AtomicInteger errorsCount = new AtomicInteger();
-        errorLog.getErrorInfo().forEach((k, v) -> {
-            System.out.println("Path: " + k);
-            errorsCount.addAndGet(v.size());
-            v.forEach(errorInfo -> {
-                System.out.println("Line: " + errorInfo.getClientLinePosition());
-                System.out.println("Error: " + errorInfo.getErrorMessage());
-            });
-        });
+//        errorLog.getErrorInfo().forEach((k, v) -> {
+//            System.out.println("Path: " + k);
+//            errorsCount.addAndGet(v.size());
+//            v.forEach(errorInfo -> {
+//                System.out.println("Line: " + errorInfo.getClientLinePosition());
+//                System.out.println("Error: " + errorInfo.getErrorMessage());
+//            });
+//        });
 
         bg.setErrorsFromLog(errorsCount.get());
         return errorLog;

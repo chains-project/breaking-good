@@ -1,7 +1,7 @@
 package se.kth.explaining;
 
 import japicmp.model.JApiCompatibilityChangeType;
-import se.kth.core.Changes_V2;
+import se.kth.core.ChangesBetweenVersions;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -10,11 +10,11 @@ import static java.lang.Thread.sleep;
 
 public abstract class ExplanationTemplate {
 
-    protected Changes_V2 changes;
+    protected ChangesBetweenVersions changes;
 
     protected String fileName;
 
-    public ExplanationTemplate(Changes_V2 changes, String fileName) {
+    public ExplanationTemplate(ChangesBetweenVersions changes, String fileName) {
         this.changes = changes;
         this.fileName = fileName;
     }
@@ -22,6 +22,7 @@ public abstract class ExplanationTemplate {
     public ExplanationTemplate(String fileName) {
         this.fileName = fileName;
     }
+
 
     public abstract String getHead();
 
@@ -33,11 +34,13 @@ public abstract class ExplanationTemplate {
         return switch (category) {
             case "METHOD_REMOVED":
             case "REMOVED":
+            case "CLASS_REMOVED":
                 yield "removed";
             case "[METHOD_ADDED]":
                 yield "added";
-            default:
-                yield "";
+            default: {
+                yield "REMOVED";
+            }
         };
     }
 
@@ -80,8 +83,10 @@ public abstract class ExplanationTemplate {
             case CONSTRUCTOR_REMOVED:
                 yield "Constructor";    // Constructor
 
-            default:
+            default: {
+                System.out.println("Error: " + apiUse);
                 yield "";
+            }
         };
     }
 

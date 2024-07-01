@@ -19,6 +19,10 @@ public class CompareTransitiveDependency {
 
     Dependency oldVersion;
 
+    ApiMetadata newApiMetadata;
+
+    ApiMetadata oldApiMetadata;
+
     List<BreakingChange> breakingChanges;
 
     public CompareTransitiveDependency(Dependency newVersion, Dependency oldVersion) {
@@ -27,9 +31,9 @@ public class CompareTransitiveDependency {
     }
 
 
-    public ApiMetadata convertToApiMetadata(Dependency dependency, Path folder) throws IOException, InterruptedException {
+    public static ApiMetadata convertToApiMetadata(Dependency dependency, Path folder) throws IOException, InterruptedException {
 
-        File file = Download.getJarFile(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), folder);
+        File file = Download.getJarFile(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), folder, "jar");
 
         if (file == null) {
             System.out.println("Could not download the jar file for " + dependency);
@@ -38,19 +42,19 @@ public class CompareTransitiveDependency {
         return new ApiMetadata(file.toPath());
     }
 
-    public void compareDependency() throws IOException, InterruptedException {
+    public List<BreakingChange> getChangesBetweenDependencies() throws IOException, InterruptedException {
 
         Path tmp = Files.createTempDirectory("tmp");
 
-        ApiMetadata apiMetadataNewVersion = convertToApiMetadata(newVersion, tmp);
+        newApiMetadata = convertToApiMetadata(newVersion, tmp);
 
-        ApiMetadata apiMetadataOldVersion = convertToApiMetadata(oldVersion, tmp);
+        oldApiMetadata = convertToApiMetadata(oldVersion, tmp);
         // compare the dependencies
         JApiCmpAnalyze jApiCmpAnalyze = new JApiCmpAnalyze(
-                apiMetadataNewVersion,
-                apiMetadataOldVersion
+                oldApiMetadata,
+                newApiMetadata
         );
-        breakingChanges = jApiCmpAnalyze.useJApiCmp_v2();
+        return jApiCmpAnalyze.useJApiCmp_v2();
     }
 
     @Override
@@ -61,5 +65,8 @@ public class CompareTransitiveDependency {
 
                 '}';
     }
+
+
+
 
 }

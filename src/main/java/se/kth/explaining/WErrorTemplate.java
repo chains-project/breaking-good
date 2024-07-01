@@ -1,6 +1,6 @@
 package se.kth.explaining;
 
-import se.kth.core.Changes_V2;
+import se.kth.core.ChangesBetweenVersions;
 import se.kth.log_Analyzer.ErrorInfo;
 import se.kth.werror.WErrorMetadata;
 
@@ -21,7 +21,7 @@ public class WErrorTemplate extends ExplanationTemplate {
         this.errorMetadata = errorMetadata;
     }
 
-    public WErrorTemplate(WErrorMetadata errorMetadata, String fileName, Changes_V2 changes) {
+    public WErrorTemplate(WErrorMetadata errorMetadata, String fileName, ChangesBetweenVersions changes) {
         super(changes, fileName);
         this.errorMetadata = errorMetadata;
     }

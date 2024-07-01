@@ -3,28 +3,33 @@ package se.kth.explaining;
 import se.kth.core.ChangesBetweenVersions;
 import se.kth.log_Analyzer.ErrorInfo;
 import se.kth.sponvisitors.BrokenChanges;
+import se.kth.transitive_changes.PairTransitiveDependency;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtNamedElement;
 
-public class CompilationErrorTemplate extends ExplanationTemplate {
+public class TransitiveExplanationTemplate extends ExplanationTemplate {
 
+    PairTransitiveDependency pair;
 
-    public CompilationErrorTemplate(ChangesBetweenVersions changes, String fileName) {
+    public TransitiveExplanationTemplate(ChangesBetweenVersions changes, PairTransitiveDependency pair, String fileName) {
         super(changes, fileName);
+        this.pair = pair;
     }
 
     @Override
     public String getHead() {
 
-        return "CI detected that the dependency upgrade from version **%s** to **%s** has failed. Here are details to help you understand and fix the problem:"
+        String header = "CI detected that the dependency upgrade from version **%s** to **%s** has failed. Here are details to help you understand and fix the problem:"
                 .formatted(changes.oldApiVersion().getName(), changes.newApiVersion().getName());
+
+        String indirectDependency = "\n" +
+                "\n" +
+                "Your code depends on indirect dependency **%s** which has been updated from version **%s** to **%s**. The new version of the indirect dependency has introduced breaking changes which are causing the build to fail."
+                        .formatted(pair.newVersion().getArtifactId(), pair.oldVersion().getVersion(), pair.newVersion().getVersion());
+        return header + indirectDependency;
     }
 
     public String clientErrorLine(ErrorInfo errorInfo, BrokenChanges brokenChange) {
-        if (brokenChange.getBrokenUse().element().toString().contains("This NamingStrategy takes the original class'")) {
-            System.out.println(brokenChange.getBrokenUse().element().toString());
-        }
-
         return "            *   An error was detected in line %s which is making use of an outdated API.\n".formatted(errorInfo.getClientLinePosition()) +
                 "             ``` java\n" +
                 "             %s   %s;\n".formatted(errorInfo.getClientLinePosition(), brokenChange.getBrokenUse().element().toString()) +
@@ -72,7 +77,6 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
         String message = "";
         // if there are more than one changes
         if (!changes.brokenChanges().isEmpty()) {
-
             String instructions = changes.brokenChanges().size() > 1 ? "constructs" : "construct";
             String firstLine = "1. Your client utilizes **%d** %s which has been modified in the new version of the dependency."
                     .formatted(changes.brokenChanges().size(), instructions);
@@ -91,7 +95,7 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
     private String generateElementExplanation(BrokenChanges changes, String category, int instructions) {
         if (instructions > 1) {
             return "   * <details>\n" +
-                    "        <summary>%s <b> </b> which has been <b>%s</b> in the new version of the dependency</summary>\n".formatted(getConstruct(changes.getBrokenUse().change()), changes.getBrokenUse().source(), category) +
+                    "        <summary>%s <b>%s</b> which has been <b>%s</b> in the new version of the dependency</summary>\n".formatted(getConstruct(changes.getBrokenUse().change()), changes.getBrokenUse().source(), category) +
                     "            \n" +
                     "        * <details>\n" +
                     "          <summary>The failure is identified from the logs generated in the build process. </summary>\n" +
@@ -133,38 +137,36 @@ public class CompilationErrorTemplate extends ExplanationTemplate {
         if (brokenChange.getNewVariants().isEmpty()) {
             return "";
         }
-        int amountVariants = brokenChange.getNewVariants().size();
-        StringBuilder message = new StringBuilder();
+//        int amountVariants = breakingChange.getApiChanges().getNewVariants().size();
+//        StringBuilder message = new StringBuilder();
+//
+//        if (amountVariants > 1) {
+//            message.append("        To address this incompatibility, there are ")
+//                    .append(amountVariants)
+//                    .append(" alternative options available in the new version of the dependency that can replace the incompatible %s currently used in the client. You can consider substituting the existing %s with one of the following options provided by the new version of the dependency:\n".formatted(breakingChange.getApiChanges().getInstruction().toLowerCase(), breakingChange.getApiChanges().getInstruction().toLowerCase()));
+//
+//            breakingChange.getApiChanges().getNewVariants().forEach(v -> {
+//                message.append("        ``` java\n")
+//                        .append("        ").append(v.getReference().variantName()).append(";\n")
+//                        .append("        ```\n")
+//                ;
+//            });
+//        } else {
+//            message.append(
+//                    "        To resolve this issue, there are alternative options available in the new version of the dependency that can replace the incompatible %s currently used in the client. You can consider substituting the existing %s with one of the following options provided by the new version of the dependency\n".formatted(breakingChange.getApiChanges().getInstruction().toLowerCase(), breakingChange.getApiChanges().getInstruction().toLowerCase()));
+//            breakingChange.getApiChanges().getNewVariants().forEach(v -> {
+//                if (v.getReference() != null)
+//                    try {
+//                        message.append("        ``` java\n")
+//                                .append("        ").append(v.getReference().variantName()).append(";\n")
+//                                .append("        ```\n");
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//            });
+//        }
+//        return message.toString();
 
-        if (amountVariants > 1) {
-            message.append("        To address this incompatibility, there are ")
-                    .append(amountVariants)
-                    .append(" alternative options available in the new version of the dependency that can replace the incompatible %s currently used in the client. You can consider substituting the existing %s with one of the following options provided by the new version of the dependency:\n".formatted(brokenChange.getNewVariants().stream().toList().get(0).getInstruction().toLowerCase(), brokenChange.getNewVariants().stream().toList().get(0).getInstruction().toLowerCase()));
-
-            brokenChange.getNewVariants().forEach(v -> {
-                message.append("        ``` java\n")
-                        .append("        ").append(v.getReference().variantName()).append(";\n")
-                        .append("        ```\n")
-                ;
-            });
-        } else {
-            message.append(
-                    "        To resolve this issue, there are alternative options available in the new version of the dependency that can replace the incompatible %s currently used in the client. You can consider substituting the existing %s with one of the following options provided by the new version of the dependency\n".formatted(brokenChange.getNewVariants().stream().toList().get(0).getInstruction().toLowerCase(), brokenChange.getNewVariants().stream().toList().get(0).getInstruction().toLowerCase()));
-            brokenChange.getNewVariants().forEach(v -> {
-                if (v.getReference() != null)
-                    try {
-                        message.append("        ``` java\n")
-                                .append("        ").append(v.getReference().variantName()).append(";\n")
-                                .append("        ```\n");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-            });
-        }
-        return message.toString();
-
-        // return"";
+        return "";
     }
-
-
 }

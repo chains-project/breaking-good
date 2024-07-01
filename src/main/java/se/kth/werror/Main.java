@@ -1,7 +1,8 @@
 package se.kth.werror;
 
 import se.kth.breaking_changes.ApiMetadata;
-import se.kth.core.Changes_V2;
+import se.kth.core.ChangesBetweenVersions;
+
 import se.kth.data.BreakingUpdateMetadata;
 import se.kth.data.DockerImages;
 
@@ -117,7 +118,7 @@ public class Main {
         ApiMetadata newApiVersion = new ApiMetadata(newDependency.toFile().getName(), newDependency);
         ApiMetadata oldApiVersion = new ApiMetadata(oldDependency.toFile().getName(), oldDependency);
 
-        Changes_V2 changes = new Changes_V2(oldApiVersion, newApiVersion);
+        ChangesBetweenVersions changes = new ChangesBetweenVersions(oldApiVersion, newApiVersion);
 
         try {
             werror.analyzeWerror(log, client, changes);

@@ -3,7 +3,8 @@ package se.kth.werror;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import se.kth.core.Changes_V2;
+import se.kth.core.ChangesBetweenVersions;
+
 import se.kth.explaining.WErrorTemplate;
 import se.kth.log_Analyzer.MavenErrorLog;
 import se.kth.log_Analyzer.MavenLogAnalyzer;
@@ -78,7 +79,7 @@ public class WError {
     }
 
 
-    public void analyzeWerror(String log, String client, Changes_V2 changes) throws IOException {
+    public void analyzeWerror(String log, String client, ChangesBetweenVersions changes) throws IOException {
         // prepare the log file
 
         MavenLogAnalyzer mavenLog = new MavenLogAnalyzer(new File(log));

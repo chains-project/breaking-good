@@ -1,4 +1,4 @@
-package se.kth.data;
+package util;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;

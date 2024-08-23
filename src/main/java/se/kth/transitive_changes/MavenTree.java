@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import se.kth.breaking_changes.ApiMetadata;
 import se.kth.breaking_changes.Download;
-import se.kth.data.JsonUtils;
+
 import util.MavenCommand;
 
 import java.io.File;
@@ -36,13 +36,8 @@ public class MavenTree {
         // read the pom file and create a tree
         System.out.printf("Reading the tree for %s%n", dependency.toString());
         try {
-            //create a temporary file to store the pom file
-//            Path pom = Files.createTempFile("tmp-pom", ".xml");
-//            Path pom = Files.createFile(Path.of("tmp-%s-%s-%s-pom.xml".formatted(dependency.getArtifactId(), dependency.getVersion(), new java.util.Date().getTime())));
             Path treeFile = Files.createFile(Path.of("trees-%s-%s-%s.txt".formatted(dependency.getArtifactId(), dependency.getVersion(), new java.util.Date().getTime())));
             File pom = Download.getJarFile(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), Path.of(""), "pom");
-
-//            apiMetadata.extractPomFromJar(pom);
 
             //execute the maven command to get the dependency tree
             assert pom != null;
@@ -122,8 +117,8 @@ public class MavenTree {
             for (Dependency oldVersion : v1) {
                 if (
                         oldVersion.getGroupId().equals(d.getGroupId())
-                        && oldVersion.getArtifactId().equals(d.getArtifactId())
-                        && !oldVersion.getVersion().equals(d.getVersion())
+                                && oldVersion.getArtifactId().equals(d.getArtifactId())
+                                && !oldVersion.getVersion().equals(d.getVersion())
 
                 ) {
                     System.out.println("New version: %s".formatted(d));
@@ -137,9 +132,6 @@ public class MavenTree {
 
         return transitiveDependencies;
     }
-
-
-
 
 
     public void getChanges() {

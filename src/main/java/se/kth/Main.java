@@ -8,7 +8,6 @@ import se.kth.breaking_changes.BreakingGoodOptions;
 import se.kth.breaking_changes.JApiCmpAnalyze;
 import se.kth.core.ChangesBetweenVersions;
 import se.kth.core.CombineResults;
-import se.kth.data.JsonUtils;
 import se.kth.explaining.CompilationErrorTemplate;
 import se.kth.explaining.ExplanationTemplate;
 import se.kth.japianalysis.BreakingChange;

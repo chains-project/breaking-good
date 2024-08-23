@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import se.kth.breaking_changes.ApiMetadata;
 import se.kth.breaking_changes.Download;
-import se.kth.data.JsonUtils;
+import util.JsonUtils;
 import util.MavenCommand;
 
 import java.io.File;

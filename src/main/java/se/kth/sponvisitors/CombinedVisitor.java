@@ -1,7 +1,7 @@
 package se.kth.sponvisitors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+//import org.apache.logging.log4j.LogManager;
+//import org.apache.logging.log4j.Logger;
 import se.kth.breaking_changes.BreakingGoodOptions;
 import spoon.reflect.code.*;
 import spoon.reflect.cu.SourcePosition;
@@ -23,7 +23,7 @@ public class CombinedVisitor extends CtScanner {
 	private final Collection<BreakingChangeVisitor> visitors;
 	private final BreakingGoodOptions options;
 
-	private static final Logger logger = LogManager.getLogger(CombinedVisitor.class);
+//	private static final Logger logger = LogManager.getLogger(CombinedVisitor.class);
 
 	public CombinedVisitor(Collection<BreakingChangeVisitor> visitors, BreakingGoodOptions options) {
 		this.visitors = Objects.requireNonNull(visitors);
@@ -136,8 +136,8 @@ public class CombinedVisitor extends CtScanner {
 				pos.isValidPosition() &&
 				pos.getEndLine() - pos.getLine() > this.options.getMaxClassLines()
 		) {
-			logger.warn("Skipping the analysis of {} [{} lines > {} lines authorized]",
-				ctClass.getQualifiedName(), pos.getEndLine() - pos.getLine(), this.options.getMaxClassLines());
+//			logger.warn("Skipping the analysis of {} [{} lines > {} lines authorized]",
+//				ctClass.getQualifiedName(), pos.getEndLine() - pos.getLine(), this.options.getMaxClassLines());
 			return;
 		}
 

@@ -5,8 +5,6 @@ import japicmp.model.*;
 import javassist.CtConstructor;
 import javassist.CtField;
 import javassist.CtMethod;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import spoon.reflect.declaration.CtPackage;
 import spoon.reflect.reference.CtExecutableReference;
 import spoon.reflect.reference.CtFieldReference;
@@ -18,7 +16,7 @@ import java.util.*;
 public class JApiCmpToSpoonVisitor implements JApiCmpDeltaVisitor {
     private final CtPackage root;
     private final List<BreakingChange> breakingChanges = new ArrayList<>();
-    private static final Logger logger = LogManager.getLogger(JApiCmpToSpoonVisitor.class);
+//    private static final Logger logger = LogManager.getLogger(JApiCmpToSpoonVisitor.class);
 
     public JApiCmpToSpoonVisitor(CtPackage root) {
         this.root = Objects.requireNonNull(root);
@@ -40,15 +38,17 @@ public class JApiCmpToSpoonVisitor implements JApiCmpDeltaVisitor {
                     breakingChanges.addAll(
                             bcs.stream().map(c -> new TypeBreakingChange(cls, clsRef, c.getType())).toList()
                     );
-                else
-                    logger.warn("Couldn't find Spoon node for class {}", cls);
+                else {
+                    // logger.warn("Couldn't find Spoon node for class {}", cls);
+
+                }
             }
 
             cls.getInterfaces().forEach(i ->
                     visit(cls, i)
             );
-        } catch (NoClassDefFoundError e) {
-            logger.error(e);
+        } catch (Exception | NoClassDefFoundError e) {
+            // logger.error(e);
         }
     }
 
@@ -56,7 +56,7 @@ public class JApiCmpToSpoonVisitor implements JApiCmpDeltaVisitor {
     public void visit(JApiMethod m) {
         Collection<JApiCompatibilityChange> bcs = m.getCompatibilityChanges();
 
-        if(m.getName().contains("setPort")){
+        if (m.getName().contains("setPort")) {
             System.out.println("Method: " + m.getName());
         }
         try {
@@ -72,8 +72,9 @@ public class JApiCmpToSpoonVisitor implements JApiCmpDeltaVisitor {
                         breakingChanges.addAll(
                                 bcs.stream().map(c -> new MethodBreakingChange(m, mRef, c.getType())).toList()
                         );
-                    else
-                        logger.warn("Couldn't find Spoon node for old method {}", m);
+                    else {
+                        // logger.warn("Couldn't find Spoon node for old method {}", m);
+                    }
                 } else if (newMethodOpt.isPresent()) {
                     // Added method introducing a breaking change => we attach it to its containing class
                     CtMethod newMethod = newMethodOpt.get();
@@ -90,7 +91,7 @@ public class JApiCmpToSpoonVisitor implements JApiCmpDeltaVisitor {
                 }
             }
         } catch (NoClassDefFoundError e) {
-            logger.error(e);
+            // logger.error(e);
         }
     }
 
@@ -112,14 +113,16 @@ public class JApiCmpToSpoonVisitor implements JApiCmpDeltaVisitor {
                             breakingChanges.addAll(
                                     bcs.stream().map(c -> new FieldBreakingChange(f, fRef, c.getType())).toList()
                             );
-                        else
-                            logger.warn("Couldn't find Spoon node for old field {}", f);
+                        else {
+                            // logger.warn("Couldn't find Spoon node for old field {}", f);
+                        }
                     } // else => no oldField
-                } else
-                    logger.warn("Couldn't find Spoon node for type {}", f.getjApiClass());
+                } else {
+                    // logger.warn("Couldn't find Spoon node for type {}", f.getjApiClass());
+                }
             }
         } catch (NoClassDefFoundError e) {
-            logger.error(e);
+            // logger.error(e);
         }
     }
 
@@ -148,14 +151,16 @@ public class JApiCmpToSpoonVisitor implements JApiCmpDeltaVisitor {
                             breakingChanges.addAll(
                                     bcs.stream().map(c -> new MethodBreakingChange(cons, cRefOpt.get(), c.getType())).toList()
                             );
-                        else
-                            logger.warn("Couldn't find constructor {}", cons);
+                        else {
+                            // logger.warn("Couldn't find constructor {}", cons);
+                        }
                     }
-                } else
-                    logger.warn("Couldn't find Spoon node for type {}", cons.getjApiClass());
+                } else {
+                    // logger.warn("Couldn't find Spoon node for type {}", cons.getjApiClass());
+                }
             }
         } catch (NoClassDefFoundError e) {
-            logger.error(e);
+            // logger.error(e);
         }
     }
 
@@ -181,11 +186,12 @@ public class JApiCmpToSpoonVisitor implements JApiCmpDeltaVisitor {
                     breakingChanges.addAll(
                             bcs.stream().map(c -> new TypeBreakingChange(jApiClass, clsRef, c.getType())).toList()
                     );
-                else
-                    logger.warn("Couldn't find Spoon node for type {}", jApiClass);
+                else {
+                    // logger.warn("Couldn't find Spoon node for type {}", jApiClass);
+                }
             }
         } catch (NoClassDefFoundError e) {
-            logger.error(e);
+            // logger.error(e);
         }
     }
 
@@ -200,11 +206,12 @@ public class JApiCmpToSpoonVisitor implements JApiCmpDeltaVisitor {
                     breakingChanges.addAll(
                             bcs.stream().map(c -> new TypeBreakingChange(cls, clsRef, c.getType())).toList()
                     );
-                else
-                    logger.warn("Couldn't find Spoon node for type {}", cls);
+                else {
+                    // logger.warn("Couldn't find Spoon node for type {}", cls);
+                }
             }
         } catch (NoClassDefFoundError e) {
-            logger.error(e);
+            // logger.error(e);
         }
     }
 }

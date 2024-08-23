@@ -15,7 +15,7 @@ public class LogFileAnalyzer {
         String logFilePath = "/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/11be71ab8713fe987785e9e25e4f3e410e709ab9/camunda-platform-7-mockito/11be71ab8713fe987785e9e25e4f3e410e709ab9.log";
 
         JavaIncompatibilityAnalyzer analyzer = new JavaIncompatibilityAnalyzer();
-       Set<String> errorList = analyzer.parseErrors(logFilePath);
+        Set<String> errorList = analyzer.parseErrors(logFilePath);
 
         for (String error : errorList) {
             System.out.println("Error:");
@@ -34,19 +34,6 @@ public class LogFileAnalyzer {
             }
             System.out.println("----");
         }
-
-//        extracted(logFilePath);
-//
-//        Set<String> errors = extractErrors(logFilePath);
-//        System.out.println(errors.size() + " errors found in the log file.");
-
-//        Map<String, List<Integer>> javaVersions =   VersionFinder.findJavaVersions("/Users/frank/Documents/Work/PHD/Explaining/breaking-good/projects/11be71ab8713fe987785e9e25e4f3e410e709ab9/camunda-platform-7-mockito");
-//
-//        for (Map.Entry<String, List<Integer>> entry : javaVersions.entrySet()) {
-//            System.out.println("File: " + entry.getKey());
-//            System.out.println("Java versions: " + entry.getValue());
-//        }
-
     }
 
 

@@ -9,8 +9,12 @@ import se.kth.sponvisitors.BreakingChangeVisitor;
 import se.kth.sponvisitors.BrokenChanges;
 import se.kth.sponvisitors.BrokenUse;
 import se.kth.spoon_compare.SpoonAnalyzer;
-import se.kth.spoon_compare.SpoonResults;
 import spoon.reflect.CtModel;
+import spoon.reflect.reference.CtExecutableReference;
+import spoon.reflect.reference.CtFieldReference;
+import spoon.reflect.reference.CtReference;
+import spoon.reflect.reference.CtTypeReference;
+import spoon.support.reflect.reference.CtExecutableReferenceImpl;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -39,7 +43,6 @@ public class CombineResults {
     CtModel model;
 
     public CombineResults(Set<ApiChange> apiChanges, ApiMetadata oldVersion, ApiMetadata newVersion, MavenErrorLog mavenLog, CtModel model) {
-        Objects.requireNonNull(apiChanges);
         Objects.requireNonNull(oldVersion);
         Objects.requireNonNull(newVersion);
         Objects.requireNonNull(mavenLog);
@@ -53,48 +56,38 @@ public class CombineResults {
         this.model = model;
     }
 
-    public Changes analyze() throws IOException {
+    public CombineResults(ApiMetadata oldVersion, ApiMetadata newVersion, MavenErrorLog mavenLog, CtModel model) {
 
-        Set<BreakingChange> change = new HashSet<>();
-        try {
-            // client.setClasspath(List.of(oldVersion.getFile()));
+        Objects.requireNonNull(oldVersion);
+        Objects.requireNonNull(newVersion);
+        Objects.requireNonNull(mavenLog);
+        Objects.requireNonNull(model);
 
-            mavenLog.getErrorInfo().forEach((k, v) -> {
-                SpoonAnalyzer spoonAnalyzer = new SpoonAnalyzer(v, apiChanges, model);
-                List<SpoonResults> results = spoonAnalyzer.applySpoon(project + k);
-//            System.out.printf("Amount of instructions %d%n", results.size());
-                findBreakingChanges(results, change);
-            });
-        } catch (Exception e) {
-            System.out.println("Error identifying breaking changes in client " + e.toString());
-            throw new RuntimeException(e);
-        }
-
-
-        return new Changes(oldVersion, newVersion, change);
+        this.oldVersion = oldVersion;
+        this.newVersion = newVersion;
+        this.mavenLog = mavenLog;
+        this.model = model;
     }
 
-    public Changes_V2 analyze_v2(List<BreakingChangeVisitor> breakingChangeVisitors, BreakingGoodOptions opts) throws IOException {
+
+    public ChangesBetweenVersions analyze_v2(List<BreakingChangeVisitor> breakingChangeVisitors, BreakingGoodOptions opts) throws IOException {
 
         Set<BrokenUse> results = new HashSet<>();
 
         try {
             // client.setClasspath(List.of(oldVersion.getFile()));
             mavenLog.getErrorInfo().forEach((k, v) -> {
-                SpoonAnalyzer spoonAnalyzer = new SpoonAnalyzer(v, apiChanges, model);
+                SpoonAnalyzer spoonAnalyzer = new SpoonAnalyzer(v, model);
                 results.addAll(spoonAnalyzer.applySpoonV2(breakingChangeVisitors, opts, project + k));
-//            System.out.printf("Amount of instructions %d%n", results.size());
-
             });
 
             Set<BrokenChanges> changes = addErrorInfo(results);
-            return new Changes_V2(oldVersion, newVersion, changes);
+            return new ChangesBetweenVersions(oldVersion, newVersion, changes);
 
         } catch (Exception e) {
             System.out.println("Error identifying breaking changes in client " + e.toString());
             throw new RuntimeException(e);
         }
-
     }
 
 
@@ -111,6 +104,8 @@ public class CombineResults {
                 });
             });
             brokenChanges.add(brokenChange);
+            Set<ApiChange> newVariants = findNewVariant(brokenUse);
+            brokenChange.setNewVariants(newVariants);
         });
 
         return brokenChanges;
@@ -126,40 +121,38 @@ public class CombineResults {
         results.add(brokenChange);
     }
 
+    public Set<ApiChange> findNewVariant(BrokenUse apiChange) {
 
-    public void findBreakingChanges(List<SpoonResults> spoonResults, Set<BreakingChange> change) {
+        try {
+//            String name = ((CtExecutableReferenceImpl<?>) apiChange.usedApiElement()).getSimpleName();
 
-        spoonResults.forEach(spoonResult -> {
-            apiChanges.forEach(apiChange -> {
-                if ((apiChange.getChangeType().equals(JApiChangeStatus.REMOVED) ||
-                        apiChange.getChangeType().equals(JApiChangeStatus.MODIFIED)
-                ) && apiChange.getName().equals(spoonResult.getName())) {
-                    for (BreakingChange breakingChange : change) {
-                        if (breakingChange.getApiChanges().getName().equals(apiChange.getName())) {
-                            breakingChange.addErrorInfo(spoonResult);
-                            return;
-                        }
-                    }
-                    BreakingChange breakingChange = new BreakingChange(apiChange);
-                    breakingChange.addErrorInfo(spoonResult);
-                    change.add(breakingChange);
-                    // find new variants
-                    Set<ApiChange> newVariants = findNewVariant(apiChange);
-                    apiChange.setNewVariants(newVariants);
+            String fullName =  fullyQualifiedName(apiChange.source());
 
+//            System.out.println("Name: " + name + " Full Name: " + fullName);
+
+            Set<ApiChange> newVariants = new HashSet<>();
+            apiChanges.forEach(apiChange1 -> {
+                if (apiChange1.getName().equals(fullName) && !apiChange1.getChangeType().equals(JApiChangeStatus.REMOVED)) {
+                    newVariants.add(apiChange1);
                 }
             });
-        });
+            return newVariants;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public Set<ApiChange> findNewVariant(ApiChange apiChange) {
 
-        Set<ApiChange> newVariants = new HashSet<>();
-        apiChanges.forEach(apiChange1 -> {
-            if (apiChange1.getName().equals(apiChange.getName()) && !apiChange1.getChangeType().equals(JApiChangeStatus.REMOVED)) {
-                newVariants.add(apiChange1);
-            }
-        });
-        return newVariants;
+    public static String fullyQualifiedName(CtReference ref) {
+        String fqn = "";
+
+        if (ref instanceof CtTypeReference<?> tRef)
+            fqn = tRef.getSimpleName();
+        else if (ref instanceof CtExecutableReference<?> eRef)
+            fqn = eRef.getSimpleName();
+        else if (ref instanceof CtFieldReference<?> fRef)
+            fqn = fRef.getSimpleName();
+
+        return fqn;
     }
 }

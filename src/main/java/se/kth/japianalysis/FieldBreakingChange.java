@@ -46,8 +46,11 @@ public class FieldBreakingChange extends AbstractBreakingChange {
 						CtTypeReference<?> newType = fRef.getFactory().Type().createReference(newTypeName);
 						yield new FieldTypeChangedVisitor(fRef, newType);
 					} catch (NotFoundException e) {
-						throw new IllegalStateException("japicmp gave us a FIELD_TYPE_CHANGED without the new type of the field");
+						System.out.println("japicmp gave us a FIELD_TYPE_CHANGED without the new type of the field");
+						yield null;
+//						throw new IllegalStateException("japicmp gave us a FIELD_TYPE_CHANGED without the new type of the field");
 					}
+
 				}
 				// TODO: To be implemented
 				case FIELD_STATIC_AND_OVERRIDES_STATIC, FIELD_GENERICS_CHANGED -> null;

@@ -1,23 +1,37 @@
 # Breaking-good
 
 [![Build](https://github.com/frankreyesgarcia/breaking-good/actions/workflows/maven.yml/badge.svg)](https://github.com/frankreyesgarcia/breaking-good/actions/workflows/maven.yml)
-# Template
+# Overview
 
-CI detected that the dependency upgrade from version <**label indicating the previous version of the dependency**> to <**label indicating the new version of the dependency**> has failed. Here are details to help you understand and fix the problem:
-1. Your client utilizes <**label indicate amount of instructions**> constructs which has been modified in the new version of the dependency.
-    * <summary> < Method | Class | Field | Import | Constructor> <b>< instruction name ></b> which has been < <b>Removed | Modified </b> > in the new version of the dependency</summary>
+Breaking-Good is a tool that provides explanations for breaking dependency updates. It uses build analysis to identify the root cause of the breaking changes and provides a detailed explanation to help developers understand and fix the problem.
 
-        *  <summary>The failure is identified from the logs generated in the build process. </summary>
+if you use Breaking-Good, please cite:
+```bibtex
+@article{reyes2024breaking,
+  title={Breaking-Good: Explaining Breaking Dependency Updates with Build Analysis},
+  author={Reyes, Frank and Baudry, Benoit and Monperrus, Martin},
+  journal={arXiv preprint arXiv:2407.03880},
+  year={2024}
+}
+```
 
-            * > Label to indicate the error message in the logs
-            * An error was detected in line < Label indicates line in client> which is making use of an outdated API.
-             ``` java
-            < Line in client >
-            ```
+# How to use Breaking-Good
 
-      To resolve this issue, there are alternative options available in the new version of the dependency that can replace the incompatible method currently used in the client. You can consider substituting the existing method with one of the following options provided by the new version of the dependency
-         ``` java
-        < New method signature>
-         ```
+To use Breaking-Good, you need to provide the following inputs:
+- The previous version of the dependency
+- The new version of the dependency
+- **(Optional)** The logs generated in the build process
+
+You can build this tool locally using `mvn package` with Java 17.
+You can then run the tool and print usage information with the command:
+```bash
+java -jar target/Explaining.jar explaining --help 
+```
+
+## License
+
+Distributed under the MIT License. See [LICENSE](https://github.com/chains-project/breaking-good/blob/main/LICENSE) for more information.
+
+    
 
 

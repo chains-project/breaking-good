@@ -23,7 +23,7 @@ To use Breaking-Good, you need to provide the following inputs:
 - **(Optional)** The logs generated in the build process
 
 You can build this tool locally using `mvn package` with Java 17.
-You can then run the tool and print usage information with the command:
+You can then run the tool and generate the explanation with the command:
 ```bash
 java -jar target/Explaining.jar explaining --help 
 ```

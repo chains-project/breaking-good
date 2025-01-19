@@ -5,13 +5,16 @@
 
 Breaking-Good is a tool that provides explanations for breaking dependency updates. It uses build analysis to identify the root cause of the breaking changes and provides a detailed explanation to help developers understand and fix the problem.
 
+Paper: [Proceedings of IEEE International Conference on Source Code Analysis and Manipulation](http://arxiv.org/pdf/2407.03880)
+
 if you use Breaking-Good, please cite:
 ```bibtex
-@article{reyes2024breaking,
+@inproceedings{reyes2024breaking,
   title={Breaking-Good: Explaining Breaking Dependency Updates with Build Analysis},
   author={Reyes, Frank and Baudry, Benoit and Monperrus, Martin},
-  journal={arXiv preprint arXiv:2407.03880},
-  year={2024}
+  booktitle={Proceedings of IEEE International Conference on Source Code Analysis and Manipulation},
+  year={2024},
+  doi = {10.1109/scam63643.2024.00014}
 }
 ```
 
